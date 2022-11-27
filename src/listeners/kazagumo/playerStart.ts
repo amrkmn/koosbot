@@ -1,5 +1,5 @@
 import { Listener, container } from "@sapphire/framework";
-import { KazagumoPlayer, KazagumoTrack } from "kazagumo";
+import { KazagumoPlayer, KazagumoTrack, Events } from "kazagumo";
 import { MessageEmbed } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
 
@@ -8,7 +8,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 @ApplyOptions<Listener.Options>({
     emitter: container.kazagumo,
     name: "kazagumo:playerStart",
-    event: "playerStart",
+    event: Events.PlayerStart,
 })
 export class ClientListener extends Listener {
     public async run(player: KazagumoPlayer, track: KazagumoTrack) {

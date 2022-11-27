@@ -8,7 +8,7 @@
     "build": "tsup",
     "watch": "tsup --watch",
     "dev": "tsup --watch --onSuccess \"yarn start\"",
-    "start": "tsup --onSuccess \"node --preserve-symlinks --enable-source-maps --no-warnings dist/index.js\"",
+    "start": "node --preserve-symlinks --enable-source-maps --no-warnings dist/index.js",
     "generate": "prisma generate"
   },
   "keywords": [],
