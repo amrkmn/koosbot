@@ -6,6 +6,7 @@ import { Message } from "discord.js";
 
 @ApplyOptions<Command.Options>({
     description: "Reloads a Sapphire piece, or all pieces of a Sapphire store.",
+    aliases: ["r"],
 })
 export class OwnerCommand extends Command {
     public async messageRun(message: Message, args: Args) {
@@ -47,7 +48,6 @@ export class OwnerCommand extends Command {
 
         await Promise.all(
             [...this.container.client.stores.values()].map(async (store) => {
-                console.log(store.name)
                 await store.loadAll();
             })
         );

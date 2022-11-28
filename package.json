@@ -17,7 +17,7 @@
   "imports": {
     "#lib/structures": "./dist/lib/structures/index.js",
     "#lib/interfaces": "./dist/lib/types/interfaces/index.js",
-    "#utils/functions": "./dist/lib/utils/functions/index.js",
+    "#lib/utils": "./dist/lib/utils/index.js",
     "#lib/*": "./dist/lib/*.js",
     "#root/*": "./dist/*.js",
     "#utils/*": "./dist/lib/utils/*.js"

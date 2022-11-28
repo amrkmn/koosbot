@@ -1,4 +1,5 @@
 import { KoosPlayer } from "#lib/extensions/KoosPlayer";
+import { embedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
@@ -19,11 +20,12 @@ export class UserCommand extends Command {
         const channel = member.voice.channel;
         const data = await db.guild.findUnique({ where: { id: message.guildId! } });
 
-        if (!channel) return reply(message, { content: "You aren't connected to a voice channel" });
+        if (!channel)
+            return reply(message, { embeds: [{ description: "You aren't connected to a voice channel", color: embedColor.red }] });
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server" }],
+                embeds: [{ description: "There's nothing playing in this server", color: embedColor.red }],
             });
         }
 
@@ -37,11 +39,14 @@ export class UserCommand extends Command {
             });
         } else if (data && listeners.size > 1) {
             let votes = this.getVotes(player);
-            let msg = "";
+            let msg = "",
+                color = 0;
             if (votes.has(member.id)) {
                 msg = `You have already voted`;
+                color = embedColor.red;
             } else {
                 msg = `Skipping`;
+                color = embedColor.green;
                 votes.add(member.id);
             }
 
@@ -55,10 +60,11 @@ export class UserCommand extends Command {
                     votes.delete(voter);
                 }
                 msg = `${title} has been skipped`;
+                color = embedColor.green;
                 player.skip();
             }
 
-            return send(message, { embeds: [{ description: msg }] });
+            return send(message, { embeds: [{ description: msg, color }] });
         } else {
             send(message, { embeds: [{ description: `${title} has been skipped` }] }).then(() => {
                 player.skip();
