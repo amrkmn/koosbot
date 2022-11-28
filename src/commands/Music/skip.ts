@@ -27,8 +27,6 @@ export class UserCommand extends Command {
             });
         }
 
-        // console.log(this.votes);
-
         const listeners = channel.members.filter((member) => !member.user.bot);
         const current = player.queue.current!;
         const title = `[${current.title}](<${current.uri}>)`;
