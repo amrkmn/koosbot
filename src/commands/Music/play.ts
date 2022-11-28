@@ -8,6 +8,7 @@ import pluralize from "pluralize";
 @ApplyOptions<Command.Options>({
     description: "Add a track to queue.",
     aliases: ["p"],
+    preconditions: ["GuildOnly"],
 })
 export class UserCommand extends Command {
     // private regex = {
@@ -31,13 +32,16 @@ export class UserCommand extends Command {
         switch (result.type) {
             case "PLAYLIST":
                 for (let track of result.tracks) tracks.push(track);
-                msg = `[**${result.playlistName}**](${query}) with ${tracks.length} ${pluralize("track", tracks.length)}`;
+                msg = `Queued playlist [${result.playlistName}](${query}) with ${tracks.length} ${pluralize(
+                    "track",
+                    tracks.length
+                )}`;
                 break;
             case "SEARCH":
             case "TRACK":
                 let [track] = result.tracks;
                 tracks.push(track);
-                msg = `Queued [**${track.title}**](${track.uri})`;
+                msg = `Queued [${track.title}](${track.uri})`;
                 break;
         }
 
@@ -49,6 +53,7 @@ export class UserCommand extends Command {
                 deaf: true,
             });
         }
+
         player.queue.add(tracks);
         if (!player.playing && !player.paused) player.play();
 

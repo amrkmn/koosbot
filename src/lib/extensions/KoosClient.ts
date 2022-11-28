@@ -5,6 +5,7 @@ import { Guild, Message } from "discord.js";
 import { resolve } from "path";
 import { Kazagumo, Plugins } from "kazagumo";
 import { Connectors, NodeOption, Shoukaku } from "shoukaku";
+import { KoosPlayer } from "#lib/extensions/KoosPlayer";
 import Spotify from "kazagumo-spotify";
 
 const { CLIENT_PREFIX, NODE_ENV } = process.env;
@@ -63,6 +64,9 @@ export class KoosClient extends SapphireClient {
                 ],
                 defaultSearchEngine: "youtube",
                 send: (id, payload) => this.guilds.cache.get(id)?.shard?.send(payload),
+                extends: {
+                    player: KoosPlayer,
+                },
             },
             new Connectors.DiscordJS(this),
             NODES

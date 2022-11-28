@@ -37,6 +37,7 @@
     "@sapphire/framework": "^3.1.4",
     "@sapphire/plugin-editable-commands": "^2.0.1",
     "@sapphire/plugin-logger": "^3.0.1",
+    "@sapphire/stopwatch": "^1.5.0",
     "@sapphire/time-utilities": "^1.7.8",
     "@sapphire/ts-config": "^3.3.4",
     "@sapphire/type": "^2.2.6",

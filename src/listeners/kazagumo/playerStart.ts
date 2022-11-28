@@ -7,7 +7,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 
 @ApplyOptions<Listener.Options>({
     emitter: container.kazagumo,
-    name: "kazagumo:playerStart",
+    name: `kazagumo:${Events.PlayerStart}`,
     event: Events.PlayerStart,
 })
 export class ClientListener extends Listener {
@@ -16,7 +16,7 @@ export class ClientListener extends Listener {
         if (!channel) return;
 
         const embed = new MessageEmbed().setDescription(
-            `Started playing [**${track.title}**](${track.uri}) ${track.requester ? `[${track.requester}]` : ""}`
+            `Started playing [${track.title}](${track.uri}) ${track.requester ? `[${track.requester}]` : ""}`
         );
 
         if (channel.isText()) channel.send({ embeds: [embed] });
