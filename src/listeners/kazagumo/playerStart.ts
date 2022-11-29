@@ -2,7 +2,7 @@ import { Listener, container } from "@sapphire/framework";
 import { KazagumoPlayer, KazagumoTrack, Events } from "kazagumo";
 import { MessageEmbed } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
-import { embedColor, regex } from "#utils/constants";
+import { embedColor } from "#utils/constants";
 
 // container.kazagumo.on("playerStart", (player, track) => {});
 
@@ -16,9 +16,8 @@ export class ClientListener extends Listener {
         const channel = await this.container.client.channels.fetch(player.textId);
         if (!channel) return;
 
-        let title = regex.youtube.test(track.uri)
-            ? `[${track.title}](${track.uri})`
-            : `[${track.title} by ${track.author}](${track.uri})`;
+        let title =
+            track.sourceName == "youtube" ? `[${track.title}](${track.uri})` : `[${track.title} by ${track.author}](${track.uri})`;
 
         const embed = new MessageEmbed() //
             .setDescription(`Started playing ${title} ${track.requester ? `[${track.requester}]` : ""}`)

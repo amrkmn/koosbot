@@ -3,12 +3,12 @@ import { embedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
-import { GuildMember, Message } from "discord.js";
+import { GuildMember, Message, MessageEmbed } from "discord.js";
 import pluralize from "pluralize";
 
 @ApplyOptions<Command.Options>({
     description: "Skip to the next track.",
-    preconditions: ["GuildOnly"],
+    preconditions: ["GuildOnly", "VoiceOnly"],
 })
 export class UserCommand extends Command {
     public votes = new Set<string>();
@@ -25,7 +25,7 @@ export class UserCommand extends Command {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.red }],
+                embeds: [{ description: "There's nothing playing in this server", color: embedColor.default }],
             });
         }
 
@@ -33,8 +33,12 @@ export class UserCommand extends Command {
         const current = player.queue.current!;
         const title = `[${current.title}](<${current.uri}>)`;
 
+        const embed = new MessageEmbed() //
+            .setDescription(`${title} has been skipped`)
+            .setColor(embedColor.green);
+
         if (data && member.roles.cache.has(data.dj)) {
-            return reply(message, { embeds: [{ description: `${title} has been skipped` }] }).then(() => {
+            return reply(message, { embeds: [embed] }).then(() => {
                 player.skip();
             });
         } else if (data && listeners.size > 1) {
@@ -66,7 +70,7 @@ export class UserCommand extends Command {
 
             return send(message, { embeds: [{ description: msg, color }] });
         } else {
-            send(message, { embeds: [{ description: `${title} has been skipped` }] }).then(() => {
+            send(message, { embeds: [embed] }).then(() => {
                 player.skip();
             });
         }

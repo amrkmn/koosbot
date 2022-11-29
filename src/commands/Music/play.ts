@@ -9,7 +9,7 @@ import pluralize from "pluralize";
 @ApplyOptions<Command.Options>({
     description: "Add a track to queue.",
     aliases: ["p"],
-    preconditions: ["GuildOnly"],
+    preconditions: ["GuildOnly", "VoiceOnly"],
 })
 export class UserCommand extends Command {
     public async messageRun(message: Message, args: Args) {
@@ -18,7 +18,7 @@ export class UserCommand extends Command {
         if (!query)
             return send(message, { embeds: [{ description: "Please provide an URL or search query", color: embedColor.red }] });
 
-        const vc = message.member?.voice.channel;
+        const channel = message.member?.voice.channel;
         let player = kazagumo.getPlayer(message.guildId!);
 
         const result = await kazagumo.search(query, { requester: message.author });
@@ -50,7 +50,7 @@ export class UserCommand extends Command {
             player ??= await kazagumo.createPlayer({
                 guildId: message.guildId!,
                 textId: message.channelId!,
-                voiceId: vc!.id,
+                voiceId: channel!.id,
                 deaf: true,
             });
         }

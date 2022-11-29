@@ -50,6 +50,7 @@
     "kazagumo": "^2.3.0",
     "kazagumo-spotify": "^1.1.5",
     "pluralize": "^8.0.0",
+    "pretty-ms": "^8.0.0",
     "shoukaku": "^3.2.2"
   }
 }
