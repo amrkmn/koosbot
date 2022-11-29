@@ -1,5 +1,5 @@
 import { KoosPlayer } from "#lib/extensions/KoosPlayer";
-import { embedColor } from "#utils/constants";
+import { embedColor, regex } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
@@ -31,7 +31,9 @@ export class UserCommand extends Command {
 
         const listeners = channel.members.filter((member) => !member.user.bot);
         const current = player.queue.current!;
-        const title = `[${current.title}](<${current.uri}>)`;
+        const title = regex.youtube.test(current.uri)
+            ? `[${current.title}](${current.uri})`
+            : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
 
         const embed = new MessageEmbed() //
             .setDescription(`${title} has been skipped`)

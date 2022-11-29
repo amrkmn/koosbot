@@ -1,3 +1,4 @@
+import { embedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { isMessageInstance } from "@sapphire/discord.js-utilities";
 import { Command } from "@sapphire/framework";
@@ -20,24 +21,24 @@ export class UserCommand extends Command {
 
     public async chatInputRun(interaction: Command.ChatInputInteraction) {
         await interaction.deferReply();
-        const msg = (await interaction.followUp({ content: "Ping?" })) as Message;
+        const msg = (await interaction.followUp({ embeds: [{ description: "Ping?", color: embedColor.default }] })) as Message;
 
         if (isMessageInstance(msg)) {
             const diff = msg.createdTimestamp - interaction.createdTimestamp;
             const ping = Math.round(this.container.client.ws.ping);
             const content = `Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms.)`;
 
-            interaction.editReply({ content });
+            interaction.editReply({ embeds: [{ description: content, color: embedColor.default }] });
         }
     }
 
     public async messageRun(message: Message) {
-        const msg = await send(message, "Ping?");
+        const msg = await send(message, { embeds: [{ description: "Ping?", color: embedColor.default }] });
 
         const diff = msg.createdTimestamp - message.createdTimestamp;
         const ping = Math.round(this.container.client.ws.ping);
         const content = `Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms.)`;
 
-        return send(message, { content });
+        return send(message, { embeds: [{ description: content, color: embedColor.default }] });
     }
 }

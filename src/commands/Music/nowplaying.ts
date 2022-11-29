@@ -26,14 +26,14 @@ export class UserCommand extends Command {
         const current = player.queue.current!;
         const title = regex.youtube.test(current.uri)
             ? `[${current.title}](${current.uri})`
-            : `[${current.title} by ${current.author}](${current.uri})`;
+            : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
 
         const description = `${title} [${current.requester}]`;
         const duration = Number(current.length);
         const progress =
             `${progressBar(player.shoukaku.position, duration, 20, current.isStream).bar} ` +
             `${prettyMs(player.shoukaku.position, { secondsDecimalDigits: 0 }).replace("ms", "s")} / ` +
-            `${!current.isStream ? prettyMs(duration, { secondsDecimalDigits: 0 }) : "Live"}`;
+            `${!current.isStream ? prettyMs(duration, { secondsDecimalDigits: 0 }) : "∞"}`;
 
         send(message, { embeds: [{ description, footer: { text: progress }, color: embedColor.default }] });
     }

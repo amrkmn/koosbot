@@ -21,8 +21,9 @@ export class UserCommand extends Command {
 
         try {
             player.destroy();
-            send(message, { embeds: [{ description: `Destroyed the player and left the voice channel`, color: embedColor.green }] });
+            send(message, { embeds: [{ description: `Destroyed the player and left the voice channel`, color: embedColor.default }] });
         } catch (error) {
+            send(message, { embeds: [{ description: `Something went wrong`, color: embedColor.red }] });
             this.container.logger.error(error);
         }
     }
