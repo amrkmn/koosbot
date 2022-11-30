@@ -39,7 +39,7 @@ export const pagination = async (options: PaginationOptions) => {
 
     const generateButtons = (state: boolean) => {
         const checkState = (name: string) => {
-            if (embeds.length == 1) return true;
+            if (embeds.length === 1) return true;
             if (["first", "previous"].includes(name) && currentPage === 1) return true;
             if (["next", "last"].includes(name) && currentPage === embeds.length) return true;
             return false;

@@ -46,33 +46,39 @@ export class UserCommand extends Command {
         } else if (data && listeners.size > 1) {
             let votes = this.getVotes(player);
             let msg = "",
-                color = 0;
+                color = 0,
+                voted = false;
+
             if (votes.has(member.id)) {
                 msg = `You have already voted`;
                 color = embedColor.red;
+                voted = true;
             } else {
                 msg = `Skipping`;
                 color = embedColor.green;
+                voted = false;
                 votes.add(member.id);
             }
 
             const voters = member.voice.channel.members.filter((voter) => votes.has(voter.id)).size;
             const required = listeners.size;
 
-            msg += `, ${voters}/${required} (${required} ${pluralize("vote", required)} required)`;
+            msg += voted ? "" : `, ${voters}/${required} (${required} ${pluralize("vote", required)} required)`;
 
             if (voters >= required) {
-                for (let [voter] of member.voice.channel.members.filter((voter) => votes.has(voter.id))) {
-                    votes.delete(voter);
+                for (let [voterId] of member.voice.channel.members.filter((voter) => votes.has(voter.id))) {
+                    votes.delete(voterId);
                 }
                 msg = `${title} has been skipped`;
                 color = embedColor.green;
-                player.skip();
+                return send(message, { embeds: [{ description: msg, color }] }).then(() => {
+                    player.skip();
+                });
             }
 
             return send(message, { embeds: [{ description: msg, color }] });
         } else {
-            send(message, { embeds: [embed] }).then(() => {
+            return send(message, { embeds: [embed] }).then(() => {
                 player.skip();
             });
         }

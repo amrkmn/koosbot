@@ -32,3 +32,7 @@ export const progressBar = (value: number, maxValue: number, size = 10, isStream
 export function pager<T>(array: Array<T>, n: number) {
     return Array.from(Array(Math.ceil(array.length / n)), (_, i) => array.slice(i * n, i * n + n));
 }
+
+export function trimString(string: string, length: number) {
+    return string.length > length ? string.substring(0, length - 3) + "..." : string;
+}

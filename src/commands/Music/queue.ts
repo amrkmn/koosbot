@@ -1,7 +1,7 @@
-import { convertTime, embedColor, pagination, regex } from "#lib/utils";
+import { convertTime, embedColor, pagination } from "#lib/utils";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command, Args } from "@sapphire/framework";
-import { reply, send } from "@sapphire/plugin-editable-commands";
+import { reply } from "@sapphire/plugin-editable-commands";
 import { Message, MessageEmbed, TextChannel } from "discord.js";
 
 @ApplyOptions<Command.Options>({
@@ -13,6 +13,7 @@ export class UserCommand extends Command {
     public async messageRun(message: Message, _args: Args) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${message.guildId}`);
+        const channel = message.channel! as TextChannel;
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
@@ -27,18 +28,22 @@ export class UserCommand extends Command {
         let totalDuration =
             player.queue.some((track) => track.isStream) || current.isStream
                 ? "Live"
-                : `${convertTime(Number(player.queue.durationLength) - player.shoukaku.position)} left`;
-        let title = regex.youtube.test(current.uri)
-            ? `[${current.title}](${current.uri})`
-            : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
+                : `${convertTime(Number(player.queue.durationLength || current.length) - player.shoukaku.position)}`;
+        let nowPlaying =
+            current.sourceName === "youtube"
+                ? `[${current.title}](${current.uri})`
+                : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
 
         if (!player.queue.length) {
             const embed = new MessageEmbed()
-                .setDescription([`__Now playing:__`, `${title} [${timeLeft}]`, ``, `__Up next:__`, `No other tracks here`].join("\n"))
+                .setDescription(
+                    [`__Now playing:__`, `${nowPlaying} [${timeLeft}]`, ``, `__Up next:__`, `No other tracks here`].join("\n")
+                )
                 .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
                 .setColor(embedColor.default);
 
-            send(message, { embeds: [embed] });
+            pagination({ channel, target: message.author, fastSkip: true, embeds: [embed] });
+            return;
         }
 
         let queueList = [];
@@ -56,16 +61,16 @@ export class UserCommand extends Command {
         }
 
         let embeds = [];
-        for (let i = 0; i < queueList.length; i++) {
-            let upNext = queueList[i].join("\n");
+        for (let list of queueList) {
+            let upNext = list.join("\n");
             embeds.push(
                 new MessageEmbed()
-                    .setDescription([`__Now playing:__`, `${title} [${timeLeft}]`, ``, `__Up next:__`, `${upNext}`].join("\n"))
+                    .setDescription([`__Now playing:__`, `${nowPlaying} [${timeLeft}]`, ``, `__Up next:__`, `${upNext}`].join("\n"))
                     .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
                     .setColor(embedColor.default)
             );
         }
 
-        pagination({ channel: message.channel as TextChannel, target: message.author, fastSkip: true, embeds });
+        pagination({ channel, embeds, target: message.author, fastSkip: true });
     }
 }
