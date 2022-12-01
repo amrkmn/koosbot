@@ -2,7 +2,8 @@ import { convertTime, embedColor, pagination } from "#lib/utils";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command, Args } from "@sapphire/framework";
 import { reply } from "@sapphire/plugin-editable-commands";
-import { Message, MessageEmbed, TextChannel } from "discord.js";
+import { Message, MessageEmbed, TextChannel, User } from "discord.js";
+import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<Command.Options>({
     description: "Display the current queue.",
@@ -10,10 +11,37 @@ import { Message, MessageEmbed, TextChannel } from "discord.js";
     preconditions: ["GuildOnly", "VoiceOnly"],
 })
 export class UserCommand extends Command {
+    public override registerApplicationCommands(registery: Command.Registry) {
+        registery.registerChatInputCommand(
+            (builder) =>
+                builder //
+                    .setName(this.name)
+                    .setDescription(this.description),
+            { idHints: ["1047810767858171944"] }
+        );
+    }
+
+    public async chatInputRun(interaction: Command.ChatInputInteraction) {
+        const { kazagumo } = this.container;
+        const player = kazagumo.getPlayer(`${interaction.guildId}`);
+        const target = interaction.member!.user as User;
+
+        if (player) await interaction.deferReply();
+        if (!player || (player && !player.queue.current)) {
+            return interaction.reply({
+                embeds: [{ description: "There's nothing playing in this server", color: embedColor.default }],
+                ephemeral: true,
+            });
+        }
+
+        pagination({ target, channel: interaction, fastSkip: true, embeds: await this.queue(player) });
+    }
+
     public async messageRun(message: Message, _args: Args) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${message.guildId}`);
-        const channel = message.channel! as TextChannel;
+        const channel = message.channel as TextChannel;
+        const target = message.author;
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
@@ -21,6 +49,10 @@ export class UserCommand extends Command {
             });
         }
 
+        pagination({ channel, target, fastSkip: true, embeds: await this.queue(player) });
+    }
+
+    private async queue(player: KazagumoPlayer) {
         const current = player.queue.current!;
         let timeLeft = current.isStream //
             ? "Live"
@@ -34,7 +66,7 @@ export class UserCommand extends Command {
                 ? `[${current.title}](${current.uri})`
                 : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
 
-        if (!player.queue.length) {
+        if (player.queue.isEmpty) {
             const embed = new MessageEmbed()
                 .setDescription(
                     [`__Now playing:__`, `${nowPlaying} [${timeLeft}]`, ``, `__Up next:__`, `No other tracks here`].join("\n")
@@ -42,8 +74,7 @@ export class UserCommand extends Command {
                 .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
                 .setColor(embedColor.default);
 
-            pagination({ channel, target: message.author, fastSkip: true, embeds: [embed] });
-            return;
+            return [embed];
         }
 
         let queueList = [];
@@ -71,6 +102,6 @@ export class UserCommand extends Command {
             );
         }
 
-        pagination({ channel, embeds, target: message.author, fastSkip: true });
+        return embeds;
     }
 }

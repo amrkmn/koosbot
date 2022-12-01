@@ -3,7 +3,9 @@ import { Events, Listener, MessageCommandDeniedPayload, UserError } from "@sapph
 import { reply } from "@sapphire/plugin-editable-commands";
 import prettyMs from "pretty-ms";
 
-@ApplyOptions<Listener.Options>({ name: Events.MessageCommandDenied })
+@ApplyOptions<Listener.Options>({
+    name: Events.MessageCommandDenied,
+})
 export class ClientListener extends Listener<typeof Events.MessageCommandDenied> {
     public override async run(error: UserError, { message }: MessageCommandDeniedPayload) {
         let content: string = error.message;

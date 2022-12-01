@@ -4,7 +4,7 @@ import { MessageEmbed } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
 import { embedColor } from "#utils/constants";
 
-// container.kazagumo.on("playerStart", (player, track) => {});
+// container.kazagumo.on("playerEnd", (player, track) => {});
 
 @ApplyOptions<Listener.Options>({
     emitter: container.kazagumo,

@@ -1,11 +1,11 @@
 import { ApplyOptions } from "@sapphire/decorators";
-import { Listener } from "@sapphire/framework";
+import { Listener, Events } from "@sapphire/framework";
 import { Guild } from "discord.js";
 
 @ApplyOptions<Listener.Options>({
-    once: true,
+    event: Events.GuildCreate,
 })
-export class ClientListener extends Listener {
+export class ClientListener extends Listener<typeof Events.GuildCreate> {
     public async run(guild: Guild) {
         if (!guild) return;
         const { db } = this.container;
@@ -17,7 +17,7 @@ export class ClientListener extends Listener {
                 create: { id: guild.id },
             });
         } catch (error) {
-            this.container.logger.error(`Error when trying to insert guild to db.`);
+            this.container.logger.error(`Error when trying to insert guild to db.`, error);
         }
     }
 }
