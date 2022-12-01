@@ -3,7 +3,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { GuildMember, Message, MessageEmbed, VoiceBasedChannel } from "discord.js";
 import { send } from "@sapphire/plugin-editable-commands";
 import { KazagumoPlayer, KazagumoTrack } from "kazagumo";
-import { embedColor, regex } from "#utils/constants";
+import { embedColor } from "#utils/constants";
 import pluralize from "pluralize";
 
 interface PlayOptions {
@@ -73,9 +73,10 @@ export class UserCommand extends Command {
             case "SEARCH":
             case "TRACK":
                 let [track] = result.tracks;
-                let title = regex.youtube.test(track.uri)
-                    ? `[${track.title}](${track.uri})`
-                    : `[${track.title} by ${track.author}](${track.uri})`;
+                let title =
+                    track.sourceName === "youtube"
+                        ? `[${track.title}](${track.uri})`
+                        : `[${track.title} by ${track.author}](${track.uri})`;
 
                 tracks.push(track);
                 msg = `Queued ${title}`;

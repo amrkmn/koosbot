@@ -11,7 +11,6 @@ import Spotify from "kazagumo-spotify";
 const { CLIENT_PREFIX, NODE_ENV } = process.env;
 
 const NODES: NodeOption[] = [
-    // { name: "localhost", url: "127.0.0.1:2333", auth: "youshallnotpass", secure: false },
     { name: "lavalink-replit.aytea14.repl.co", url: "lavalink-replit.aytea14.repl.co:443", auth: "maybeiwasboring", secure: true },
     { name: "lava1.horizxon.studio", url: "lava1.horizxon.studio:80", auth: "horizxon.studio", secure: false },
     { name: "lava2.horizxon.studio", url: "lava2.horizxon.studio:80", auth: "horizxon.studio", secure: false },
@@ -68,7 +67,8 @@ export class KoosClient extends SapphireClient {
                 send: (id, payload) => this.guilds.cache.get(id)?.shard?.send(payload),
             },
             new Connectors.DiscordJS(this),
-            NODES
+            NODES,
+            { moveOnDisconnect: true }
         );
         container.shoukaku = container.kazagumo.shoukaku;
 

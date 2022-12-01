@@ -74,7 +74,7 @@ export const pagination = async (options: PaginationOptions) => {
 
     const initialMessage =
         channel instanceof ButtonInteraction || channel instanceof CommandInteraction
-            ? ((await channel.followUp({ embeds: [changeFooter()], ephemeral: true })) as Message)
+            ? ((await channel.followUp({ embeds: [changeFooter()], components: components() })) as Message)
             : await channel.send({ embeds: [changeFooter()], components: components() });
 
     const defaultFilter = (interaction: ButtonInteraction) =>
@@ -86,9 +86,7 @@ export const pagination = async (options: PaginationOptions) => {
         if (time) opt["time"] = time;
         return opt;
     };
-    const collector = !(channel instanceof ButtonInteraction || channel instanceof CommandInteraction)
-        ? channel.createMessageComponentCollector(collectorOptions())
-        : null;
+    const collector = initialMessage.createMessageComponentCollector(collectorOptions());
 
     if (collector) {
         collector.on("collect", async (interaction) => {
