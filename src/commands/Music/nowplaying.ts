@@ -19,14 +19,14 @@ export class UserCommand extends Command {
                 builder //
                     .setName(this.name)
                     .setDescription(this.description),
-            { idHints: ["1047562980495196340"] }
+            { idHints: ["1047562980495196340", "1048159856697278464"] }
         );
     }
 
     public async chatInputRun(interaction: Command.ChatInputInteraction) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(interaction.guildId!);
-        
+
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({

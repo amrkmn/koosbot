@@ -21,7 +21,7 @@ export class UserCommand extends Command {
                 builder //
                     .setName(this.name)
                     .setDescription(this.description),
-            { idHints: ["1047804848273375252"] }
+            { idHints: ["1047804848273375252", "1048159944635072623"] }
         );
     }
 
@@ -113,6 +113,6 @@ export class UserCommand extends Command {
     }
 
     private getVotes(player: KazagumoPlayer) {
-        return player.votes;
+        return player.skipVotes;
     }
 }

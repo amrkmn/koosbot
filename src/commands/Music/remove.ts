@@ -24,7 +24,7 @@ export class UserCommand extends Command {
                             .setDescription("Position of song to remove")
                             .setRequired(true)
                     ),
-            { idHints: ["1047879470654181416"] }
+            { idHints: ["1047879470654181416", "1048159863374630953"] }
         );
     }
 

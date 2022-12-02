@@ -48,7 +48,7 @@ export class KoosClient extends SapphireClient {
         else return `${CLIENT_PREFIX}`;
 
         const data = await container.db.guild.findUnique({ where: { id: guildId! } });
-        return data?.prefix ?? `${CLIENT_PREFIX}`;
+        return data && data?.prefix === "NONE" ? `${CLIENT_PREFIX}` : data!.prefix ?? `${CLIENT_PREFIX}`;
     }
 
     public override async login(token?: string | undefined): Promise<string> {

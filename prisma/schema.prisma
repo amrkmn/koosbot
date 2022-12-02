@@ -12,7 +12,7 @@ datasource db {
 
 model guild {
   id     String  @id @map("_id")
-  prefix String  @default("k.")
+  prefix String  @default("NONE")
   dj     String  @default("NONE")
   djOnly Boolean @default(false)
 }

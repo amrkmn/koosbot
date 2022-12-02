@@ -30,7 +30,7 @@ export class UserCommand extends Command {
                             .setDescription("Could be a link of the track, or a search term")
                             .setRequired(true)
                     ),
-            { idHints: ["1047561979314843730"] }
+            { idHints: ["1047561979314843730", "1048159858911870977"] }
         );
     }
 
