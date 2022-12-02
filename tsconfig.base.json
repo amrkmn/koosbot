@@ -6,6 +6,8 @@
         "module": "ESNext",
         "noImplicitReturns": false,
         "importsNotUsedAsValues": "preserve",
-        "removeComments": true
+        "removeComments": true,
+        "declarationMap": false,
+        "declaration": false
     }
 }

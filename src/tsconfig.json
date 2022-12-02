@@ -13,7 +13,7 @@
             "#lib/*": ["lib/*"],
             "#root/*": ["*"]
         },
-        "composite": true
+        "composite": false
     },
     "include": [".", "./**/*.json"],
     "exclude": ["./tsconfig.json"]
