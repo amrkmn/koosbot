@@ -6,6 +6,7 @@
         "module": "ESNext",
         "noImplicitReturns": false,
         "importsNotUsedAsValues": "preserve",
-        "removeComments": true
+        "removeComments": true,
+        "emitDecoratorMetadata": false
     }
 }
