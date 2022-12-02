@@ -7,10 +7,10 @@ export class UserArgument extends Argument<Piece> {
             if (piece) return this.ok(piece);
         }
         return this.error({
-            message: `I could not resolve \`${parameter}\` to a piece! Make sure you typed its name or one of its aliases correctly!`,
-            parameter,
             context,
+            parameter,
             identifier: `arguments:piece`,
+            message: `I could not resolve \`${parameter}\` to a piece! Make sure you typed its name or one of its aliases correctly!`,
         });
     }
 }
