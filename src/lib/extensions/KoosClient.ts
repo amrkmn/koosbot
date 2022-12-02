@@ -11,7 +11,6 @@ import Spotify from "kazagumo-spotify";
 const { CLIENT_PREFIX, NODE_ENV } = process.env;
 
 const NODES: NodeOption[] = [
-    { name: "lavalink-replit.aytea14.repl.co", url: "lavalink-replit.aytea14.repl.co:443", auth: "maybeiwasboring", secure: true },
     { name: "lava1.horizxon.studio", url: "lava1.horizxon.studio:80", auth: "horizxon.studio", secure: false },
     { name: "lava2.horizxon.studio", url: "lava2.horizxon.studio:80", auth: "horizxon.studio", secure: false },
     { name: "lava3.horizxon.studio", url: "lava3.horizxon.studio:80", auth: "horizxon.studio", secure: false },

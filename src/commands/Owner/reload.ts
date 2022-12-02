@@ -7,6 +7,7 @@ import { Message } from "discord.js";
 @ApplyOptions<Command.Options>({
     description: "Reloads a Sapphire piece, or all pieces of a Sapphire store.",
     aliases: ["r"],
+    preconditions: ["OwnerOnly"],
 })
 export class OwnerCommand extends Command {
     public async messageRun(message: Message, args: Args) {

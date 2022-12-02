@@ -36,3 +36,16 @@ export function pager<T>(array: Array<T>, n: number) {
 export function trimString(string: string, length: number) {
     return string.length > length ? string.substring(0, length - 3) + "..." : string;
 }
+
+export function cutText(str: string, length: number) {
+    if (str.length < length) return str;
+    const cut = splitText(str, length - 3);
+    if (cut.length < length - 3) return `${cut}...`;
+    return `${cut.slice(0, length - 3)}...`;
+}
+
+export function splitText(str: string, length: number, char = " ") {
+    const x = str.substring(0, length).lastIndexOf(char);
+    const pos = x === -1 ? length : x;
+    return str.substring(0, pos);
+}
