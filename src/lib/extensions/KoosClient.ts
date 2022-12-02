@@ -36,7 +36,7 @@ export class KoosClient extends SapphireClient {
             baseUserDirectory: resolve(process.cwd(), "dist"),
             api: {
                 listenOptions: {
-                    port: 3001,
+                    port: Number(process.env.API_PORT ?? 3001),
                     host: "0.0.0.0",
                 },
             },
