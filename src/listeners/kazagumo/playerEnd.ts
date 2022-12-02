@@ -6,9 +6,10 @@ import { Events, KazagumoPlayer } from "kazagumo";
     emitter: container.kazagumo,
     name: `kazagumo:${Events.PlayerEnd}`,
     event: Events.PlayerEnd,
+    enabled: false,
 })
 export class ClientListener extends Listener {
-    public async run(player: KazagumoPlayer) {
-        this.container.logger.debug(player);
+    public async run(_player: KazagumoPlayer) {
+        return;
     }
 }
