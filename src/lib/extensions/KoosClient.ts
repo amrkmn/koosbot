@@ -33,9 +33,6 @@ export class KoosClient extends SapphireClient {
             },
             loadDefaultErrorListeners: true,
             baseUserDirectory: resolve(process.cwd(), "dist"),
-            defaultCooldown: {
-                delay: 2000,
-            },
             api: {
                 listenOptions: {
                     port: Number(process.env.PORT ?? 3001),
