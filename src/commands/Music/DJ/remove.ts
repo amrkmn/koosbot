@@ -1,18 +1,20 @@
 import { embedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
-import { Args, Command } from "@sapphire/framework";
+import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { Message, MessageEmbed } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 import { isNullish } from "@sapphire/utilities";
+import { KoosCommand } from "#lib/extensions";
 
-@ApplyOptions<Command.Options>({
+@ApplyOptions<KoosCommand.Options>({
     description: "Remove a track from the queue",
-    preconditions: ["GuildOnly", "VoiceOnly"],
-    aliases: ["rm"],
+    preconditions: ["GuildOnly", "VoiceOnly", "DJ"],
+    aliases: ["rm", "del", "delete"],
+    usage: "position",
 })
-export class UserCommand extends Command {
-    public override registerApplicationCommands(registery: Command.Registry) {
+export class UserCommand extends KoosCommand {
+    public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>
                 builder //
@@ -28,7 +30,7 @@ export class UserCommand extends Command {
         );
     }
 
-    public async chatInputRun(interaction: Command.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(interaction.guildId!)!;
         const position = interaction.options.getNumber("position");
@@ -36,12 +38,12 @@ export class UserCommand extends Command {
         if (player) await interaction.deferReply();
         if (isNullish(position))
             return interaction.reply({
-                embeds: [{ description: "Please specify the song positions to remove.", color: embedColor.red }],
+                embeds: [{ description: "Please specify the song positions to remove.", color: embedColor.error }],
                 ephemeral: true,
             });
         if (!player || (player && !player.queue.current))
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.default }],
+                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
                 ephemeral: true,
             });
 
@@ -55,12 +57,12 @@ export class UserCommand extends Command {
 
         if (isNullish(position)) {
             return reply(message, {
-                embeds: [{ description: "Please specify the song positions to remove.", color: embedColor.red }],
+                embeds: [{ description: "Please specify the song positions to remove.", color: embedColor.error }],
             });
         }
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.default }],
+                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
             });
         }
 
@@ -71,12 +73,12 @@ export class UserCommand extends Command {
         if (position > player.queue.size)
             return new MessageEmbed({
                 description: `The queue doesn't have that many tracks (Total Songs: ${player.queue.size})`,
-                color: embedColor.red,
+                color: embedColor.error,
             });
         if (position < 1)
             return new MessageEmbed({
                 description: `The position number must be from 1 to ${player.queue.size}`,
-                color: embedColor.red,
+                color: embedColor.error,
             });
 
         const track = player.queue[position - 1];

@@ -49,3 +49,16 @@ export function splitText(str: string, length: number, char = " ") {
     const pos = x === -1 ? length : x;
     return str.substring(0, pos);
 }
+
+export function isString(input: unknown) {
+    return typeof input === "string";
+}
+
+export function formatPerms(string: string) {
+    let txt = string.split("_");
+    let words: string[] = [];
+    txt.forEach((str) => {
+        words.push(str.charAt(0).toUpperCase() + str.slice(1).toLowerCase());
+    });
+    return words.join("");
+}

@@ -1,19 +1,19 @@
+import { KoosCommand } from "#lib/extensions";
 import { embedColor, regex } from "#utils/constants";
 import { progressBar } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
-import { Command } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { Message, MessageEmbed } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 import prettyMs from "pretty-ms";
 
-@ApplyOptions<Command.Options>({
+@ApplyOptions<KoosCommand.Options>({
     description: "Show information about the currently playing track.",
     aliases: ["np"],
     preconditions: ["GuildOnly", "VoiceOnly"],
 })
-export class UserCommand extends Command {
-    public override registerApplicationCommands(registery: Command.Registry) {
+export class UserCommand extends KoosCommand {
+    public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>
                 builder //
@@ -23,14 +23,14 @@ export class UserCommand extends Command {
         );
     }
 
-    public async chatInputRun(interaction: Command.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(interaction.guildId!);
 
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.default }],
+                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
                 ephemeral: true,
             });
         }
@@ -44,7 +44,7 @@ export class UserCommand extends Command {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.default }],
+                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
             });
         }
 

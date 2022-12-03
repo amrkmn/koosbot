@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { container, LogLevel, SapphireClient } from "@sapphire/framework";
+import { Awaitable, container, LogLevel, SapphireClient, SapphirePrefix } from "@sapphire/framework";
 import { GatewayIntentBits } from "discord-api-types/v9";
 import { Guild, Message } from "discord.js";
 import { resolve } from "path";
@@ -53,10 +53,10 @@ export class KoosClient extends SapphireClient {
         let guildId: string | null;
         if (input instanceof Guild) guildId = input.id;
         else if (input instanceof Message) guildId = input.guildId;
-        else return `${CLIENT_PREFIX}`;
+        else return [`${CLIENT_PREFIX}`] as SapphirePrefix;
 
         const data = await container.db.guild.findUnique({ where: { id: guildId! } });
-        return data && data?.prefix === "NONE" ? `${CLIENT_PREFIX}` : data!.prefix ?? `${CLIENT_PREFIX}`;
+        return [data && data?.prefix === "NONE" ? `${CLIENT_PREFIX}` : data!.prefix ?? `${CLIENT_PREFIX}`] as SapphirePrefix;
     }
 
     public override async login(token?: string | undefined): Promise<string> {
@@ -90,5 +90,11 @@ declare module "@sapphire/pieces" {
         db: PrismaClient;
         kazagumo: Kazagumo;
         shoukaku: Shoukaku;
+    }
+}
+
+declare module "@sapphire/framework" {
+    interface SapphireClient {
+        prefix(input: Guild | Message): Awaitable<SapphirePrefix>;
     }
 }

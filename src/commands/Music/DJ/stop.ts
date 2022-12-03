@@ -1,15 +1,15 @@
+import { KoosCommand } from "#lib/extensions";
 import { embedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
-import { Command } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { Message } from "discord.js";
 
-@ApplyOptions<Command.Options>({
+@ApplyOptions<KoosCommand.Options>({
     description: "Stops and disconnects the player.",
-    preconditions: ["GuildOnly", "VoiceOnly"],
+    preconditions: ["GuildOnly", "VoiceOnly", "DJ"],
 })
-export class UserCommand extends Command {
-    public override registerApplicationCommands(registery: Command.Registry) {
+export class UserCommand extends KoosCommand {
+    public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>
                 builder //
@@ -19,14 +19,14 @@ export class UserCommand extends Command {
         );
     }
 
-    public async chatInputRun(interaction: Command.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${interaction.guildId}`);
 
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.default }],
+                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
                 ephemeral: true,
             });
         }
@@ -38,7 +38,7 @@ export class UserCommand extends Command {
             });
             return;
         } catch (error) {
-            interaction.followUp({ embeds: [{ description: `Something went wrong`, color: embedColor.red }] });
+            interaction.followUp({ embeds: [{ description: `Something went wrong`, color: embedColor.error }] });
             this.container.logger.error(error);
             return;
         }
@@ -50,16 +50,17 @@ export class UserCommand extends Command {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.default }],
+                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
             });
         }
 
         try {
-            player.destroy();
-            send(message, { embeds: [{ description: `Destroyed the player and left the voice channel`, color: embedColor.default }] });
+            player.queue.clear();
+            player.playing = false;
+            send(message, { embeds: [{ description: `Stopped playback and cleared the queue`, color: embedColor.default }] });
             return;
         } catch (error) {
-            send(message, { embeds: [{ description: `Something went wrong`, color: embedColor.red }] });
+            send(message, { embeds: [{ description: `Something went wrong`, color: embedColor.error }] });
             this.container.logger.error(error);
             return;
         }

@@ -1,17 +1,18 @@
+import { KoosCommand } from "#lib/extensions";
 import { convertTime, embedColor, pagination } from "#lib/utils";
 import { ApplyOptions } from "@sapphire/decorators";
-import { Command, Args } from "@sapphire/framework";
+import { Args } from "@sapphire/framework";
 import { reply } from "@sapphire/plugin-editable-commands";
 import { Message, MessageEmbed, TextChannel, User } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 
-@ApplyOptions<Command.Options>({
+@ApplyOptions<KoosCommand.Options>({
     description: "Display the current queue.",
     aliases: ["q"],
     preconditions: ["GuildOnly", "VoiceOnly"],
 })
-export class UserCommand extends Command {
-    public override registerApplicationCommands(registery: Command.Registry) {
+export class UserCommand extends KoosCommand {
+    public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>
                 builder //
@@ -21,7 +22,7 @@ export class UserCommand extends Command {
         );
     }
 
-    public async chatInputRun(interaction: Command.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${interaction.guildId}`);
         const target = interaction.member!.user as User;
@@ -29,7 +30,7 @@ export class UserCommand extends Command {
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.default }],
+                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
                 ephemeral: true,
             });
         }
@@ -45,7 +46,7 @@ export class UserCommand extends Command {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.default }],
+                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
             });
         }
 

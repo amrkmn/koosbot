@@ -1,15 +1,17 @@
+import { KoosCommand } from "#lib/extensions";
 import { ApplyOptions } from "@sapphire/decorators";
-import { Args, Command, Piece, Store } from "@sapphire/framework";
+import { Args, Piece, Store } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { Stopwatch } from "@sapphire/stopwatch";
 import { Message } from "discord.js";
 
-@ApplyOptions<Command.Options>({
+@ApplyOptions<KoosCommand.Options>({
     description: "Reloads a Sapphire piece, or all pieces of a Sapphire store.",
     aliases: ["r"],
     preconditions: ["OwnerOnly"],
+    hidden: true,
 })
-export class OwnerCommand extends Command {
+export class OwnerCommand extends KoosCommand {
     public async messageRun(message: Message, args: Args) {
         const content = await this.reloadAny(message, args);
         return send(message, content);
