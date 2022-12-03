@@ -17,7 +17,7 @@ export class UserCommand extends KoosCommand {
                 builder //
                     .setName(this.name)
                     .setDescription(this.description),
-            { idHints: ["1048603380643287070"] }
+            { idHints: ["1048603380643287070", "1048630875627208825"] }
         );
     }
 
