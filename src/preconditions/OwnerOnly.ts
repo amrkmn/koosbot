@@ -1,7 +1,7 @@
+import { envParseArray } from "#env";
 import { Precondition } from "@sapphire/framework";
+import { isNullishOrEmpty } from "@sapphire/utilities";
 import type { CommandInteraction, Message, ContextMenuInteraction } from "discord.js";
-
-const OWNERS = process.env.CLIENT_OWNERS;
 
 export class OwnerOnlyPrecondition extends Precondition {
     public override async messageRun(message: Message) {
@@ -15,11 +15,14 @@ export class OwnerOnlyPrecondition extends Precondition {
     }
 
     private checkOwner(userId: string) {
-        if (OWNERS)
-            OWNERS.includes(userId)
-                ? this.ok()
-                : this.error({ message: "This command can only be used by the owner.", context: { silent: true } });
-        return this.error({ message: "This command can only be used by the owner.", context: { silent: true } });
+        const OWNERS = envParseArray("CLIENT_OWNERS");
+
+        if (isNullishOrEmpty(OWNERS))
+            return this.error({ message: "This command can only be used by the owner.", context: { silent: false } });
+
+        return OWNERS.includes(userId)
+            ? this.ok()
+            : this.error({ message: "This command can only be used by the owner.", context: { silent: false } });
     }
 }
 

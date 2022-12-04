@@ -4,7 +4,7 @@ export const regex = {
 };
 
 export const embedColor = {
-    error: 0xf0463a,
+    error: 0xf21100,
     success: 0x3fb97c,
     warn: 0xffb132,
     default: 0xda6c56,

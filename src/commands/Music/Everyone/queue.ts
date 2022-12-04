@@ -1,5 +1,6 @@
 import { KoosCommand } from "#lib/extensions";
-import { convertTime, embedColor, pagination } from "#lib/utils";
+import { convertTime, pagination } from "#utils/functions";
+import { embedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply } from "@sapphire/plugin-editable-commands";

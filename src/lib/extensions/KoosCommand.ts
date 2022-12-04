@@ -19,14 +19,14 @@ export class KoosCommand extends Command {
 
     constructor(ctx: Command.Context, options: KoosCommand.Options) {
         super(ctx, { ...options, ...KoosCommand.resolvePreConditions(ctx, options) });
+        const usage = options.usage as CommandUsage;
 
         options.typing ??= false;
         options.cooldown ??= Time.Second * 2.5;
-        const usage = options.usage as CommandUsage;
+        options.requiredUserPermissions = options.permissions;
 
         this.client = this.container.client;
         this.permissionLevel = options.permissionLevels ?? PermissionLevels.Everyone;
-        this.options.requiredUserPermissions = options.permissions;
         this.hidden = options.hidden ?? false;
         this.usage =
             !isNullOrUndefined(usage) && isString(usage)

@@ -1,9 +1,10 @@
+import { envParseString } from "#env";
 import type { KoosClient } from "#lib/extensions/KoosClient";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, Store } from "@sapphire/framework";
 import { blue, yellow } from "colorette";
 
-const dev = process.env.NODE_ENV !== "production";
+const dev = envParseString("NODE_ENV") !== "production";
 
 @ApplyOptions<Listener.Options>({
     once: true,

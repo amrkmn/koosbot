@@ -55,9 +55,8 @@ export class UserCommand extends KoosCommand {
         }
 
         try {
-            player.queue.clear();
-            player.playing = false;
-            send(message, { embeds: [{ description: `Stopped playback and cleared the queue`, color: embedColor.default }] });
+            player.destroy();
+            send(message, { embeds: [{ description: `Destroyed the player and left the voice channel`, color: embedColor.default }] });
             return;
         } catch (error) {
             send(message, { embeds: [{ description: `Something went wrong`, color: embedColor.error }] });

@@ -2,6 +2,7 @@ import { KoosCommand } from "#lib/extensions";
 import { PermissionLevels } from "#lib/types/Enums";
 import { KoosArgument } from "#lib/interfaces";
 import { Argument } from "@sapphire/framework";
+import { envParseArray } from "#env";
 
 export class UserArgument extends Argument<KoosCommand> {
     public async run(parameter: string, context: KoosArgument.Context) {
@@ -22,7 +23,7 @@ export class UserArgument extends Argument<KoosCommand> {
 
     private isAllowed(command: KoosCommand, context: KoosArgument.Context): boolean {
         if (command.permissionLevel !== PermissionLevels.BotOwner) return true;
-        return context.owners ?? Array.from(process.env.CLIENT_OWNERS!).includes(context.message.author.id);
+        return context.owners ?? Array.from(envParseArray("CLIENT_OWNERS")).includes(context.message.author.id);
     }
 }
 

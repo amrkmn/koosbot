@@ -1,8 +1,9 @@
 import { embedColor } from "#utils/constants";
+import { mins } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
-import { Events, KazagumoPlayer, PlayerState } from "kazagumo";
-import ms from "ms";
+import { Events, KazagumoPlayer } from "kazagumo";
+import { isNullish } from "@sapphire/utilities";
 
 @ApplyOptions<Listener.Options>({
     emitter: container.kazagumo,
@@ -11,15 +12,16 @@ import ms from "ms";
 })
 export class ClientListener extends Listener {
     public async run(player: KazagumoPlayer) {
-        const channel = container.client.channels.cache.get(player.textId) ?? (await container.client.channels.fetch(player.textId));
-        if (!channel) return;
+        const { client } = this.container;
+        const guild = client.guilds.cache.get(player.guildId) ?? (await client.guilds.fetch(player.guildId));
+        const channel = container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId));
+        if (!channel || !guild) return;
 
         if (channel.isText()) channel.send({ embeds: [{ description: "There are no more tracks", color: embedColor.error }] });
 
         const leaveAfterTime = setTimeout(() => {
-            console.log(player.queue.isEmpty, player.state === PlayerState.CONNECTED);
-            if (player.queue.isEmpty && player.state === PlayerState.CONNECTED) {
-                player.disconnect();
+            if (player.queue.isEmpty && !isNullish(guild.me?.voice.channelId)) {
+                player.destroy();
                 if (channel.isText())
                     channel.send({
                         embeds: [
@@ -31,6 +33,6 @@ export class ClientListener extends Listener {
                     });
             }
             clearTimeout(leaveAfterTime);
-        }, ms("10s"));
+        }, mins(3));
     }
 }

@@ -7,8 +7,7 @@ import { Kazagumo, Plugins } from "kazagumo";
 import { Connectors, NodeOption, Shoukaku } from "shoukaku";
 import { KoosPlayer } from "#lib/extensions/KoosPlayer";
 import Spotify from "kazagumo-spotify";
-
-const { CLIENT_PREFIX, NODE_ENV } = process.env;
+import { envParseInteger, envParseString } from "#env";
 
 const NODES: NodeOption[] = [
     { name: "lava1.horizxon.studio", url: "lava1.horizxon.studio:80", auth: "horizxon.studio", secure: false },
@@ -21,11 +20,11 @@ export class KoosClient extends SapphireClient {
     constructor() {
         super({
             intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates],
-            logger: { level: NODE_ENV === "production" ? LogLevel.Info : LogLevel.Debug },
+            logger: { level: envParseString("NODE_ENV") === "production" ? LogLevel.Info : LogLevel.Debug },
             partials: ["CHANNEL"],
             caseInsensitiveCommands: true,
             caseInsensitivePrefixes: true,
-            defaultPrefix: CLIENT_PREFIX,
+            defaultPrefix: envParseString("CLIENT_PREFIX"),
             loadMessageCommandListeners: true,
             allowedMentions: {
                 parse: ["roles", "users", "everyone"],
@@ -35,7 +34,7 @@ export class KoosClient extends SapphireClient {
             baseUserDirectory: resolve(process.cwd(), "dist"),
             api: {
                 listenOptions: {
-                    port: Number(process.env.PORT ?? 3001),
+                    port: envParseInteger("PORT", 3001),
                     host: "0.0.0.0",
                 },
             },
@@ -50,10 +49,14 @@ export class KoosClient extends SapphireClient {
         let guildId: string | null;
         if (input instanceof Guild) guildId = input.id;
         else if (input instanceof Message) guildId = input.guildId;
-        else return [`${CLIENT_PREFIX}`] as SapphirePrefix;
+        else return [`${envParseString("CLIENT_PREFIX")}`] as SapphirePrefix;
 
         const data = await container.db.guild.findUnique({ where: { id: guildId! } });
-        return [data && data?.prefix === "NONE" ? `${CLIENT_PREFIX}` : data!.prefix ?? `${CLIENT_PREFIX}`] as SapphirePrefix;
+        return [
+            data && data?.prefix === "NONE"
+                ? `${envParseString("CLIENT_PREFIX")}`
+                : data!.prefix ?? `${envParseString("CLIENT_PREFIX")}`,
+        ] as SapphirePrefix;
     }
 
     public override async login(token?: string | undefined): Promise<string> {
@@ -62,8 +65,8 @@ export class KoosClient extends SapphireClient {
             {
                 plugins: [
                     new Spotify({
-                        clientId: process.env.SPOTIFY_ID + "",
-                        clientSecret: process.env.SPOTIFY_SECRET + "",
+                        clientId: `${envParseString("SPOTIFY_ID")}`,
+                        clientSecret: `${envParseString("SPOTIFY_SECRET")}`,
                     }),
                     new Plugins.PlayerMoved(this),
                 ],
