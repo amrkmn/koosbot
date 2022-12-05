@@ -84,7 +84,7 @@ export class UserCommand extends KoosCommand {
                         : `[${track.title} by ${track.author}](${track.uri})`;
 
                 tracks.push(track);
-                msg = `Queued ${title}`;
+                msg = `Queued ${title} at position #${Number(player?.queue.totalSize ?? 0)}`;
                 break;
         }
 
