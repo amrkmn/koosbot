@@ -13,7 +13,8 @@ import { embedColor } from "#utils/constants";
 })
 export class ClientListener extends Listener {
     public async run(player: KazagumoPlayer, track: KazagumoTrack) {
-        const channel = await this.container.client.channels.fetch(player.textId);
+        const channel =
+            this.container.client.channels.cache.get(player.textId) ?? (await this.container.client.channels.fetch(player.textId));
         if (!channel) return;
 
         let title =

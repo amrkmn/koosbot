@@ -8,6 +8,6 @@ export class UserRoute extends Route {
     }
 
     public [methods.POST](_request: ApiRequest, response: ApiResponse) {
-        response.json({ message: "Landing Page!" });
+        response.json({ message: `Landing page for ${this.container.client.user?.tag}` });
     }
 }

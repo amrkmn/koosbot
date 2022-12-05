@@ -18,21 +18,9 @@ export class ClientListener extends Listener {
         if (!channel || !guild) return;
 
         if (channel.isText()) channel.send({ embeds: [{ description: "There are no more tracks", color: embedColor.error }] });
-
-        const leaveAfterTime = setTimeout(() => {
-            if (player.queue.isEmpty && !isNullish(guild.me?.voice.channelId)) {
-                player.destroy();
-                if (channel.isText())
-                    channel.send({
-                        embeds: [
-                            {
-                                description: `No tracks have been playing for the past 3 minutes, leaving.`,
-                                color: embedColor.error,
-                            },
-                        ],
-                    });
-            }
-            clearTimeout(leaveAfterTime);
-        }, mins(3));
+        if (player.queue.isEmpty && !isNullish(guild.me?.voice.channelId)) {
+            this.container.tasks.create("kazagumoLeave", { channelId: channel.id, guildId: guild.id }, mins(3));
+        }
+        return;
     }
 }

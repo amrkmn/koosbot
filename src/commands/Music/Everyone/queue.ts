@@ -9,8 +9,8 @@ import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Display the current queue.",
-    aliases: ["q"],
     preconditions: ["GuildOnly", "VoiceOnly"],
+    aliases: ["q"],
 })
 export class UserCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {

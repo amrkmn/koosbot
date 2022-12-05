@@ -4,15 +4,53 @@ import { convertTime, cutText, mins } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
-import { Message, MessageSelectOptionData, MessageSelectMenu } from "discord.js";
+import {
+    Message,
+    MessageSelectOptionData,
+    MessageSelectMenu,
+    CommandInteraction,
+    MessageEmbed,
+    MessageActionRow,
+    GuildMember,
+} from "discord.js";
 import { Kazagumo } from "kazagumo";
 import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
     description: `Searches and lets you choose a song.`,
+    preconditions: ["GuildOnly", "VoiceOnly"],
     usage: "song name",
 })
 export class UserCommand extends KoosCommand {
+    public override registerApplicationCommands(registery: KoosCommand.Registry) {
+        registery.registerChatInputCommand(
+            (builder) =>
+                builder //
+                    .setName(this.name)
+                    .setDescription(this.description)
+                    .addStringOption((option) =>
+                        option //
+                            .setName("query")
+                            .setDescription("The url or search term of track you want to play")
+                            .setRequired(true)
+                    ),
+            { idHints: ["1049256604865937458"] }
+        );
+    }
+
+    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+        const { kazagumo } = this.container;
+        const query = interaction.options.getString("query");
+
+        if (!query)
+            return interaction.reply({
+                embeds: [{ description: "Please provide an URL or search query", color: embedColor.error }],
+                ephemeral: true,
+            });
+
+        await this.search(kazagumo, interaction, query);
+    }
+
     public async messageRun(message: Message, args: Args) {
         const { kazagumo } = this.container;
         const query = await args.rest("string").catch(() => undefined);
@@ -22,7 +60,10 @@ export class UserCommand extends KoosCommand {
         await this.search(kazagumo, message, query);
     }
 
-    private async search(kazagumo: Kazagumo, message: Message, query: string) {
+    private async search(kazagumo: Kazagumo, message: Message | KoosCommand.ChatInputInteraction, query: string) {
+        if (message instanceof CommandInteraction && !message.deferred) await message.deferReply();
+        const member = message.member as GuildMember;
+
         let { tracks } = await kazagumo.search(query, { requester: message.member });
 
         tracks = tracks.slice(0, 15);
@@ -40,10 +81,14 @@ export class UserCommand extends KoosCommand {
 
         const selectMenu = new MessageSelectMenu().setCustomId("searchSongs").setOptions(options).setPlaceholder("Pick a track");
 
-        const msg = await send(message, {
-            embeds: [{ description: `There are ${tracks.length} ${pluralize("result", tracks.length)}`, color: embedColor.default }],
-            components: [{ type: "ACTION_ROW", components: [selectMenu] }],
-        });
+        const embed = new MessageEmbed()
+            .setDescription(`There are ${tracks.length} ${pluralize("result", tracks.length)}`)
+            .setColor(embedColor.default);
+        const row = new MessageActionRow().setComponents(selectMenu);
+        const msg =
+            message instanceof CommandInteraction
+                ? ((await message.followUp({ embeds: [embed], components: [row] })) as Message)
+                : await send(message, { embeds: [embed], components: [row] });
 
         const collector = msg.createMessageComponentCollector({
             time: mins(1),
@@ -74,7 +119,7 @@ export class UserCommand extends KoosCommand {
                 player = await kazagumo.createPlayer({
                     guildId: `${message.guildId}`,
                     textId: `${message.channelId}`,
-                    voiceId: `${message.member?.voice.channelId}`,
+                    voiceId: `${member.voice.channelId}`,
                     deaf: true,
                 });
 
@@ -89,31 +134,14 @@ export class UserCommand extends KoosCommand {
             switch (reason) {
                 case "cancel":
                 case "picked":
-                    send(message, {
-                        embeds: [
-                            {
-                                description: `There are ${tracks.length} ${pluralize("result", tracks.length)}`,
-                                color: embedColor.default,
-                            },
-                        ],
-                        components: [
-                            {
-                                type: "ACTION_ROW",
-                                components: [selectMenu.setPlaceholder("You already picked a choice").setDisabled(true)],
-                            },
-                        ],
-                    });
+                    let pickedRow = new MessageActionRow().setComponents(
+                        selectMenu.setPlaceholder("You already picked a choice").setDisabled(true)
+                    );
+                    msg.edit({ embeds: [embed], components: [pickedRow] });
                     break;
                 case "time":
-                    send(message, {
-                        embeds: [
-                            {
-                                description: `There are ${tracks.length} ${pluralize("result", tracks.length)}`,
-                                color: embedColor.default,
-                            },
-                        ],
-                        components: [{ type: "ACTION_ROW", components: [selectMenu.setPlaceholder("Timed out").setDisabled(true)] }],
-                    });
+                    let timedOutRow = new MessageActionRow().setComponents(selectMenu.setPlaceholder("Timed out").setDisabled(true));
+                    msg.edit({ embeds: [embed], components: [timedOutRow] });
                     break;
             }
         });

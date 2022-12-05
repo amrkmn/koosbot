@@ -6,8 +6,9 @@ import { resolve } from "path";
 import { Kazagumo, Plugins } from "kazagumo";
 import { Connectors, NodeOption, Shoukaku } from "shoukaku";
 import { KoosPlayer } from "#lib/extensions/KoosPlayer";
-import Spotify from "kazagumo-spotify";
 import { envParseInteger, envParseString } from "#env";
+import { ScheduledTaskRedisStrategy } from "@sapphire/plugin-scheduled-tasks/register-redis";
+import Spotify from "kazagumo-spotify";
 
 const NODES: NodeOption[] = [
     { name: "lava1.horizxon.studio", url: "lava1.horizxon.studio:80", auth: "horizxon.studio", secure: false },
@@ -37,6 +38,17 @@ export class KoosClient extends SapphireClient {
                     port: envParseInteger("PORT", 3001),
                     host: "0.0.0.0",
                 },
+            },
+            tasks: {
+                strategy: new ScheduledTaskRedisStrategy({
+                    bull: {
+                        connection: {
+                            port: envParseInteger("REDIS_PORT_SECRET"),
+                            password: `${envParseString("REDIS_PASSWORD_SECRET")}`,
+                            host: `${envParseString("REDIS_HOST_SECRET")}`,
+                        },
+                    },
+                }),
             },
         });
     }
