@@ -59,10 +59,11 @@ export class UserCommand extends KoosCommand {
         let timeLeft = current.isStream //
             ? "Live"
             : `${convertTime(Number(current.length) - player.shoukaku.position)} left`;
+        let duration = player.queue.isEmpty ? current.length : player.queue.durationLength + Number(current.length);
         let totalDuration =
             player.queue.some((track) => track.isStream) || current.isStream
                 ? "Live"
-                : `${convertTime(Number(player.queue.durationLength || current.length) - player.shoukaku.position)}`;
+                : `${convertTime(Number(duration) - player.shoukaku.position)}`;
         let nowPlaying =
             current.sourceName === "youtube"
                 ? `[${current.title}](${current.uri})`

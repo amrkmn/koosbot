@@ -1,6 +1,7 @@
 import { Precondition, PreconditionOptions } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
-import type { CommandInteraction, GuildMember, Message } from "discord.js";
+import { CommandInteraction, GuildMember, Message } from "discord.js";
+import { KazagumoPlayer } from "kazagumo";
 
 export class DJPrecondition extends Precondition<PreconditionOptions> {
     public async messageRun(message: Message) {
@@ -8,7 +9,10 @@ export class DJPrecondition extends Precondition<PreconditionOptions> {
         const data = await this.container.db.guild.findUnique({ where: { id: `${message.guildId}` } });
         if (isNullish(data)) return this.ok();
 
-        return this.checkDJ(message.member!, data.dj) ? this.ok() : this.error({ message: `This command can only run by DJ.` });
+        const player = this.container.kazagumo.getPlayer(`${message.guildId}`);
+        if (!player || (player && !player.queue.current)) return this.ok();
+
+        return this.checkDJ(message, player, data.dj) ? this.ok() : this.error({ message: `This command can only run by DJ or the song requester.` });
     }
 
     public async chatInputRun(interaction: CommandInteraction) {
@@ -16,12 +20,22 @@ export class DJPrecondition extends Precondition<PreconditionOptions> {
         const data = await this.container.db.guild.findUnique({ where: { id: `${interaction.guildId}` } });
         if (isNullish(data)) return this.ok();
 
-        return this.checkDJ(interaction.member as GuildMember, data.dj)
-            ? this.ok()
-            : this.error({ message: `This command can only run by DJ.` });
+        const player = this.container.kazagumo.getPlayer(`${interaction.guildId}`);
+        if (!player || (player && !player.queue.current)) return this.ok();
+
+        return this.checkDJ(interaction, player, data.dj) ? this.ok() : this.error({ message: `This command can only run by DJ or the song requester.` });
     }
 
-    private checkDJ(member: GuildMember, dj: string) {
-        return member.roles.cache.has(dj) || member.roles.cache.some((role) => role.name.toLowerCase() === "dj");
+    private checkDJ(message: Message | CommandInteraction, player: KazagumoPlayer, dj: string) {
+        const member = message.member as GuildMember;
+
+        const current = player.queue.current!;
+        const requester = current.requester;
+
+        if (requester instanceof GuildMember) {
+            return requester.user.id === member.user.id;
+        }
+
+        return member.roles.cache.has(dj);
     }
 }

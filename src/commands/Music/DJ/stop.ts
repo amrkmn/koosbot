@@ -24,7 +24,7 @@ export class UserCommand extends KoosCommand {
         const player = kazagumo.getPlayer(`${interaction.guildId}`);
 
         if (player) await interaction.deferReply();
-        if (!player || (player && !player.queue.current)) {
+        if (!player) {
             return interaction.reply({
                 embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
                 ephemeral: true,
@@ -48,7 +48,7 @@ export class UserCommand extends KoosCommand {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${message.guildId}`);
 
-        if (!player || (player && !player.queue.current)) {
+        if (!player) {
             return reply(message, {
                 embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
             });

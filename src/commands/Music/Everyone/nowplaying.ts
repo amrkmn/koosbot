@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { embedColor, regex } from "#utils/constants";
+import { embedColor } from "#utils/constants";
 import { progressBar } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
@@ -53,14 +53,15 @@ export class UserCommand extends KoosCommand {
 
     private nowPlaying(player: KazagumoPlayer) {
         const current = player.queue.current!;
-        const title = regex.youtube.test(current.uri)
-            ? `[${current.title}](${current.uri})`
-            : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
+        const title =
+            current.sourceName === "youtube"
+                ? `[${current.title}](${current.uri})`
+                : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
 
         const description = `${title} [${current.requester}]`;
         const duration = Number(current.length);
         const progress =
-            `${progressBar(player.shoukaku.position, duration, 20, current.isStream).bar} ` +
+            `${progressBar(player.shoukaku.position, duration, 20, current.isStream)} ` +
             `${prettyMs(player.shoukaku.position, { secondsDecimalDigits: 0 }).replace("ms", "s")} / ` +
             `${!current.isStream ? prettyMs(duration, { secondsDecimalDigits: 0 }) : "∞"}`;
 

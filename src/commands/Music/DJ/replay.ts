@@ -1,31 +1,29 @@
 import { KoosCommand } from "#lib/extensions";
-import { embedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
-import { reply, send } from "@sapphire/plugin-editable-commands";
-import { Message, MessageEmbed } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
+import { MessageEmbed, Message } from "discord.js";
+import { embedColor } from "#utils/constants";
+import { reply, send } from "@sapphire/plugin-editable-commands";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: "Skip to the next track.",
+    description: `Replay the current song.`,
     preconditions: ["GuildOnly", "VoiceOnly", "DJ"],
-    aliases: ["s", "n", "next"],
+    aliases: ["rp", "restart"],
 })
 export class UserCommand extends KoosCommand {
-    public votes = new Set<string>();
-
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>
                 builder //
                     .setName(this.name)
                     .setDescription(this.description),
-            { idHints: ["1047804848273375252", "1048159944635072623"] }
+            { idHints: ["1049311240205373520", "1049325907703251004"] }
         );
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
         const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(interaction.guildId!)!;
+        const player = kazagumo.getPlayer(`${interaction.guildId}`);
 
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
@@ -35,7 +33,7 @@ export class UserCommand extends KoosCommand {
             });
         }
 
-        interaction.followUp({ embeds: [await this.skip(player)] });
+        interaction.followUp({ embeds: [this.replay(player)] });
     }
 
     public async messageRun(message: Message) {
@@ -48,21 +46,18 @@ export class UserCommand extends KoosCommand {
             });
         }
 
-        send(message, { embeds: [await this.skip(player)] });
+        send(message, { embeds: [this.replay(player)] });
     }
 
-    private async skip(player: KazagumoPlayer) {
+    private replay(player: KazagumoPlayer) {
         const current = player.queue.current!;
         const title =
             current.sourceName === "youtube"
                 ? `[${current.title}](${current.uri})`
-                : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
+                : `[${current.title} by ${current.author}](${current.uri})`;
 
-        const embed = new MessageEmbed() //
-            .setDescription(`${title} has been skipped`)
-            .setColor(embedColor.success);
+        player.shoukaku.seekTo(0);
 
-        player.skip();
-        return embed;
+        return new MessageEmbed().setDescription(`Starting over ${title}`).setColor(embedColor.default);
     }
 }

@@ -18,15 +18,13 @@ export const progressBar = (value: number, maxValue: number, size = 10, isStream
     const progress = size * percentage;
     const emptyProgress = size - progress;
 
-    if (isStream) {
-        return { bar: emptyBar.repeat(size).replace(/.$/, `${filledBar}`) };
-    }
+    if (isStream) return emptyBar.repeat(size).replace(/.$/, `${filledBar}`);
 
     const progressText = emptyBar.repeat(progress < 1 ? 1 : progress).replace(/.$/, `${filledBar}`);
     const emptyProgressText = emptyBar.repeat(emptyProgress);
-    const percentageText = (percentage * 100).toFixed(1) + "%";
+    // const percentageText = (percentage * 100).toFixed(1) + "%";
     const bar = progressText + emptyProgressText;
-    return { bar, percentageText };
+    return bar
 };
 
 export function pager<T>(array: Array<T>, n: number) {

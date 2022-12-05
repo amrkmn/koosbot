@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc -b src",
     "watch": "tsc-watch -b src --onSuccess \"yarn start\"",
-    "dev": "yarn build && yarn start",
+    "dev": "yarn clean && yarn build && yarn start",
     "start": "node --preserve-symlinks --enable-source-maps --no-warnings dist/index.js",
     "generate": "prisma generate",
     "clean": "node scripts/clean.mjs"
