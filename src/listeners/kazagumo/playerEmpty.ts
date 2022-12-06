@@ -1,5 +1,6 @@
+import { envParseString } from "#env";
 import { embedColor } from "#utils/constants";
-// import { mins } from "#utils/functions";
+import { mins, sec } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
 import { Events, KazagumoPlayer } from "kazagumo";
@@ -18,7 +19,11 @@ export class ClientListener extends Listener {
 
         if (channel.isText()) channel.send({ embeds: [{ description: "There are no more tracks", color: embedColor.error }] });
 
-        this.container.tasks.create("kazagumoLeave", { channelId: channel.id, guildId: guild.id }, 10_000);
+        this.container.tasks.create(
+            "kazagumoLeave",
+            { channelId: channel.id, guildId: guild.id },
+            envParseString("NODE_ENV") === "production" ? mins(3) : sec(10)
+        );
         return;
     }
 }
