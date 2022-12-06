@@ -5,11 +5,11 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "build": "tsup",
-    "watch": "tsup --watch",
-    "dev": "tsup --watch --onSuccess \"yarn start\"",
+    "build": "npx tsup && yarn generate",
+    "watch": "npx tsup --watch",
+    "dev": "npx tsup --watch --onSuccess \"yarn start\"",
     "start": "node --preserve-symlinks --enable-source-maps --no-warnings dist/index.js",
-    "generate": "prisma generate",
+    "generate": "npx prisma generate",
     "clean": "node scripts/clean.mjs"
   },
   "keywords": [],
