@@ -47,6 +47,7 @@ export class KoosClient extends SapphireClient {
                             password: `${envParseString("REDIS_PASSWORD_SECRET")}`,
                             host: `${envParseString("REDIS_HOST_SECRET")}`,
                         },
+                        prefix: envParseString("CLIENT_ID"),
                     },
                 }),
             },
