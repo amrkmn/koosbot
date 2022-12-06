@@ -12,7 +12,7 @@ export class DJPrecondition extends Precondition<PreconditionOptions> {
         const player = this.container.kazagumo.getPlayer(`${message.guildId}`);
         if (!player || (player && !player.queue.current)) return this.ok();
 
-        return this.checkDJ(message, player, data.djTest)
+        return this.checkDJ(message, player, data.dj)
             ? this.ok()
             : this.error({ message: `This command can only run by DJ or the song requester.` });
     }
@@ -25,7 +25,7 @@ export class DJPrecondition extends Precondition<PreconditionOptions> {
         const player = this.container.kazagumo.getPlayer(`${interaction.guildId}`);
         if (!player || (player && !player.queue.current)) return this.ok();
 
-        return this.checkDJ(interaction, player, data.djTest)
+        return this.checkDJ(interaction, player, data.dj)
             ? this.ok()
             : this.error({ message: `This command can only run by DJ or the song requester.` });
     }
