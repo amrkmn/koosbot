@@ -4,8 +4,9 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { KazagumoPlayer } from "kazagumo";
 import { Message, GuildMember, MessageEmbed } from "discord.js";
 import { embedColor } from "#utils/constants";
-import pluralize from "pluralize";
+import { isNullishOrEmpty } from "@sapphire/utilities";
 import { reply, send } from "@sapphire/plugin-editable-commands";
+import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Lets you vote for skipping the current track.",
@@ -71,8 +72,9 @@ export class UserCommand extends KoosCommand {
         const embed = new MessageEmbed() //
             .setDescription(`${title} has been skip`)
             .setColor(embedColor.success);
+        const roles = [...member.roles.cache.keys()].filter((id) => data?.dj.includes(id));
 
-        if (data && member.roles.cache.has(data.dj)) {
+        if (data && !isNullishOrEmpty(roles)) {
             player.skip();
             return embed;
         } else if (data && listeners.size > 1) {

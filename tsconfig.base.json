@@ -9,6 +9,6 @@
         "removeComments": true,
         "declarationMap": false,
         "declaration": false,
-        "emitDecoratorMetadata": false
+        "emitDecoratorMetadata": false,
     }
 }
