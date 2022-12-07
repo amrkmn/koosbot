@@ -8,6 +8,7 @@ import { MessageEmbed } from "discord.js";
     name: "kazagumoLeave",
     bullJobsOptions: {
         removeOnComplete: true,
+        removeOnFail: true,
     },
 })
 export class ClientTask extends ScheduledTask {
