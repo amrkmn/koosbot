@@ -1,10 +1,18 @@
 import { KoosCommand } from "#lib/extensions";
+import { PermissionLevels } from "#lib/types/Enums";
 import { embedColor } from "#utils/constants";
 import { isString } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args, SapphirePrefix } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { Collection, Message } from "discord.js";
+
+const categoryLevel: { [key: string]: number } = {
+    Admin: PermissionLevels.Administrator,
+    DJ: PermissionLevels.DJ,
+    Everyone: PermissionLevels.Everyone,
+    General: PermissionLevels.Everyone,
+};
 
 @ApplyOptions<KoosCommand.Options>({
     description: `Lists all the commands`,
@@ -91,6 +99,7 @@ export class UserCommand extends KoosCommand {
         const commands = await this.fetchCommands(message);
         const helpMessage: { name: string; value: string }[] = [];
 
+        commands.sort((_, __, a, b) => categoryLevel[a] - categoryLevel[b]);
         for (const [category, list] of commands) {
             helpMessage.push({
                 name: `${category} commands (${list.length})`,
@@ -106,7 +115,7 @@ export class UserCommand extends KoosCommand {
         await Promise.all(
             commands.map(async (cmd) => {
                 const command = cmd as unknown as KoosCommand;
-                if (command.hidden) return;
+                if (command.hidden || !command.enabled) return;
 
                 const result = await cmd.preconditions.messageRun(message, command as any, { command: null! });
                 if (result.err().isSome() && Reflect.get(result.err().unwrap(), "identifier") === "OwnerOnly") return;

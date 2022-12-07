@@ -1,6 +1,6 @@
 export const enum PermissionLevels {
     Everyone = 0,
-    Moderator = 5,
+    DJ = 3,
     Administrator = 6,
     ServerOwner = 7,
     BotOwner = 10,

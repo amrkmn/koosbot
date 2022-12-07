@@ -24,10 +24,17 @@ export const progressBar = (value: number, maxValue: number, size = 10, isStream
     const emptyProgressText = emptyBar.repeat(emptyProgress);
     // const percentageText = (percentage * 100).toFixed(1) + "%";
     const bar = progressText + emptyProgressText;
-    return bar
+    return bar;
 };
 
-export function pager<T>(array: Array<T>, n: number) {
+export function removeItem<T>(array: Array<T>, value: T): Array<T> {
+    const newArray = [...array];
+    const index = newArray.indexOf(value);
+    if (index > -1) newArray.splice(index, 1);
+    return newArray;
+}
+
+export function chunk<T>(array: Array<T>, n: number) {
     return Array.from(Array(Math.ceil(array.length / n)), (_, i) => array.slice(i * n, i * n + n));
 }
 
