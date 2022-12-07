@@ -7,7 +7,7 @@ export class DJPrecondition extends Precondition<PreconditionOptions> {
     public async messageRun(message: Message) {
         if (!message.guild) return this.ok();
         const data = await this.container.db.guild.findUnique({ where: { id: `${message.guildId}` } });
-        if (isNullish(data)) return this.ok();
+        if (isNullish(data) || (data && isNullishOrEmpty(data.dj))) return this.ok();
 
         const player = this.container.kazagumo.getPlayer(`${message.guildId}`);
         if (!player || (player && !player.queue.current)) return this.ok();
@@ -20,7 +20,7 @@ export class DJPrecondition extends Precondition<PreconditionOptions> {
     public async chatInputRun(interaction: CommandInteraction) {
         if (!interaction.guild) return this.ok();
         const data = await this.container.db.guild.findUnique({ where: { id: `${interaction.guildId}` } });
-        if (isNullish(data)) return this.ok();
+        if (isNullish(data) || (data && isNullishOrEmpty(data.dj))) return this.ok();
 
         const player = this.container.kazagumo.getPlayer(`${interaction.guildId}`);
         if (!player || (player && !player.queue.current)) return this.ok();
