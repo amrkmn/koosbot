@@ -123,7 +123,7 @@ export class UserCommand extends KoosCommand {
                     deaf: true,
                 });
 
-            interaction.followUp({ embeds: [{ description: `Queued ${title}`, color: embedColor.default }] });
+            interaction.followUp({ embeds: [{ description: `Queued ${title} at position #${Number(player?.queue.totalSize ?? 0)}`, color: embedColor.default }] });
 
             player.queue.add(selected);
             if (!player.playing && !player.paused) player.play();

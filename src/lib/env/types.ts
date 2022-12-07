@@ -1,5 +1,5 @@
 export type BooleanString = "true" | "false";
-export type IntegerString = `${bigint}`;
+export type IntegerString = `${number}`;
 
 export type KoosEnvAny = keyof KoosEnv;
 export type KoosEnvString = {

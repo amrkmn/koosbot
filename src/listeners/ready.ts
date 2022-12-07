@@ -15,9 +15,9 @@ export class ClientListener extends Listener {
         client.logger.info(`Logged in as ${client.user?.tag}`);
         this.printStoreDebugInformation();
 
-        // client.guilds.cache.map(async (guild) => {
-        //     await this.container.db.guild.upsert({ where: { id: guild.id }, update: {}, create: { id: guild.id } });
-        // });
+        client.guilds.cache.map(async (guild) => {
+            await this.container.db.guild.upsert({ where: { id: guild.id }, update: {}, create: { id: guild.id } });
+        });
     }
 
     private printStoreDebugInformation() {

@@ -47,7 +47,7 @@ export class AdminCommand extends KoosCommand {
     public async messageRun(message: Message, args: Args) {
         const role = await args.pick("role").catch(() => undefined);
         if (!role && args.finished) return send(message, { embeds: [await this.setdj(message.guildId!, undefined)] });
-        if (!role) return send(message, { embeds: [{ description: `Role not found`, color: embedColor.error }] });
+        if (!role) return send(message, { embeds: [{ description: `Role not found.`, color: embedColor.error }] });
 
         send(message, { embeds: [await this.setdj(message.guildId!, role.id)] });
     }
@@ -58,7 +58,8 @@ export class AdminCommand extends KoosCommand {
         if (!data) return new MessageEmbed().setDescription(`There is no DJ role set.`).setColor(embedColor.warn);
 
         const dj = data.dj.map((id) => `<@&${id}>`);
-        if (isNullishOrEmpty(dj)) return new MessageEmbed().setDescription(`There is no DJ role set.`).setColor(embedColor.warn);
+        if (!roleId && isNullishOrEmpty(dj))
+            return new MessageEmbed().setDescription(`There is no DJ role set.`).setColor(embedColor.warn);
         if (!roleId)
             return new MessageEmbed().setDescription(`__Configured DJ role:__\n\n${dj.join("\n")}`).setColor(embedColor.default);
 

@@ -43,7 +43,7 @@ export class KoosClient extends SapphireClient {
                 strategy: new ScheduledTaskRedisStrategy({
                     bull: {
                         connection: {
-                            port: envParseInteger("REDIS_PORT_SECRET"),
+                            port: Number(process.env.REDIS_PORT_SECRET) || undefined,
                             password: `${envParseString("REDIS_PASSWORD_SECRET")}`,
                             host: `${envParseString("REDIS_HOST_SECRET")}`,
                         },
