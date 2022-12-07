@@ -26,7 +26,7 @@ export class UserCommand extends KoosCommand {
                             .setDescription("Position of song to remove")
                             .setRequired(true)
                     ),
-            { idHints: ["1047879470654181416", "1048159863374630953"] }
+            { idHints: ["1050092669860319292", "1050094595914076201"] }
         );
     }
 

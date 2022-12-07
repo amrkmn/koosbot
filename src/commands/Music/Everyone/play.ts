@@ -34,14 +34,15 @@ export class UserCommand extends KoosCommand {
                             .setName("query")
                             .setDescription("Could be a link of the track, or a search term")
                             .setRequired(true)
+                            .setAutocomplete(true)
                     ),
-            { idHints: ["1047561979314843730", "1048159858911870977"] }
+            { idHints: ["1050092839700287521", "1050094765485609030"] }
         );
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
         const { kazagumo } = this.container;
-        const query = interaction.options.getString("query")!;
+        const query = interaction.options.getString("query", true)!;
         await interaction.deferReply();
 
         const member = interaction.member! as GuildMember;

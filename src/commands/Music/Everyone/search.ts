@@ -34,7 +34,7 @@ export class UserCommand extends KoosCommand {
                             .setDescription("The url or search term of track you want to play")
                             .setRequired(true)
                     ),
-            { idHints: ["1049256604865937458"] }
+            { idHints: ["1050092844116877416", "1050094769092690020"] }
         );
     }
 
@@ -123,7 +123,11 @@ export class UserCommand extends KoosCommand {
                     deaf: true,
                 });
 
-            interaction.followUp({ embeds: [{ description: `Queued ${title} at position #${Number(player?.queue.totalSize ?? 0)}`, color: embedColor.default }] });
+            interaction.followUp({
+                embeds: [
+                    { description: `Queued ${title} at position #${Number(player?.queue.totalSize ?? 0)}`, color: embedColor.default },
+                ],
+            });
 
             player.queue.add(selected);
             if (!player.playing && !player.paused) player.play();

@@ -32,7 +32,7 @@ export class AdminCommand extends KoosCommand {
                             .setDescription("The role that you want Add/Remove")
                             .setRequired(false)
                     ),
-            { idHints: ["1049901217502986260", "1049906694286741555"] }
+            { idHints: ["1050092662486749296", "1050094587592581140"] }
         );
     }
 
