@@ -8,7 +8,7 @@ import { isNullish } from "@sapphire/utilities";
 import { KoosCommand } from "#lib/extensions";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: "Remove a track from the queue",
+    description: "Remove a track from the queue.",
     preconditions: ["GuildOnly", "VoiceOnly", "DJ"],
     aliases: ["rm", "del", "delete"],
     usage: "position",

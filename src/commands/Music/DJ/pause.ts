@@ -6,7 +6,7 @@ import { Message, MessageEmbed } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: "Clears the current queue.",
+    description: "Pause the current queue.",
     preconditions: ["GuildOnly", "VoiceOnly", "DJ"],
     aliases: ["break"],
 })

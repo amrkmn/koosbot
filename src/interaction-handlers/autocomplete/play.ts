@@ -24,8 +24,11 @@ export class AutocompleteHandler extends InteractionHandler {
         switch (interaction.commandName) {
             case "play":
                 const results = await kazagumo.search(query.value, { requester: interaction.member });
-                results.tracks = results.tracks.slice(0, 10);
+                if (results.type === "PLAYLIST") {
+                    return this.some([{ name: cutText(`${results.playlistName}`, 100), value: `${query.value}` }]);
+                }
 
+                results.tracks = results.tracks.slice(0, 10);
                 const tracks = results.tracks.map((track) => {
                     const title =
                         track.sourceName === "youtube" //

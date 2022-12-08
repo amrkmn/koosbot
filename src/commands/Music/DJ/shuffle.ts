@@ -6,7 +6,7 @@ import { reply, send } from "@sapphire/plugin-editable-commands";
 import { KoosCommand } from "#lib/extensions";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: "Shuffle the queue",
+    description: "Shuffle the queue.",
     preconditions: ["GuildOnly", "VoiceOnly", "DJ"],
     aliases: ["sh"],
 })

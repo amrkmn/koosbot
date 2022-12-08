@@ -6,7 +6,7 @@ import { send } from "@sapphire/plugin-editable-commands";
 import type { Message } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: "Get the bot's latency",
+    description: "Get the bot's latency.",
 })
 export class UserCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
