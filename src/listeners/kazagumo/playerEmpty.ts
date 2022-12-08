@@ -39,7 +39,6 @@ export class ClientListener extends Listener {
         this.timeoutId = undefined;
     }
     async setup(guild: Guild | null, player: KazagumoPlayer) {
-        console.log(this.timeoutId, typeof this.timeoutId);
         if (typeof this.timeoutId !== "undefined") this.cancel();
 
         const { client } = this.container;

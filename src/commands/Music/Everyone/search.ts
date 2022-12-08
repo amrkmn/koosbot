@@ -63,26 +63,35 @@ export class UserCommand extends KoosCommand {
     private async search(kazagumo: Kazagumo, message: Message | KoosCommand.ChatInputInteraction, query: string) {
         if (message instanceof CommandInteraction && !message.deferred) await message.deferReply();
         const member = message.member as GuildMember;
+        const options: MessageSelectOptionData[] = [];
 
-        let { tracks } = await kazagumo.search(query, { requester: message.member });
-
+        let { tracks, type, playlistName } = await kazagumo.search(query, { requester: message.member });
         tracks = tracks.slice(0, 15);
 
-        let options: MessageSelectOptionData[] = [];
-        let i = 0;
-        for (let track of tracks) {
+        if (type === "PLAYLIST") {
+            let duration = tracks.reduce((all, track) => all + Number(track.length), 0);
             options.push({
-                label: cutText(`${track.title}`, 100),
-                description: `Duration: ${convertTime(track.length!)} | Author: ${track.author}`,
-                value: `${i++}`,
+                label: cutText(`${playlistName}`, 100),
+                description: `Duration: ${convertTime(duration)} | Tracks: ${tracks.length}`,
+                value: `${query}`,
             });
+        } else {
+            for (let track of tracks) {
+                options.push({
+                    label: cutText(`${track.title}`, 100),
+                    description: `Duration: ${convertTime(track.length!)} | Author: ${track.author}`,
+                    value: `${track.uri}`,
+                });
+            }
         }
-        options.push({ label: "Cancel", description: "Cancels this search", value: `cancel` });
+        options.push({ label: "Cancel", description: "Cancel this search", value: `cancel` });
 
         const selectMenu = new MessageSelectMenu().setCustomId("searchSongs").setOptions(options).setPlaceholder("Pick a track");
 
         const embed = new MessageEmbed()
-            .setDescription(`There are ${tracks.length} ${pluralize("result", tracks.length)}`)
+            .setDescription(
+                type === "PLAYLIST" ? `Here is the result` : `There are ${tracks.length} ${pluralize("result", tracks.length)}`
+            )
             .setColor(embedColor.default);
         const row = new MessageActionRow().setComponents(selectMenu);
         const msg =
@@ -109,12 +118,14 @@ export class UserCommand extends KoosCommand {
                 return;
             }
 
-            const selected = tracks[userOption];
-            const title =
-                selected.sourceName === "youtube"
+            const selected = type === "PLAYLIST" && isNaN(userOption) ? tracks : tracks[userOption];
+            const title = !Array.isArray(selected)
+                ? selected.sourceName === "youtube"
                     ? `[${selected.title}](${selected.uri})`
-                    : `[${selected.title} by ${selected.author}](${selected.uri})`;
+                    : `[${selected.title} by ${selected.author}](${selected.uri})`
+                : `[${playlistName}](${interaction.values.at(0)})`;
 
+            console.log(title);
             if (!player)
                 player = await kazagumo.createPlayer({
                     guildId: `${message.guildId}`,
@@ -125,7 +136,13 @@ export class UserCommand extends KoosCommand {
 
             interaction.followUp({
                 embeds: [
-                    { description: `Queued ${title} at position #${Number(player?.queue.totalSize ?? 0)}`, color: embedColor.default },
+                    {
+                        description:
+                            type === "PLAYLIST"
+                                ? `Queued playlist ${title} with ${tracks.length} ${pluralize("track", tracks.length)}`
+                                : `Queued ${title} at position #${Number(player?.queue.totalSize ?? 0)}`,
+                        color: embedColor.default,
+                    },
                 ],
             });
 
