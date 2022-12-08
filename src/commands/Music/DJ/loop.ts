@@ -10,7 +10,7 @@ import { KazagumoPlayer } from "kazagumo";
     description: `Cycles through all three loop modes (queue, song, off).`,
     preconditions: ["GuildOnly", "VoiceOnly", "DJ"],
     usage: {
-        type: ["off", "queue", "song"],
+        type: ["queue", "song", "off"],
         required: false,
     },
 })
@@ -18,7 +18,7 @@ export class UserCommand extends KoosCommand {
     public async messageRun(message: Message, args: Args) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(message.guildId!)!;
-        const mode = await args.pick("enum", { enum: ["off", "queue", "song"], caseInsensitive: true }).catch(() => undefined);
+        const mode = await args.pick("enum", { enum: ["queue", "song", "off"], caseInsensitive: true }).catch(() => undefined);
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
@@ -31,13 +31,15 @@ export class UserCommand extends KoosCommand {
 
     private async loop(player: KazagumoPlayer, type?: "off" | "queue" | "song") {
         if (!type) {
-            player.setLoop();
             switch (player.loop) {
                 case "none":
+                    player.setLoop("queue");
                     return new MessageEmbed({ description: "Looping the queue activated.", color: embedColor.default });
                 case "queue":
+                    player.setLoop("track");
                     return new MessageEmbed({ description: "Looping the current song enabled.", color: embedColor.default });
                 case "track":
+                    player.setLoop("none");
                     return new MessageEmbed({ description: "Looping disabled.", color: embedColor.default });
             }
         } else {

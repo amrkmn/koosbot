@@ -12,6 +12,7 @@ const dev = envParseString("NODE_ENV") !== "production";
 export class ClientListener extends Listener {
     private readonly style = dev ? yellow : blue;
     public async run(client: KoosClient) {
+        client.logger.info(client.generateInvite({ scopes: ["bot"], permissions: ["ADMINISTRATOR"] }));
         client.logger.info(`Logged in as ${client.user?.tag}`);
         this.printStoreDebugInformation();
 
