@@ -18,18 +18,18 @@ export class ClientTask extends ScheduledTask {
         const guild = client.guilds.cache.get(guildId) ?? (await client.guilds.fetch(guildId));
         const channel = client.channels.cache.get(channelId) ?? (await client.channels.fetch(channelId));
         if (isNullish(player) || isNullish(channel)) return;
+        if (player.queue.current) return;
+        if (!player.queue.isEmpty && !isNullish(guild.me?.voice.channelId)) return;
 
         if (channel.isText()) {
-            if (player.queue.isEmpty && !isNullish(guild.me?.voice.channelId)) {
-                player.destroy();
-                channel.send({
-                    embeds: [
-                        new MessageEmbed()
-                            .setDescription(`No tracks have been playing for the past 3 minutes, leaving.`)
-                            .setColor(embedColor.error),
-                    ],
-                });
-            }
+            player.destroy();
+            channel.send({
+                embeds: [
+                    new MessageEmbed()
+                        .setDescription(`No tracks have been playing for the past 3 minutes, leaving.`)
+                        .setColor(embedColor.error),
+                ],
+            });
         }
     }
 }

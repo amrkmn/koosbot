@@ -22,7 +22,7 @@ export class ClientListener extends Listener {
         this.container.tasks.create(
             "kazagumoLeave",
             { channelId: channel.id, guildId: guild.id },
-            envParseString("NODE_ENV") === "production" ? mins(3) : sec(10)
+            envParseString("NODE_ENV") === "production" ? mins(3) : sec(25)
         );
         return;
     }
