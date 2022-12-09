@@ -3,6 +3,3 @@ node_modules
 dist
 Lavalink.jar
 yarn-error.log
-Dockerfile
-fly.toml
-.dockerignore
