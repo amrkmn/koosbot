@@ -51,7 +51,7 @@ export class UserCommand extends KoosCommand {
 
     private async volume(player: KazagumoPlayer, input?: number) {
         const { db } = this.container;
-        const data = await db.guild.findUnique({ where: { id: player.guildId } });
+        const data = await db.guilds.findUnique({ where: { id: player.guildId } });
 
         if (typeof input === "undefined") {
             let volume = 0;
@@ -61,7 +61,7 @@ export class UserCommand extends KoosCommand {
         }
 
         player.setVolume(input);
-        await db.guild.update({ where: { id: player.guildId }, data: { volume: input } });
+        await db.guilds.update({ where: { id: player.guildId }, data: { volume: input } });
         return new MessageEmbed().setDescription(`Changed the volume to \`${player.volume * 100}%\``).setColor(embedColor.default);
     }
 }

@@ -31,6 +31,22 @@ export class UserCommand extends KoosCommand {
         );
     }
 
+    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+        const { kazagumo } = this.container;
+        const player = kazagumo.getPlayer(interaction.guildId!)!;
+        const mode = interaction.options.getSubcommand(true) as "off" | "queue" | "song";
+
+        if (player) await interaction.deferReply();
+        if (!player || (player && !player.queue.current)) {
+            return interaction.reply({
+                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                ephemeral: true,
+            });
+        }
+
+        interaction.followUp({ embeds: [await this.loop(player, mode)] });
+    }
+
     public async messageRun(message: Message, args: Args) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(message.guildId!)!;

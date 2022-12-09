@@ -5,7 +5,7 @@ import { send } from "@sapphire/plugin-editable-commands";
 import { KazagumoPlayer, KazagumoTrack } from "kazagumo";
 import { embedColor } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
-import { guild } from "@prisma/client";
+import { guilds } from "@prisma/client";
 import pluralize from "pluralize";
 import { isNullish } from "@sapphire/utilities";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
@@ -14,7 +14,7 @@ interface PlayOptions {
     message: Message | KoosCommand.ChatInputInteraction;
     player: KazagumoPlayer | undefined;
     channel: VoiceBasedChannel;
-    data: guild | null;
+    data: guilds | null;
 }
 
 @ApplyOptions<KoosCommand.Options>({
@@ -43,7 +43,7 @@ export class UserCommand extends KoosCommand {
 
     public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
         const { kazagumo, db } = this.container;
-        const data = await db.guild.findUnique({ where: { id: `${interaction.guildId}` } });
+        const data = await db.guilds.findUnique({ where: { id: `${interaction.guildId}` } });
         const query = interaction.options.getString("query", true)!;
         await interaction.deferReply();
 
@@ -56,7 +56,7 @@ export class UserCommand extends KoosCommand {
 
     public async messageRun(message: Message, args: Args) {
         const { kazagumo, db } = this.container;
-        const data = await db.guild.findUnique({ where: { id: `${message.guildId}` } });
+        const data = await db.guilds.findUnique({ where: { id: `${message.guildId}` } });
         const query = await args.rest("string").catch(() => undefined);
         if (!query)
             return send(message, { embeds: [{ description: "Please provide an URL or search query", color: embedColor.error }] });

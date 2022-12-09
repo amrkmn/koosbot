@@ -52,7 +52,7 @@ export class AdminCommand extends KoosCommand {
 
     private async setdj(guildId: string, roleId?: string) {
         const { db } = this.container;
-        const data = await db.guild.findUnique({ where: { id: guildId } });
+        const data = await db.guilds.findUnique({ where: { id: guildId } });
         if (!data) return new MessageEmbed().setDescription(`There is no DJ role set.`).setColor(embedColor.warn);
 
         const dj = data.dj.map((id) => `<@&${id}>`);
@@ -68,7 +68,7 @@ export class AdminCommand extends KoosCommand {
             ? removeItem(data.dj, roleId)
             : [...data.dj, roleId];
 
-        await db.guild.upsert({
+        await db.guilds.upsert({
             where: { id: guildId },
             update: { dj: { set: roles } },
             create: { id: guildId, dj: { set: roles } },

@@ -17,7 +17,7 @@ export class ClientListener extends Listener {
         this.printStoreDebugInformation();
 
         client.guilds.cache.map(async (guild) => {
-            await this.container.db.guild.upsert({ where: { id: guild.id }, update: {}, create: { id: guild.id } });
+            await this.container.db.guilds.upsert({ where: { id: guild.id }, update: {}, create: { id: guild.id } });
         });
     }
 

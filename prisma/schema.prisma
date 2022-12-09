@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL_SECRET")
 }
 
-model guild {
+model guilds {
   id     String   @id @map("_id")
   prefix String   @default("NONE")
   dj     String[] @default([])
