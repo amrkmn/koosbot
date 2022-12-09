@@ -8,13 +8,29 @@ import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
     description: `Cycles through all three loop modes (queue, song, off).`,
-    preconditions: ["GuildOnly", "VoiceOnly", "DJ"],
+    preconditions: ["VoiceOnly", "DJ"],
     usage: {
-        type: ["queue", "song", "off"],
-        required: false,
+        types: [
+            { type: "queue", description: "Loop the queue.", subcommand: true },
+            { type: "song", description: "Loop the current playing song.", subcommand: true },
+            { type: "off", description: "Turn looping off", subcommand: true },
+        ],
     },
 })
 export class UserCommand extends KoosCommand {
+    public override registerApplicationCommands(registery: KoosCommand.Registry) {
+        registery.registerChatInputCommand(
+            (builder) =>
+                builder //
+                    .setName(this.name)
+                    .setDescription(this.description)
+                    .addSubcommand((subcommand) => subcommand.setName("queue").setDescription("Loop the queue."))
+                    .addSubcommand((subcommand) => subcommand.setName("song").setDescription("Loop the current playing song."))
+                    .addSubcommand((subcommand) => subcommand.setName("off").setDescription("Turn looping off")),
+            { idHints: ["1050624814580252753", "1050766024347230298"] }
+        );
+    }
+
     public async messageRun(message: Message, args: Args) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(message.guildId!)!;

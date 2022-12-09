@@ -1,3 +1,5 @@
+export const zws = "\u200B";
+
 export const regex = {
     youtube: /(youtu\.be\/|youtube\.com\/)/g,
     spotify: /^(?:https:\/\/open\.spotify\.com\/(?:user\/[A-Za-z0-9]+\/)?|spotify:)(album|playlist|track)(?:[/:])([A-Za-z0-9]+).*$/g,

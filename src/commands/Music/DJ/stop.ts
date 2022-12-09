@@ -6,7 +6,7 @@ import { Message } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Stops and disconnects the player.",
-    preconditions: ["GuildOnly", "VoiceOnly", "DJ"],
+    preconditions: ["VoiceOnly", "DJ"],
 })
 export class UserCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {

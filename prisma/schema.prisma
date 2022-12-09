@@ -15,4 +15,5 @@ model guild {
   prefix String   @default("NONE")
   dj     String[] @default([])
   djOnly Boolean  @default(false)
+  volume Int      @default(100)
 }

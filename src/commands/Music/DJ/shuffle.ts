@@ -7,7 +7,7 @@ import { KoosCommand } from "#lib/extensions";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Shuffle the queue.",
-    preconditions: ["GuildOnly", "VoiceOnly", "DJ"],
+    preconditions: ["VoiceOnly", "DJ"],
     aliases: ["sh"],
 })
 export class UserCommand extends KoosCommand {

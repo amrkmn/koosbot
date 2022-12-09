@@ -10,7 +10,7 @@ import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Lets you vote for skipping the current track.",
-    preconditions: ["GuildOnly", "VoiceOnly"],
+    preconditions: ["VoiceOnly"],
 })
 export class UserCommand extends KoosCommand {
     public votes = new Set<string>();

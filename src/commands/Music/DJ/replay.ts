@@ -7,7 +7,7 @@ import { reply, send } from "@sapphire/plugin-editable-commands";
 
 @ApplyOptions<KoosCommand.Options>({
     description: `Replay the current song.`,
-    preconditions: ["GuildOnly", "VoiceOnly", "DJ"],
+    preconditions: ["VoiceOnly", "DJ"],
     aliases: ["rp", "restart"],
 })
 export class UserCommand extends KoosCommand {

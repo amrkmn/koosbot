@@ -4,23 +4,24 @@ import { GuildMember, Message, MessageEmbed, VoiceBasedChannel } from "discord.j
 import { send } from "@sapphire/plugin-editable-commands";
 import { KazagumoPlayer, KazagumoTrack } from "kazagumo";
 import { embedColor } from "#utils/constants";
-import pluralize from "pluralize";
 import { KoosCommand } from "#lib/extensions";
+import { guild } from "@prisma/client";
+import pluralize from "pluralize";
+import { isNullish } from "@sapphire/utilities";
+import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
 
 interface PlayOptions {
     message: Message | KoosCommand.ChatInputInteraction;
     player: KazagumoPlayer | undefined;
     channel: VoiceBasedChannel;
+    data: guild | null;
 }
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Add a track to queue.",
     aliases: ["p"],
-    preconditions: ["GuildOnly", "VoiceOnly"],
-    usage: {
-        type: "query",
-        required: true,
-    },
+    preconditions: ["VoiceOnly"],
+    usage: "query",
 })
 export class UserCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
@@ -41,7 +42,8 @@ export class UserCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
-        const { kazagumo } = this.container;
+        const { kazagumo, db } = this.container;
+        const data = await db.guild.findUnique({ where: { id: `${interaction.guildId}` } });
         const query = interaction.options.getString("query", true)!;
         await interaction.deferReply();
 
@@ -49,11 +51,12 @@ export class UserCommand extends KoosCommand {
         const channel = member.voice.channel as VoiceBasedChannel;
         let player = kazagumo.getPlayer(interaction.guildId!);
 
-        return interaction.followUp({ embeds: [await this.play(query, { message: interaction, player, channel })] });
+        return interaction.followUp({ embeds: [await this.play(query, { message: interaction, player, channel, data })] });
     }
 
     public async messageRun(message: Message, args: Args) {
-        const { kazagumo } = this.container;
+        const { kazagumo, db } = this.container;
+        const data = await db.guild.findUnique({ where: { id: `${message.guildId}` } });
         const query = await args.rest("string").catch(() => undefined);
         if (!query)
             return send(message, { embeds: [{ description: "Please provide an URL or search query", color: embedColor.error }] });
@@ -61,10 +64,10 @@ export class UserCommand extends KoosCommand {
         const channel = message.member?.voice.channel as VoiceBasedChannel;
         let player = kazagumo.getPlayer(message.guildId!);
 
-        return send(message, { embeds: [await this.play(query, { message, player, channel })] });
+        return send(message, { embeds: [await this.play(query, { message, player, channel, data })] });
     }
 
-    private async play(query: string, { message, player, channel }: PlayOptions) {
+    private async play(query: string, { message, player, channel, data }: PlayOptions) {
         const { kazagumo } = this.container;
         const result = await kazagumo.search(query, { requester: message.member });
         if (!result.tracks.length) return new MessageEmbed({ description: `Something went wrong`, color: embedColor.error });
@@ -90,11 +93,16 @@ export class UserCommand extends KoosCommand {
         }
 
         if (!player) {
+            if (!canJoinVoiceChannel(channel))
+                return new MessageEmbed()
+                    .setDescription(`I cannot join your voice channel. It seem like I don't have the right permissions`)
+                    .setColor(embedColor.error);
             player ??= await kazagumo.createPlayer({
                 guildId: message.guildId!,
                 textId: message.channelId!,
                 voiceId: channel!.id,
                 deaf: true,
+                volume: isNullish(data) ? 100 : data.volume,
             });
         }
 

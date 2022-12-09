@@ -2,8 +2,10 @@ import { KoosCommand } from "#lib/extensions";
 import { embedColor } from "#utils/constants";
 import { convertTime, cutText, mins } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
+import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
+import { isNullish } from "@sapphire/utilities";
 import {
     Message,
     MessageSelectOptionData,
@@ -18,8 +20,8 @@ import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
     description: `Searches and lets you choose a song.`,
-    preconditions: ["GuildOnly", "VoiceOnly"],
-    usage: "song name",
+    preconditions: ["VoiceOnly"],
+    usage: "query",
 })
 export class UserCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
@@ -63,10 +65,11 @@ export class UserCommand extends KoosCommand {
     private async search(kazagumo: Kazagumo, message: Message | KoosCommand.ChatInputInteraction, query: string) {
         if (message instanceof CommandInteraction && !message.deferred) await message.deferReply();
         const member = message.member as GuildMember;
+        const data = await this.container.db.guild.findUnique({ where: { id: `${message.guildId}` } });
         const options: MessageSelectOptionData[] = [];
 
         let { tracks, type, playlistName } = await kazagumo.search(query, { requester: message.member });
-        tracks = tracks.slice(0, 15);
+        tracks = type === "PLAYLIST" ? tracks : tracks.slice(0, 15);
 
         if (type === "PLAYLIST") {
             let duration = tracks.reduce((all, track) => all + Number(track.length), 0);
@@ -125,14 +128,26 @@ export class UserCommand extends KoosCommand {
                     : `[${selected.title} by ${selected.author}](${selected.uri})`
                 : `[${playlistName}](${interaction.values.at(0)})`;
 
-            console.log(title);
-            if (!player)
-                player = await kazagumo.createPlayer({
+            if (!player) {
+                if (!canJoinVoiceChannel(member.voice.channel)) {
+                    interaction.followUp({
+                        embeds: [
+                            {
+                                description: `I cannot join your voice channel. It seem like I don't have the right permissions`,
+                                color: embedColor.error,
+                            },
+                        ],
+                    });
+                    return;
+                }
+                player ??= await kazagumo.createPlayer({
                     guildId: `${message.guildId}`,
                     textId: `${message.channelId}`,
                     voiceId: `${member.voice.channelId}`,
                     deaf: true,
+                    volume: isNullish(data) ? 100 : data.volume,
                 });
+            }
 
             interaction.followUp({
                 embeds: [

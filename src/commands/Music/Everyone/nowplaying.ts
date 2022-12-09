@@ -10,7 +10,7 @@ import prettyMs from "pretty-ms";
 @ApplyOptions<KoosCommand.Options>({
     description: "Show information about the currently playing track.",
     aliases: ["np"],
-    preconditions: ["GuildOnly", "VoiceOnly"],
+    preconditions: ["VoiceOnly"],
 })
 export class UserCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {

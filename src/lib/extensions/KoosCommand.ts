@@ -1,25 +1,31 @@
 import { Command, PreconditionEntryResolvable, SapphireClient, UserPermissionsPrecondition } from "@sapphire/framework";
 import { PermissionLevels } from "#lib/types/Enums";
-import type { PermissionResolvable } from "discord.js";
 import { isString } from "#utils/functions";
-import { isNullOrUndefined } from "@sapphire/utilities";
+import { isNullish } from "@sapphire/utilities";
 import { Time } from "@sapphire/timestamp";
+import type { PermissionResolvable } from "discord.js";
 
-interface CommandUsage {
+interface CommandUsageOptions {
     type?: string | string[];
+    description?: string;
     required?: boolean;
-    arrayOfTypes?: { type: string | string[]; required?: boolean }[];
+    types?: Array<{
+        type: string | string[];
+        description?: string;
+        subcommand?: boolean;
+        required?: boolean;
+    }>;
 }
 
 export class KoosCommand extends Command {
     public client: SapphireClient;
     public readonly permissionLevel: PermissionLevels;
-    public readonly usage?: CommandUsage;
+    public readonly usage?: CommandUsageOptions;
     public readonly hidden: boolean;
 
     constructor(ctx: Command.Context, options: KoosCommand.Options) {
         super(ctx, { ...options, ...KoosCommand.resolvePreConditions(ctx, options) });
-        const usage = options.usage as CommandUsage;
+        const usage = options.usage as CommandUsageOptions;
 
         options.typing ??= false;
         options.cooldown ??= Time.Second * 2.5;
@@ -29,16 +35,16 @@ export class KoosCommand extends Command {
         this.permissionLevel = options.permissionLevels ?? PermissionLevels.Everyone;
         this.hidden = options.hidden ?? false;
         this.usage =
-            !isNullOrUndefined(usage) && isString(usage)
+            !isNullish(usage) && isString(usage)
                 ? {
                       type: usage as string,
                       required: isString(usage) ? true : false,
-                      arrayOfTypes: [],
+                      types: [],
                   }
                 : {
                       type: Reflect.get(usage ?? {}, "type"),
                       required: Reflect.get(usage ?? {}, "required") ?? false,
-                      arrayOfTypes: Reflect.get(usage ?? {}, "arrayOfTypes"),
+                      types: Reflect.get(usage ?? {}, "types"),
                   };
     }
 
@@ -46,6 +52,7 @@ export class KoosCommand extends Command {
         options.generateDashLessAliases ??= true;
 
         const preconditions = (options.preconditions ??= []) as PreconditionEntryResolvable[];
+        preconditions.push('GuildOnly')
 
         if (options.permissions) {
             preconditions.push(new UserPermissionsPrecondition(options.permissions));
@@ -78,7 +85,7 @@ export class KoosCommand extends Command {
 export namespace KoosCommand {
     export type Options = Command.Options & {
         permissionLevels?: number;
-        usage?: CommandUsage | string;
+        usage?: CommandUsageOptions | string;
         permissions?: PermissionResolvable;
         hidden?: boolean;
         guarded?: boolean;

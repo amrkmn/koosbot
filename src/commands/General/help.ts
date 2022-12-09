@@ -5,7 +5,8 @@ import { isString } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args, SapphirePrefix } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
-import { Collection, Message } from "discord.js";
+import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
+import { Collection, Message, EmbedFieldData } from "discord.js";
 
 const categoryLevel: { [key: string]: number } = {
     Admin: PermissionLevels.Administrator,
@@ -17,6 +18,9 @@ const categoryLevel: { [key: string]: number } = {
 @ApplyOptions<KoosCommand.Options>({
     description: `Lists all the commands`,
     aliases: ["h", "cmds", "cmd"],
+    usage: {
+        type: "command",
+    },
 })
 export class UserCommand extends KoosCommand {
     public async messageRun(message: Message, args: Args) {
@@ -36,7 +40,7 @@ export class UserCommand extends KoosCommand {
                 embeds: [
                     {
                         description: aliases ? `Aliases: \`${aliases}\`` : undefined,
-                        fields: [{ name: `${usage}`, value: `${buildedCommand.description}\n\`[${buildedCommand.category}]\`` }],
+                        fields: usage,
                         author: { name: `Help command: ${buildedCommand.name}`, iconURL: this.client.user?.displayAvatarURL() },
                         color: embedColor.default,
                     },
@@ -73,26 +77,45 @@ export class UserCommand extends KoosCommand {
         return { name, description, aliases, category };
     }
 
-    private parseUsage(command: KoosCommand, prefix: SapphirePrefix) {
-        const types = command.usage?.arrayOfTypes;
-        const parsedTypes = types?.map(({ type, required }) => {
-            let brackets = required ? `<>` : `[]`;
-            return isString(type) || Array.isArray(type)
-                ? Array.isArray(type)
-                    ? `${brackets[0]}${type.join(" | ")}${brackets[1]}`
-                    : `${brackets[0]}${type}${brackets[1]}`
-                : ``;
-        });
-        let brackets = command.usage?.required ? `<>` : `[]`;
+    private parseUsage(command: KoosCommand, prefix: SapphirePrefix): EmbedFieldData[] {
+        // const types = command.usage?.types;
+        // const parsedTypes = types?.map(({ type, required }) => {
+        //     let brackets = required ? `<>` : `[]`;
+        //     return isString(type) || Array.isArray(type)
+        //         ? Array.isArray(type)
+        //             ? `${brackets[0]}${type.join(" | ")}${brackets[1]}`
+        //             : `${brackets[0]}${type}${brackets[1]}`
+        //         : ``;
+        // });
+        let category = `[${command.fullCategory.at(-1) ?? command.category}]`;
+        if (isNullish(command.usage)) return [{ name: `${prefix}${command.name}`, value: `${command.description}\n\`${category}\`` }];
+
+        let usages: EmbedFieldData[] = [];
+        let brackets = command.usage.required ? `<>` : `[]`;
         let text =
-            isString(command.usage?.type) || Array.isArray(command.usage?.type)
+            isString(command.usage.type) || Array.isArray(command.usage.type)
                 ? Array.isArray(command.usage?.type)
-                    ? `${brackets[0]}${command.usage?.type.join(" | ")}${brackets[1]}`
+                    ? `${brackets[0]}${command.usage?.type.join("|")}${brackets[1]}`
                     : `${brackets[0]}${command.usage?.type}${brackets[1]}`
                 : ``;
-        if (parsedTypes && parsedTypes.length !== 0) text = parsedTypes.join(" ");
+        usages.push({
+            name: `${prefix}${command.name}${text ? ` ${text}` : ``}`,
+            value: `${command.description ?? "No description provided."}\n\`${category}\``,
+        });
+        if (isNullishOrEmpty(command.usage.types) || !Array.isArray(command.usage.types)) return usages;
 
-        return `${prefix}${command.name} ${text}`;
+        for (let { type, description, required, subcommand } of command.usage.types) {
+            let brackets = required ? `<>` : `[]`;
+            let text = subcommand
+                ? ` ${Array.isArray(type) ? type.join("|") : type}`
+                : ` ${brackets[0]}${Array.isArray(type) ? type.join("|") : type}${brackets[1]}`;
+            usages.push({
+                name: `${prefix}${command.name}${text}`,
+                value: `${description ?? "No description provided."}\n\`${category}\``,
+            });
+        }
+
+        return usages;
     }
 
     private async buildHelp(message: Message) {

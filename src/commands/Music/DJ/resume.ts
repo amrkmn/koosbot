@@ -7,7 +7,7 @@ import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Resume the current queue.",
-    preconditions: ["GuildOnly", "VoiceOnly", "DJ"],
+    preconditions: ["VoiceOnly", "DJ"],
     aliases: ["continue"],
 })
 export class UserCommand extends KoosCommand {

@@ -10,5 +10,6 @@ declare module "@sapphire/framework" {
         OwnerOnly: never;
         ServerOwner: never;
         DJ: never;
+        Everyone: never;
     }
 }

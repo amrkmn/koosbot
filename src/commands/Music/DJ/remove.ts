@@ -9,7 +9,7 @@ import { KoosCommand } from "#lib/extensions";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Remove a track from the queue.",
-    preconditions: ["GuildOnly", "VoiceOnly", "DJ"],
+    preconditions: ["VoiceOnly", "DJ"],
     aliases: ["rm", "del", "delete"],
     usage: "position",
 })
@@ -23,7 +23,7 @@ export class UserCommand extends KoosCommand {
                     .addNumberOption((option) =>
                         option //
                             .setName("position")
-                            .setDescription("Position of song to remove")
+                            .setDescription("Position of song to remove.")
                             .setRequired(true)
                     ),
             { idHints: ["1050092669860319292", "1050094595914076201"] }

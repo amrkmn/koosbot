@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { embedColor } from "#utils/constants";
+import { embedColor, zws } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { MessageEmbed, Message, Role } from "discord.js";
 // import { isNullishOrEmpty } from "@sapphire/utilities";
@@ -10,13 +10,11 @@ import { removeItem } from "#utils/functions";
 import { PermissionLevels } from "#lib/types/Enums";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: "Add/Remove a DJ role.",
-    preconditions: ["GuildOnly", "Administrator"],
+    description: "Show the current DJ roles.",
     aliases: ["dj"],
     permissionLevels: PermissionLevels.Administrator,
     usage: {
-        type: "role",
-        required: false,
+        types: [{ type: "role", description: "Add/Remove a DJ role.", required: true }],
     },
 })
 export class AdminCommand extends KoosCommand {
@@ -61,7 +59,9 @@ export class AdminCommand extends KoosCommand {
         if (!roleId && isNullishOrEmpty(dj))
             return new MessageEmbed().setDescription(`There is no DJ role set.`).setColor(embedColor.warn);
         if (!roleId)
-            return new MessageEmbed().setDescription(`__Configured DJ role:__\n\n${dj.join("\n")}`).setColor(embedColor.default);
+            return new MessageEmbed()
+                .setFields([{ name: `Configured DJ role:`, value: `${zws}\n${dj.join("\n")}` }])
+                .setColor(embedColor.default);
 
         const idAdded = data.dj.includes(roleId) ? false : true;
         const roles = data.dj.includes(roleId) //

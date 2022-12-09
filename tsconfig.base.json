@@ -10,5 +10,7 @@
         "declarationMap": false,
         "declaration": false,
         "emitDecoratorMetadata": false,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false
     }
 }
