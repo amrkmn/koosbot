@@ -23,7 +23,7 @@ export class AdminCommand extends KoosCommand {
             (builder) =>
                 builder //
                     .setName(this.name)
-                    .setDescription(this.description)
+                    .setDescription("Show the current DJ roles or Add/Remove DJ role")
                     .addRoleOption((option) =>
                         option //
                             .setName("role")
