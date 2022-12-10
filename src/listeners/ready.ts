@@ -12,7 +12,24 @@ const dev = envParseString("NODE_ENV") !== "production";
 export class ClientListener extends Listener {
     private readonly style = dev ? yellow : blue;
     public async run(client: KoosClient) {
-        client.logger.info(client.generateInvite({ scopes: ["bot"], permissions: ["ADMINISTRATOR"] }));
+        client.logger.info(
+            client.generateInvite({
+                scopes: ["bot"],
+                permissions: [
+                    "CREATE_INSTANT_INVITE",
+                    "ATTACH_FILES",
+                    "CONNECT",
+                    "EMBED_LINKS",
+                    "MANAGE_MESSAGES",
+                    "SEND_MESSAGES",
+                    "READ_MESSAGE_HISTORY",
+                    "ADD_REACTIONS",
+                    "USE_EXTERNAL_EMOJIS",
+                    "SPEAK",
+                    "VIEW_AUDIT_LOG",
+                ],
+            })
+        );
         client.logger.info(`Logged in as ${client.user?.tag}`);
         this.printStoreDebugInformation();
 
