@@ -74,7 +74,7 @@ export class UserCommand extends KoosCommand {
                 .setDescription(
                     [
                         `__Now playing:__`,
-                        `${nowPlaying} [${timeLeft}] ${current.requester}`,
+                        `${nowPlaying} [${timeLeft}] ~ ${current.requester}`,
                         ``,
                         `__Up next:__`,
                         `No other tracks here`,
@@ -95,7 +95,9 @@ export class UserCommand extends KoosCommand {
                         track.sourceName === "youtube"
                             ? `[${track.title}](${track.uri})`
                             : `[${track.title} by ${track.author ?? "Unknown artist"}](${track.uri})`;
-                    return `**${i + ++index}.** ${title} [${track.isStream ? "Live" : convertTime(track.length!)}] ${track.requester}`;
+                    return `**${i + ++index}.** ${title} [${track.isStream ? "Live" : convertTime(track.length!)}] ~ ${
+                        track.requester
+                    }`;
                 })
             );
         }
@@ -106,9 +108,13 @@ export class UserCommand extends KoosCommand {
             embeds.push(
                 new MessageEmbed()
                     .setDescription(
-                        [`__Now playing:__`, `${nowPlaying} [${timeLeft}] ${current.requester}`, ``, `__Up next:__`, `${upNext}`].join(
-                            "\n"
-                        )
+                        [
+                            `__Now playing:__`,
+                            `${nowPlaying} [${timeLeft}] ~ ${current.requester}`,
+                            ``,
+                            `__Up next:__`,
+                            `${upNext}`,
+                        ].join("\n")
                     )
                     .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
                     .setColor(embedColor.default)
