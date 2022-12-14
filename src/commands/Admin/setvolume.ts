@@ -8,10 +8,18 @@ import { isNullish } from "@sapphire/utilities";
 import { Message, MessageEmbed } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: "Lets you change the bots default output volume.",
+    description: "View the current default volume.",
     aliases: ["setvol"],
     permissionLevels: PermissionLevels.Administrator,
-    usage: "1-200",
+    usage: {
+        types: [
+            {
+                type: "1-200",
+                required: true,
+                description: "Lets you change the bots default output volume.",
+            },
+        ],
+    },
 })
 export class AdminCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {

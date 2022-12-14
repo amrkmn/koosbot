@@ -12,7 +12,7 @@ import pluralize from "pluralize";
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["s", "n", "next"],
     usage: {
-        types: [{ type: "to", description: "Skips to a specific track in the queue.", subcommand: true }],
+        types: [{ type: "to", description: "Skips to a specific track in the queue.", required: true }],
     },
 })
 export class UserCommand extends KoosCommand {

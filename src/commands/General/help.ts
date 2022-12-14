@@ -100,7 +100,7 @@ export class UserCommand extends KoosCommand {
                 : ``;
         usages.push({
             name: `${prefix}${command.name}${text ? ` ${text}` : ``}`,
-            value: `${command.description ?? "No description provided."}\n\`${category}\``,
+            value: `${command.usage.description ?? command.description ?? "No description provided."}\n\`${category}\``,
         });
         if (isNullishOrEmpty(command.usage.types) || !Array.isArray(command.usage.types)) return usages;
 

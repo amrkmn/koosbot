@@ -8,10 +8,18 @@ import { Message, MessageEmbed } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: "Lets you change the bots output volume.",
+    description: "View the current player's volume.",
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["v", "vol"],
-    usage: "1-200",
+    usage: {
+        types: [
+            {
+                type: "1-200",
+                required: true,
+                description: "Lets you change the bots output volume.",
+            },
+        ],
+    },
 })
 export class UserCommand extends KoosCommand {
     public override async registerApplicationCommands(registery: KoosCommand.Registry) {
