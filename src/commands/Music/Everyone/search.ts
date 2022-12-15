@@ -85,11 +85,12 @@ export class UserCommand extends KoosCommand {
                 value: `${query}`,
             });
         } else {
+            let i = 0;
             for (let track of tracks) {
                 options.push({
                     label: cutText(`${track.title}`, 100),
                     description: `Duration: ${convertTime(track.length!)} | Author: ${track.author}`,
-                    value: `${track.uri}`,
+                    value: `${i++}`,
                 });
             }
         }
@@ -127,6 +128,7 @@ export class UserCommand extends KoosCommand {
                     return;
                 }
 
+                collector.stop("picked");
                 const selected = type === "PLAYLIST" && isNaN(userOption) ? tracks : tracks[userOption];
 
                 const title = !Array.isArray(selected)
@@ -170,7 +172,6 @@ export class UserCommand extends KoosCommand {
 
                 player.queue.add(selected);
                 if (!player.playing && !player.paused) player.play();
-                collector.stop("picked");
             } catch (error) {
                 collector.stop("error");
             }
@@ -190,8 +191,12 @@ export class UserCommand extends KoosCommand {
                     msg.edit({ embeds: [embed], components: [timedOutRow] });
                     break;
                 case "error":
+                    let errorRow = new MessageActionRow().setComponents(
+                        selectMenu.setPlaceholder("Something went wrong").setDisabled(true)
+                    );
                     msg.edit({
                         embeds: [{ description: `Something went wrong when trying to add track to queue.`, color: embedColor.error }],
+                        components: [errorRow],
                     });
                     break;
             }
