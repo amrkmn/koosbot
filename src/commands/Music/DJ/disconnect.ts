@@ -6,8 +6,9 @@ import { Message, MessageEmbed } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: "Stops the player and clear the queue.",
+    description: "Disconnects the bot from its current voice channel.",
     preconditions: ["VoiceOnly", "DJ"],
+    aliases: ["dc", "leave"],
 })
 export class UserCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
@@ -16,7 +17,7 @@ export class UserCommand extends KoosCommand {
                 builder //
                     .setName(this.name)
                     .setDescription(this.description),
-            { idHints: ["1050092758070730815", "1050094683856048268"] }
+            { idHints: ["1053318753800175707", "1053318960638087218"] }
         );
     }
 
@@ -32,7 +33,7 @@ export class UserCommand extends KoosCommand {
             });
         }
 
-        interaction.followUp({ embeds: [await this.stop(player)] });
+        interaction.followUp({ embeds: [await this.disconnect(player)] });
     }
 
     public async messageRun(message: Message) {
@@ -45,13 +46,11 @@ export class UserCommand extends KoosCommand {
             });
         }
 
-        send(message, { embeds: [await this.stop(player)] });
+        send(message, { embeds: [this.disconnect(player)] });
     }
 
-    private async stop(player: KazagumoPlayer) {
-        player.queue.clear();
-        player.shoukaku.stopTrack();
-
-        return new MessageEmbed().setDescription("Stopped playback and cleared the queue").setColor(embedColor.default);
+    private disconnect(player: KazagumoPlayer) {
+        player.destroy();
+        return new MessageEmbed().setDescription(`Destroyed the player and left the voice channel`).setColor(embedColor.default);
     }
 }

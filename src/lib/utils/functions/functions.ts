@@ -55,7 +55,7 @@ export function splitText(str: string, length: number, char = " ") {
     return str.substring(0, pos);
 }
 
-export function isString(input: unknown) {
+export function isString(input: unknown): input is string {
     return typeof input === "string";
 }
 

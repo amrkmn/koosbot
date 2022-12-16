@@ -54,6 +54,6 @@ export class UserCommand extends KoosCommand {
 
         player.pause(false);
 
-        return new MessageEmbed({ description: `Paused the song.`, color: embedColor.default });
+        return new MessageEmbed({ description: `Resumed the song.`, color: embedColor.default });
     }
 }

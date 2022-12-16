@@ -1,11 +1,12 @@
 import { envParseString } from "#env";
 import { embedColor } from "#utils/constants";
-import { mins, sec } from "#utils/functions";
+import { isString, mins, sec } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
 import { Guild, MessageEmbed } from "discord.js";
 import { Events, KazagumoPlayer } from "kazagumo";
+import ms from "ms";
 
 @ApplyOptions<Listener.Options>({
     emitter: container.kazagumo,
@@ -14,30 +15,25 @@ import { Events, KazagumoPlayer } from "kazagumo";
 })
 export class ClientListener extends Listener {
     timeoutId: NodeJS.Timeout | undefined;
+    leaveAfter: number = envParseString("NODE_ENV") === "production" ? mins(3) : sec(25);
 
-    public async run(player: KazagumoPlayer) {
-        const { client } = this.container;
-        const guild = client.guilds.cache.get(player.guildId) ?? (await client.guilds.fetch(player.guildId));
-        const channel = container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId));
-        if (isNullish(guild) || isNullish(player) || isNullish(channel)) return;
+    public async run(player: KazagumoPlayer | string) {
+        if (typeof player === "string" && player === "stop") return;
+        if (player instanceof KazagumoPlayer) {
+            const { client } = this.container;
+            const guild = client.guilds.cache.get(player.guildId) ?? (await client.guilds.fetch(player.guildId));
+            const channel = container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId));
+            if (isNullish(guild) || isNullish(player) || isNullish(channel)) return;
 
-        if (player.queue.current) return;
+            if (player.queue.current) return;
 
-        if (channel.isText()) channel.send({ embeds: [{ description: "There are no more tracks", color: embedColor.error }] });
+            // if (channel.isText()) channel.send({ embeds: [{ description: "There are no more tracks", color: embedColor.error }] });
 
-        await this.setup(guild, player);
-
-        // this.container.tasks.create(
-        //     "kazagumoLeave",
-        //     { channelId: channel.id, guildId: guild.id },
-        //     envParseString("NODE_ENV") === "production" ? mins(3) : sec(25)
-        // );
-        return;
+            await this.setup(guild, player);
+            return;
+        }
     }
 
-    remind() {
-        this.timeoutId = undefined;
-    }
     async setup(guild: Guild | null, player: KazagumoPlayer) {
         if (typeof this.timeoutId !== "undefined") this.cancel();
 
@@ -45,25 +41,28 @@ export class ClientListener extends Listener {
         const channel = container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId));
         if (isNullish(guild) || isNullish(player) || isNullish(channel)) return this.cancel();
 
-        this.timeoutId = setTimeout(
-            () => {
-                if (player.queue.current) return this.cancel();
-                if (player.queue.isEmpty && !isNullish(guild.me?.voice.channelId)) {
-                    player.destroy();
-                    if (channel.isText())
-                        channel.send({
-                            embeds: [
-                                new MessageEmbed()
-                                    .setDescription(`No tracks have been playing for the past 3 minutes, leaving.`)
-                                    .setColor(embedColor.error),
-                            ],
-                        });
-                }
-            },
-            envParseString("NODE_ENV") === "production" ? mins(3) : sec(25)
-        );
+        this.timeoutId = setTimeout(() => {
+            if (player.queue.current) return this.cancel();
+            if (player.queue.isEmpty && !isNullish(guild.me?.voice.channelId)) {
+                player.destroy();
+                if (channel.isText())
+                    channel.send({
+                        embeds: [
+                            new MessageEmbed()
+                                .setDescription(
+                                    `No tracks have been playing for the past ${ms(this.leaveAfter, { long: true })}, leaving.`
+                                )
+                                .setColor(embedColor.error),
+                        ],
+                    });
+            }
+        }, this.leaveAfter);
+    }
+    reset() {
+        this.timeoutId = undefined;
     }
     cancel() {
         clearTimeout(this.timeoutId);
+        this.reset();
     }
 }
