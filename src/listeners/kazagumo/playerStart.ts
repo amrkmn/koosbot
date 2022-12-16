@@ -3,8 +3,7 @@ import { KazagumoPlayer, KazagumoTrack, Events } from "kazagumo";
 import { MessageEmbed } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
 import { embedColor } from "#utils/constants";
-
-// container.kazagumo.on("playerEnd", (player, track) => {});
+import { convertTime } from "#utils/functions";
 
 @ApplyOptions<Listener.Options>({
     emitter: container.kazagumo,
@@ -21,7 +20,9 @@ export class ClientListener extends Listener {
             track.sourceName == "youtube" ? `[${track.title}](${track.uri})` : `[${track.title} by ${track.author}](${track.uri})`;
 
         const embed = new MessageEmbed() //
-            .setDescription(`Started playing ${title} ${track.requester ? `[${track.requester}]` : ""}`)
+            .setDescription(
+                `Started playing ${title} [${convertTime(Number(track.length))}] ${track.requester ? `~ ${track.requester}` : ""}`
+            )
             .setColor(embedColor.default);
 
         if (channel.isText()) channel.send({ embeds: [embed] });
