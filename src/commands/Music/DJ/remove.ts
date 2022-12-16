@@ -11,7 +11,12 @@ import { KoosCommand } from "#lib/extensions";
     description: "Remove a track from the queue.",
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["rm", "del", "delete"],
-    usage: "position",
+    usage: {
+        type: [
+            { type: "position", required: true },
+            { type: "to", required: false },
+        ],
+    },
 })
 export class UserCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
@@ -25,6 +30,12 @@ export class UserCommand extends KoosCommand {
                             .setName("position")
                             .setDescription("Position of song to remove.")
                             .setRequired(true)
+                    )
+                    .addNumberOption((option) =>
+                        option //
+                            .setName("to")
+                            .setDescription("Remove a range of tracks from the queue")
+                            .setRequired(false)
                     ),
             { idHints: ["1050092669860319292", "1050094595914076201"] }
         );
@@ -34,6 +45,7 @@ export class UserCommand extends KoosCommand {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(interaction.guildId!)!;
         const position = interaction.options.getNumber("position");
+        const to = interaction.options.getNumber("to") ?? undefined;
 
         if (player) await interaction.deferReply();
         if (isNullish(position))
@@ -47,13 +59,14 @@ export class UserCommand extends KoosCommand {
                 ephemeral: true,
             });
 
-        return interaction.followUp({ embeds: [await this.remove(player, position)] });
+        return interaction.followUp({ embeds: [await this.remove(player, position, to)] });
     }
 
     public async messageRun(message: Message, args: Args) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(message.guildId!)!;
         const position = await args.pick("number").catch(() => undefined);
+        const to = await args.pick("number").catch(() => undefined);
 
         if (isNullish(position)) {
             return reply(message, {
@@ -66,13 +79,16 @@ export class UserCommand extends KoosCommand {
             });
         }
 
-        return send(message, { embeds: [await this.remove(player, position)] });
+        return send(message, { embeds: [await this.remove(player, position, to)] });
     }
 
-    private async remove(player: KazagumoPlayer, position: number) {
-        if (position > player.queue.size)
+    private async remove(player: KazagumoPlayer, position: number, to?: number) {
+        if (position === to) to = undefined;
+        if (to && to < position) to = undefined;
+
+        if (position > player.queue.size || (to && to > player.queue.size))
             return new MessageEmbed({
-                description: `The queue doesn't have that many tracks (Total Songs: ${player.queue.size})`,
+                description: `The queue doesn't have that many tracks (Total tracks: ${player.queue.size})`,
                 color: embedColor.error,
             });
         if (position < 1)
@@ -80,6 +96,10 @@ export class UserCommand extends KoosCommand {
                 description: `The position number must be from 1 to ${player.queue.size}`,
                 color: embedColor.error,
             });
+        if (to && to <= player.queue.size && to > position) {
+            player.queue.splice(position - 1, to - position + 1);
+            return new MessageEmbed({ description: `Removed song from index ${position} to ${to}`, color: embedColor.default });
+        }
 
         const track = player.queue[position - 1];
         const title =

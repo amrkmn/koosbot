@@ -1,6 +1,6 @@
 import { envParseString } from "#env";
 import { embedColor } from "#utils/constants";
-import { isString, mins, sec } from "#utils/functions";
+import { mins, sec } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";

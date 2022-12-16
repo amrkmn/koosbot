@@ -6,7 +6,6 @@ import { Time } from "@sapphire/timestamp";
 import type { PermissionResolvable } from "discord.js";
 
 interface CommandUsageOptions {
-    type?: string | string[];
     description?: string;
     required?: boolean;
     types?: Array<{
@@ -15,6 +14,15 @@ interface CommandUsageOptions {
         subcommand?: boolean;
         required?: boolean;
     }>;
+    type?:
+        | string
+        | Array<string>
+        | Array<{
+              type: string | string[];
+              description?: string;
+              subcommand?: boolean;
+              required?: boolean;
+          }>;
 }
 
 export class KoosCommand extends Command {
@@ -52,7 +60,7 @@ export class KoosCommand extends Command {
         options.generateDashLessAliases ??= true;
 
         const preconditions = (options.preconditions ??= []) as PreconditionEntryResolvable[];
-        preconditions.push('GuildOnly')
+        preconditions.push("GuildOnly");
 
         if (options.permissions) {
             preconditions.push(new UserPermissionsPrecondition(options.permissions));

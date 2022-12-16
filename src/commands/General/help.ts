@@ -78,26 +78,32 @@ export class UserCommand extends KoosCommand {
     }
 
     private parseUsage(command: KoosCommand, prefix: SapphirePrefix): EmbedFieldData[] {
-        // const types = command.usage?.types;
-        // const parsedTypes = types?.map(({ type, required }) => {
-        //     let brackets = required ? `<>` : `[]`;
-        //     return isString(type) || Array.isArray(type)
-        //         ? Array.isArray(type)
-        //             ? `${brackets[0]}${type.join(" | ")}${brackets[1]}`
-        //             : `${brackets[0]}${type}${brackets[1]}`
-        //         : ``;
-        // });
         let category = `[${command.fullCategory.at(-1) ?? command.category}]`;
         if (isNullish(command.usage)) return [{ name: `${prefix}${command.name}`, value: `${command.description}\n\`${category}\`` }];
 
         let usages: EmbedFieldData[] = [];
         let brackets = command.usage.required ? `<>` : `[]`;
-        let text =
-            isString(command.usage.type) || Array.isArray(command.usage.type)
-                ? Array.isArray(command.usage?.type)
-                    ? `${brackets[0]}${command.usage?.type.join("|")}${brackets[1]}`
-                    : `${brackets[0]}${command.usage?.type}${brackets[1]}`
-                : ``;
+        let text = "";
+        if (Array.isArray(command.usage.type)) {
+            if (command.usage.type.some((value) => isString(value))) {
+                text = Array.isArray(command.usage?.type)
+                    ? `${brackets[0]}${command.usage.type.join("|")}${brackets[1]}`
+                    : `${brackets[0]}${command.usage.type}${brackets[1]}`;
+            } else {
+                const types = command.usage.type
+                    .map((v) => {
+                        if (isString(v)) return "";
+                        let brackets = v.required ? `<>` : `[]`;
+                        return Array.isArray(v.type)
+                            ? `${brackets[0]}${v.type.join("|")}${brackets[1]}`
+                            : `${brackets[0]}${v.type}${brackets[1]}`;
+                    })
+                    .filter(String);
+
+                text = !isNullishOrEmpty(types) ? types.join(" ") : `${command.usage.type.join("|")}`;
+            }
+        }
+
         usages.push({
             name: `${prefix}${command.name}${text ? ` ${text}` : ``}`,
             value: `${command.usage.description ?? command.description ?? "No description provided."}\n\`${category}\``,
