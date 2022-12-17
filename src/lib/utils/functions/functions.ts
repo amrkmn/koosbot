@@ -1,25 +1,39 @@
-export const convertTime = (duration: number) => {
-    let seconds: number | string = parseInt(`${(duration / 1000) % 60}`),
-        minutes: number | string = parseInt(`${(duration / (1000 * 60)) % 60}`),
-        hours: number | string = parseInt(`${(duration / (1000 * 60 * 60)) % 24}`);
+import { container } from "@sapphire/framework";
 
-    hours = hours < 10 ? "0" + hours : hours;
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-    seconds = seconds < 10 ? "0" + seconds : seconds;
+export async function databasePing() {
+    const startTime = process.hrtime.bigint();
+    await container.db.guilds.findMany();
+    const endTime = process.hrtime.bigint() - startTime;
+
+    return convertHrtime(endTime).milliseconds;
+}
+
+export function convertHrtime(hrtime: number | bigint) {
+    const nanoseconds = Number(hrtime);
+    const number = Number(nanoseconds);
+    const milliseconds = number / 1e6;
+    const seconds = number / 1e9;
+
+    return { seconds, milliseconds, nanoseconds };
+}
+
+export const convertTime = (duration: number) => {
+    let seconds: string = String(Math.floor((duration / 1000) % 60)).padStart(2, "0");
+    let minutes: string = String(Math.floor((duration / (1000 * 60)) % 60)).padStart(2, "0");
+    let hours: string = String(Math.floor((duration / (1000 * 60 * 60)) % 24)).padStart(2, "0");
 
     if (duration < 3600000) return minutes + ":" + seconds;
     else return hours + ":" + minutes + ":" + seconds;
 };
 
 export const progressBar = (value: number, maxValue: number, size = 10, isStream: boolean) => {
-    let emptyBar = "▬",
-        filledBar = "🔵";
+    let emptyBar = "▬";
+    let filledBar = "🔵";
+    if (isStream) return emptyBar.repeat(size).replace(/.$/, `${filledBar}`);
+
     const percentage = value / maxValue;
     const progress = size * percentage;
     const emptyProgress = size - progress;
-
-    if (isStream) return emptyBar.repeat(size).replace(/.$/, `${filledBar}`);
-
     const progressText = emptyBar.repeat(progress < 1 ? 1 : progress).replace(/.$/, `${filledBar}`);
     const emptyProgressText = emptyBar.repeat(emptyProgress);
     // const percentageText = (percentage * 100).toFixed(1) + "%";

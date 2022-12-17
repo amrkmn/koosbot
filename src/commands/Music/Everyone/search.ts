@@ -68,7 +68,7 @@ export class UserCommand extends KoosCommand {
         const data = await this.container.db.guilds.findUnique({ where: { id: `${message.guildId}` } });
         const options: MessageSelectOptionData[] = [];
 
-        let { tracks, type, playlistName } = await kazagumo.search(query, { requester: data?.requester ? message.member : null });
+        let { tracks, type, playlistName } = await kazagumo.search(query, { requester: message.member });
         tracks = type === "PLAYLIST" ? tracks : tracks.slice(0, 15);
 
         if (isNullishOrEmpty(tracks)) {

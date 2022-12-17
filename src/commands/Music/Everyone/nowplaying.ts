@@ -35,7 +35,7 @@ export class UserCommand extends KoosCommand {
             });
         }
 
-        return interaction.followUp({ embeds: [this.nowPlaying(player)] });
+        return interaction.followUp({ embeds: [await this.nowPlaying(player)] });
     }
 
     public async messageRun(message: Message) {
@@ -48,17 +48,18 @@ export class UserCommand extends KoosCommand {
             });
         }
 
-        send(message, { embeds: [this.nowPlaying(player)] });
+        send(message, { embeds: [await this.nowPlaying(player)] });
     }
 
-    private nowPlaying(player: KazagumoPlayer) {
+    private async nowPlaying(player: KazagumoPlayer) {
+        const data = await this.container.db.guilds.findUnique({ where: { id: player.guildId } });
         const current = player.queue.current!;
         const title =
             current.sourceName === "youtube"
                 ? `[${current.title}](${current.uri})`
                 : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
 
-        const description = `${title} [${current.requester}]`;
+        const description = `${title}${data?.requester ? ` ~ ${current.requester}` : ``}`;
         const duration = Number(current.length);
         const progress =
             `${progressBar(player.shoukaku.position, duration, 20, current.isStream)} ` +

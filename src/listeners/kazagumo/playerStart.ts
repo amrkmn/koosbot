@@ -12,6 +12,7 @@ import { convertTime } from "#utils/functions";
 })
 export class ClientListener extends Listener {
     public async run(player: KazagumoPlayer, track: KazagumoTrack) {
+        const data = await this.container.db.guilds.findUnique({ where: { id: player.guildId } });
         const channel =
             this.container.client.channels.cache.get(player.textId) ?? (await this.container.client.channels.fetch(player.textId));
         if (!channel) return;
@@ -21,7 +22,7 @@ export class ClientListener extends Listener {
 
         const embed = new MessageEmbed() //
             .setDescription(
-                `Started playing ${title} [${convertTime(Number(track.length))}]${track.requester ? ` ~ ${track.requester}` : ""}`
+                `Started playing ${title} [${convertTime(Number(track.length))}]${data?.requester ? ` ~ ${track.requester}` : ""}`
             )
             .setColor(embedColor.default);
 

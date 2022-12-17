@@ -55,6 +55,7 @@ export class UserCommand extends KoosCommand {
     }
 
     private async queue(player: KazagumoPlayer) {
+        const data = await this.container.db.guilds.findUnique({ where: { id: player.guildId } });
         const current = player.queue.current!;
         let timeLeft = current.isStream //
             ? "Live"
@@ -74,7 +75,7 @@ export class UserCommand extends KoosCommand {
                 .setDescription(
                     [
                         `__Now playing:__`,
-                        `${nowPlaying} [${timeLeft}]${current.requester ? ` ~ ${current.requester}` : ``}`,
+                        `${nowPlaying} [${timeLeft}]${data?.requester ? ` ~ ${current.requester}` : ``}`,
                         ``,
                         `__Up next:__`,
                         `No other tracks here`,
@@ -96,7 +97,7 @@ export class UserCommand extends KoosCommand {
                             ? `[${track.title}](${track.uri})`
                             : `[${track.title} by ${track.author ?? "Unknown artist"}](${track.uri})`;
                     return `**${i + ++index}.** ${title} [${track.isStream ? "Live" : convertTime(track.length!)}]${
-                        track.requester ? ` ~ ${track.requester}` : ``
+                        data?.requester ? ` ~ ${track.requester}` : ``
                     }`;
                 })
             );
@@ -110,7 +111,7 @@ export class UserCommand extends KoosCommand {
                     .setDescription(
                         [
                             `__Now playing:__`,
-                            `${nowPlaying} [${timeLeft}]${current.requester ? ` ~ ${current.requester}` : ``}`,
+                            `${nowPlaying} [${timeLeft}]${data?.requester ? ` ~ ${current.requester}` : ``}`,
                             ``,
                             `__Up next:__`,
                             `${upNext}`,

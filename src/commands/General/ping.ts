@@ -1,5 +1,6 @@
 import { KoosCommand } from "#lib/extensions";
 import { embedColor } from "#utils/constants";
+import { databasePing } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { isMessageInstance } from "@sapphire/discord.js-utilities";
 import { send } from "@sapphire/plugin-editable-commands";
@@ -26,7 +27,8 @@ export class UserCommand extends KoosCommand {
         if (isMessageInstance(msg)) {
             const diff = msg.createdTimestamp - interaction.createdTimestamp;
             const ping = Math.round(this.container.client.ws.ping);
-            const content = `Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms.)`;
+            const database = Math.round(await databasePing());
+            const content = `Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms. Database: ${database}ms.)`;
 
             interaction.editReply({ embeds: [{ description: content, color: embedColor.default }] });
         }
@@ -37,7 +39,8 @@ export class UserCommand extends KoosCommand {
 
         const diff = msg.createdTimestamp - message.createdTimestamp;
         const ping = Math.round(this.container.client.ws.ping);
-        const content = `Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms.)`;
+        const database = Math.round(await databasePing());
+        const content = `Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms. Database: ${database}ms.)`;
 
         return send(message, { embeds: [{ description: content, color: embedColor.default }] });
     }

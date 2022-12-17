@@ -4,11 +4,16 @@ import { MessageEmbed, Message } from "discord.js";
 import { embedColor } from "#utils/constants";
 import { send } from "@sapphire/plugin-editable-commands";
 import { Emojis, PermissionLevels } from "#lib/types/Enums";
+import { Args } from "@sapphire/framework";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Enables/disables if the requester is shown on each track.",
     permissionLevels: PermissionLevels.Administrator,
     aliases: ["req"],
+    usage: {
+        type: ["true", "false"],
+        required: true,
+    },
 })
 export class UserCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
@@ -34,8 +39,10 @@ export class UserCommand extends KoosCommand {
         interaction.followUp({ embeds: [await this.requester(interaction.guildId!, enable)] });
     }
 
-    public async messageRun(message: Message) {
-        send(message, { embeds: [await this.requester(message.guildId!)] });
+    public async messageRun(message: Message, args: Args) {
+        const enable = await args.pick("boolean").catch(() => undefined);
+
+        send(message, { embeds: [await this.requester(message.guildId!, enable)] });
     }
 
     private async requester(guildId: string, enable?: boolean) {

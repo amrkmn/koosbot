@@ -70,7 +70,7 @@ export class UserCommand extends KoosCommand {
 
     private async play(query: string, { message, player, channel, data }: PlayOptions) {
         const { kazagumo } = this.container;
-        const result = await kazagumo.search(query, { requester: data?.requester ? message.member : null });
+        const result = await kazagumo.search(query, { requester: message.member });
         if (!result.tracks.length) return new MessageEmbed({ description: `Something went wrong`, color: embedColor.error });
 
         let tracks: KazagumoTrack[] = [],
