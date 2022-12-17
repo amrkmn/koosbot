@@ -11,11 +11,11 @@ import { ScheduledTaskRedisStrategy } from "@sapphire/plugin-scheduled-tasks/reg
 import Spotify from "kazagumo-spotify";
 
 const NODES: NodeOption[] = [
-    { name: "lavalink.aytea.ga", url: "lavalink.aytea.ga:443", auth: "maybeiwasboring", secure: true },
-    { name: "lava1.horizxon.studio", url: "lava1.horizxon.studio:80", auth: "horizxon.studio", secure: false },
-    // { name: "lava2.horizxon.studio", url: "lava2.horizxon.studio:80", auth: "horizxon.studio", secure: false },
-    { name: "lava3.horizxon.studio", url: "lava3.horizxon.studio:80", auth: "horizxon.studio", secure: false },
-    { name: "lava4.horizxon.studio", url: "lava4.horizxon.studio:80", auth: "horizxon.studio", secure: false },
+    { name: "lavalink.botsuniversity.ml", url: "lavalink.botsuniversity.ml:443", auth: "mathiscool", secure: true },
+    { name: "lavalink2.botsuniversity.ml", url: "lavalink2.botsuniversity.ml:443", auth: "mathiscool", secure: true },
+    { name: "lavalink3.botsuniversity.ml", url: "lavalink3.botsuniversity.ml:443", auth: "mathiscool", secure: true },
+    { name: "lavalink4.botsuniversity.ml", url: "lavalink4.botsuniversity.ml:443", auth: "mathiscool", secure: true },
+    { name: "node1.kartadharta.xyz", url: "node1.kartadharta.xyz:443", auth: "kdlavalink", secure: true },
 ];
 
 export class KoosClient extends SapphireClient {
@@ -44,7 +44,7 @@ export class KoosClient extends SapphireClient {
                 strategy: new ScheduledTaskRedisStrategy({
                     bull: {
                         connection: {
-                            port: Number(process.env.REDIS_PORT_SECRET) || undefined,
+                            port: envParseInteger("REDIS_PORT_SECRET"),
                             password: `${envParseString("REDIS_PASSWORD_SECRET")}`,
                             host: `${envParseString("REDIS_HOST_SECRET")}`,
                         },

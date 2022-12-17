@@ -13,7 +13,7 @@ export class StoreArgument extends Argument<Store<Piece>> {
             message: [
                 `I could not resolve \`${parameter}\` to a valid store!`,
                 `**Hint**: the following are supported: ${this.possibles.join(", ")}.`,
-            ].join("\n"),
+            ].join(" "),
         });
     }
 

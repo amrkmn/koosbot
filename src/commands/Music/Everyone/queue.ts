@@ -74,7 +74,7 @@ export class UserCommand extends KoosCommand {
                 .setDescription(
                     [
                         `__Now playing:__`,
-                        `${nowPlaying} [${timeLeft}] ~ ${current.requester}`,
+                        `${nowPlaying} [${timeLeft}]${current.requester ? ` ~ ${current.requester}` : ``}`,
                         ``,
                         `__Up next:__`,
                         `No other tracks here`,
@@ -95,8 +95,8 @@ export class UserCommand extends KoosCommand {
                         track.sourceName === "youtube"
                             ? `[${track.title}](${track.uri})`
                             : `[${track.title} by ${track.author ?? "Unknown artist"}](${track.uri})`;
-                    return `**${i + ++index}.** ${title} [${track.isStream ? "Live" : convertTime(track.length!)}] ~ ${
-                        track.requester
+                    return `**${i + ++index}.** ${title} [${track.isStream ? "Live" : convertTime(track.length!)}]${
+                        track.requester ? ` ~ ${track.requester}` : ``
                     }`;
                 })
             );
@@ -110,7 +110,7 @@ export class UserCommand extends KoosCommand {
                     .setDescription(
                         [
                             `__Now playing:__`,
-                            `${nowPlaying} [${timeLeft}] ~ ${current.requester}`,
+                            `${nowPlaying} [${timeLeft}]${current.requester ? ` ~ ${current.requester}` : ``}`,
                             ``,
                             `__Up next:__`,
                             `${upNext}`,

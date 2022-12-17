@@ -57,7 +57,8 @@ export class UserCommand extends KoosCommand {
     public async messageRun(message: Message, args: Args) {
         const { kazagumo, db } = this.container;
         const data = await db.guilds.findUnique({ where: { id: `${message.guildId}` } });
-        const query = await args.rest("string").catch(() => undefined);
+        const attachment = message.attachments.first();
+        const query = attachment ? attachment.proxyURL : await args.rest("string").catch(() => undefined);
         if (!query)
             return send(message, { embeds: [{ description: "Please provide an URL or search query", color: embedColor.error }] });
 
@@ -69,7 +70,7 @@ export class UserCommand extends KoosCommand {
 
     private async play(query: string, { message, player, channel, data }: PlayOptions) {
         const { kazagumo } = this.container;
-        const result = await kazagumo.search(query, { requester: message.member });
+        const result = await kazagumo.search(query, { requester: data?.requester ? message.member : null });
         if (!result.tracks.length) return new MessageEmbed({ description: `Something went wrong`, color: embedColor.error });
 
         let tracks: KazagumoTrack[] = [],

@@ -7,8 +7,8 @@ export const enum PermissionLevels {
 }
 
 export enum Emojis {
-    Yes = "<:icons_Correct:1020350510777245800>",
-    No = "<:icons_Wrong:1020350513490968607>",
+    Yes = "<:yes:896571151315255366>",
+    No = "<:no:926367736794341428>",
     Blank = "<:blank:1020712225616445561> ",
     CovidActive = "<:covid_active:1014913022688505927>",
     CovidConfirmed = "<:covid_confirmed:1014912823123521677>",

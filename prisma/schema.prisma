@@ -11,9 +11,10 @@ datasource db {
 }
 
 model guilds {
-  id     String   @id @map("_id")
-  prefix String   @default("NONE")
-  dj     String[] @default([])
-  djOnly Boolean  @default(false)
-  volume Int      @default(100)
+  id        String   @id @map("_id")
+  prefix    String   @default("NONE")
+  dj        String[] @default([])
+  djOnly    Boolean  @default(false)
+  volume    Int      @default(100)
+  requester Boolean  @default(true)
 }

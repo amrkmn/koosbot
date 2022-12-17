@@ -10,7 +10,10 @@ export class UserArgument extends Argument<Piece> {
             context,
             parameter,
             identifier: `arguments:piece`,
-            message: `I could not resolve \`${parameter}\` to a piece! Make sure you typed its name or one of its aliases correctly!`,
+            message: [
+                `I could not resolve \`${parameter}\` to a piece!`,
+                `Make sure you typed its name or one of its aliases correctly!`,
+            ].join(" "),
         });
     }
 }
