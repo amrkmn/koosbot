@@ -1,8 +1,8 @@
 import { Buttons } from "#lib/types/Enums";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, Events } from "@sapphire/framework";
-import { Message, CommandInteraction, MessageButton, MessageActionRow, MessageEmbed } from "discord.js";
-import { isNullish } from "@sapphire/utilities";
+import { Message, CommandInteraction, MessageButton, MessageActionRow, MessageEmbed, GuildMember } from "discord.js";
+import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { KazagumoPlayer } from "kazagumo";
 import { convertTime } from "#utils/functions";
 import { embedColor } from "#utils/constants";
@@ -31,7 +31,8 @@ export class ClientListener extends Listener {
     public async run(interaction: CommandInteraction) {
         if (!interaction.isButton()) return;
         const player = this.container.kazagumo.getPlayer(interaction.guildId!);
-        if (isNullish(player)) return;
+        const data = await this.container.db.guilds.findUnique({ where: { id: interaction.guildId! } });
+        if (isNullish(player) || isNullish(data)) return;
 
         const msg = player.data.get("nowPlayingMessage") as Message;
         const id = interaction.customId as "buttonPauseOrResume" | "buttonSkip" | "buttonStop" | "buttonShowQueue";
@@ -43,11 +44,25 @@ export class ClientListener extends Listener {
                 msg.edit({ components: [this.buttons(player.paused)] });
                 break;
             case "buttonSkip":
-                player.skip();
+                if (this.checkDJ(interaction, player, data.dj)) {
+                    player.skip();
+                    return;
+                }
+                interaction.followUp({
+                    embeds: [{ description: `This button can only use by DJ or the song requester.`, color: embedColor.error }],
+                    ephemeral: true,
+                });
                 break;
             case "buttonStop":
-                player.queue.clear();
-                player.skip();
+                if (this.checkDJ(interaction, player, data.dj)) {
+                    player.queue.clear();
+                    player.skip();
+                    return;
+                }
+                interaction.followUp({
+                    embeds: [{ description: `This button can only use by DJ or the song requester.`, color: embedColor.error }],
+                    ephemeral: true,
+                });
                 break;
             case "buttonShowQueue":
                 const queue = await this.queue(player);
@@ -130,6 +145,21 @@ export class ClientListener extends Listener {
 
                 break;
         }
+    }
+
+    private checkDJ(message: Message | CommandInteraction, player: KazagumoPlayer, dj: string[]) {
+        const member = message.member as GuildMember;
+
+        const current = player.queue.current!;
+        const requester = current.requester;
+
+        const roles = [...member.roles.cache.keys()].filter((id) => dj.includes(id));
+
+        if (requester instanceof GuildMember && requester.user.id === member.user.id) {
+            return requester.user.id === member.user.id;
+        }
+
+        return !isNullishOrEmpty(roles);
     }
 
     private buttons(paused = false) {
