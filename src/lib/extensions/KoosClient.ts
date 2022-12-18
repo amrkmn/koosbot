@@ -11,11 +11,13 @@ import { ScheduledTaskRedisStrategy } from "@sapphire/plugin-scheduled-tasks/reg
 import Spotify from "kazagumo-spotify";
 
 const NODES: NodeOption[] = [
-    { name: "lavalink.botsuniversity.ml", url: "lavalink.botsuniversity.ml:443", auth: "mathiscool", secure: true },
-    { name: "lavalink2.botsuniversity.ml", url: "lavalink2.botsuniversity.ml:443", auth: "mathiscool", secure: true },
-    { name: "lavalink3.botsuniversity.ml", url: "lavalink3.botsuniversity.ml:443", auth: "mathiscool", secure: true },
-    { name: "lavalink4.botsuniversity.ml", url: "lavalink4.botsuniversity.ml:443", auth: "mathiscool", secure: true },
-    { name: "node1.kartadharta.xyz", url: "node1.kartadharta.xyz:443", auth: "kdlavalink", secure: true },
+    { name: "lavalink.aytea.ga", url: "lavalink.aytea.ga:443", auth: "maybeiwasboring", secure: true },
+    { name: "lavalink.lexnet.cc", url: "lavalink.lexnet.cc:443", auth: "lexn3tl@val!nk", secure: true },
+    { name: "node1.lewdhutao.tech", url: "node1.lewdhutao.tech:1183", auth: "lewdhutao", secure: false },
+    { name: "lava1.horizxon.studio", url: "lava1.horizxon.studio:80", auth: "horizxon.studio", secure: false },
+    // { name: "lava2.horizxon.studio", url: "lava2.horizxon.studio:80", auth: "horizxon.studio", secure: false },
+    { name: "lava3.horizxon.studio", url: "lava3.horizxon.studio:80", auth: "horizxon.studio", secure: false },
+    { name: "lava4.horizxon.studio", url: "lava4.horizxon.studio:80", auth: "horizxon.studio", secure: false },
 ];
 
 export class KoosClient extends SapphireClient {

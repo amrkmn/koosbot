@@ -17,3 +17,10 @@ export enum Emojis {
     CovidTest = "<:covid_test:1014913025272201239>",
     Loading = "<a:loading:1027594528460386495>",
 }
+
+export enum Buttons {
+    PauseOrResume = "buttonPauseOrResume",
+    Skip = "buttonSkip",
+    Stop = "buttonStop",
+    ShowQueue = "buttonShowQueue",
+}

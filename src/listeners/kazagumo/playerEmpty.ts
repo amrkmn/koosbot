@@ -4,7 +4,7 @@ import { mins, sec } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
-import { Guild, MessageEmbed } from "discord.js";
+import { Guild, Message, MessageEmbed } from "discord.js";
 import { Events, KazagumoPlayer } from "kazagumo";
 import ms from "ms";
 
@@ -17,21 +17,20 @@ export class ClientListener extends Listener {
     timeoutId: NodeJS.Timeout | undefined;
     leaveAfter: number = envParseString("NODE_ENV") === "production" ? mins(3) : sec(25);
 
-    public async run(player: KazagumoPlayer | string) {
-        if (typeof player === "string" && player === "stop") return;
-        if (player instanceof KazagumoPlayer) {
-            const { client } = this.container;
-            const guild = client.guilds.cache.get(player.guildId) ?? (await client.guilds.fetch(player.guildId));
-            const channel = container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId));
-            if (isNullish(guild) || isNullish(player) || isNullish(channel)) return;
+    public async run(player: KazagumoPlayer) {
+        const { client } = this.container;
+        const guild = client.guilds.cache.get(player.guildId) ?? (await client.guilds.fetch(player.guildId));
+        const channel = container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId));
+        if (isNullish(guild) || isNullish(player) || isNullish(channel)) return;
 
-            if (player.queue.current) return;
+        if (player.queue.current) return;
 
-            // if (channel.isText()) channel.send({ embeds: [{ description: "There are no more tracks", color: embedColor.error }] });
+        const msg = player.data.get("nowPlayingMessage");
+        if (!isNullish(msg) && msg instanceof Message && msg.deletable) msg.delete();
+        // if (channel.isText()) channel.send({ embeds: [{ description: "There are no more tracks", color: embedColor.error }] });
 
-            await this.setup(guild, player);
-            return;
-        }
+        await this.setup(guild, player);
+        return;
     }
 
     async setup(guild: Guild | null, player: KazagumoPlayer) {

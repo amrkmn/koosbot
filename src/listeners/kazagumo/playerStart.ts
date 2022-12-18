@@ -1,9 +1,10 @@
 import { Listener, container } from "@sapphire/framework";
 import { KazagumoPlayer, KazagumoTrack, Events } from "kazagumo";
-import { MessageEmbed } from "discord.js";
+import { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
 import { embedColor } from "#utils/constants";
 import { convertTime } from "#utils/functions";
+import { Buttons } from "#lib/types/Enums";
 
 @ApplyOptions<Listener.Options>({
     emitter: container.kazagumo,
@@ -25,7 +26,17 @@ export class ClientListener extends Listener {
                 `Started playing ${title} [${convertTime(Number(track.length))}]${data?.requester ? ` ~ ${track.requester}` : ""}`
             )
             .setColor(embedColor.default);
+        const buttons = [
+            new MessageButton().setLabel("Pause").setCustomId(Buttons.PauseOrResume).setStyle("SUCCESS"),
+            new MessageButton().setLabel("Skip").setCustomId(Buttons.Skip).setStyle("PRIMARY"),
+            new MessageButton().setLabel("Stop").setCustomId(Buttons.Stop).setStyle("DANGER"),
+            new MessageButton().setLabel("Show Queue").setCustomId(Buttons.ShowQueue).setStyle("SECONDARY"),
+        ];
+        const row = new MessageActionRow().setComponents(buttons);
 
-        if (channel.isText()) channel.send({ embeds: [embed] });
+        if (channel.isText()) {
+            const msg = await channel.send({ embeds: [embed], components: [row] });
+            player.data.set("nowPlayingMessage", msg);
+        }
     }
 }
