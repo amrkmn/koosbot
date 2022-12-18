@@ -1,7 +1,7 @@
 import { Buttons } from "#lib/types/Enums";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, Events } from "@sapphire/framework";
-import { Message, CommandInteraction, MessageButton, MessageActionRow, MessageEmbed, GuildMember } from "discord.js";
+import { Message, CommandInteraction, MessageButton, MessageActionRow, MessageEmbed, GuildMember, Guild } from "discord.js";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { KazagumoPlayer } from "kazagumo";
 import { convertTime } from "#utils/functions";
@@ -36,8 +36,14 @@ export class ClientListener extends Listener {
 
         const msg = player.data.get("nowPlayingMessage") as Message;
         const id = interaction.customId as "buttonPauseOrResume" | "buttonSkip" | "buttonStop" | "buttonShowQueue";
+        const checkMember = this.checkMember(interaction.guild!, interaction.member as GuildMember);
 
         await interaction.deferUpdate();
+
+        if (!isNullish(checkMember)) {
+            interaction.followUp({ embeds: [checkMember], ephemeral: true });
+            return;
+        }
         switch (id) {
             case "buttonPauseOrResume":
                 player.pause(!player.paused);
@@ -145,6 +151,24 @@ export class ClientListener extends Listener {
 
                 break;
         }
+    }
+
+    private checkMember(guild: Guild | null, member: GuildMember) {
+        if (!guild) return new MessageEmbed({ description: "You cannot run this message command in DMs.", color: embedColor.error });
+        if (
+            !isNullish(guild.me) &&
+            member.voice.channel !== null && //
+            guild.me.voice.channel !== null &&
+            member.voice.channelId !== guild.me!.voice.channelId
+        )
+            return new MessageEmbed({
+                description: `You aren't connected to the same voice channel as I am. I'm currently connected to ${guild.me.voice.channel}`,
+                color: embedColor.error,
+            });
+
+        return member.voice.channel !== null //
+            ? undefined
+            : new MessageEmbed({ description: "You aren't connected to a voice channel.", color: embedColor.error });
     }
 
     private checkDJ(message: Message | CommandInteraction, player: KazagumoPlayer, dj: string[]) {
