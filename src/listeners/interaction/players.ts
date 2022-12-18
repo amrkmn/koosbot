@@ -34,93 +34,99 @@ export class ClientListener extends Listener {
         if (isNullish(player)) return;
 
         const msg = player.data.get("nowPlayingMessage") as Message;
+        const id = interaction.customId as "buttonPauseOrResume" | "buttonSkip" | "buttonStop" | "buttonShowQueue";
 
-        if ([Buttons.PauseOrResume, Buttons.Skip, Buttons.Stop].includes(interaction.customId as Buttons)) {
-            await interaction.deferUpdate();
-        }
-
-        let currentPage = 1;
-        switch (interaction.customId) {
-            case Buttons.PauseOrResume:
+        await interaction.deferUpdate();
+        switch (id) {
+            case "buttonPauseOrResume":
                 player.pause(!player.paused);
                 msg.edit({ components: [this.buttons(player.paused)] });
                 break;
-            case Buttons.Skip:
+            case "buttonSkip":
                 player.skip();
                 break;
-            case Buttons.Stop:
+            case "buttonStop":
                 player.queue.clear();
                 player.skip();
                 break;
-            case Buttons.ShowQueue:
+            case "buttonShowQueue":
                 const queue = await this.queue(player);
+                const embed = queue[0];
 
-                const generateButtons = (state: boolean) => {
-                    const checkState = (name: string) => {
-                        if (queue.length === 1) return true;
-                        if (["first", "previous"].includes(name) && currentPage === 1) return true;
-                        if (["next", "last"].includes(name) && currentPage === queue.length) return true;
-                        return false;
-                    };
-                    let names = ["first", "previous", "next", "last"];
-                    names.push("stop");
-                    const buttons = names.reduce((accumulator: MessageButton[], name) => {
-                        accumulator.push(
-                            new MessageButton()
-                                .setCustomId(name)
-                                .setDisabled(state || checkState(name))
-                                .setLabel(this.defaultLabels[name])
-                                .setStyle(this.defaultStyles[name])
-                        );
-                        return accumulator;
-                    }, []);
-                    return buttons;
-                };
-                const components = (state = false) => new MessageActionRow().addComponents(generateButtons(state));
-                const changeFooter = () => {
-                    const embed = queue[currentPage - 1];
-                    const newEmbed = new MessageEmbed(embed);
-                    if (embed?.footer?.text) {
-                        return newEmbed.setFooter({
-                            text: `Page ${currentPage}/${queue.length} | ${embed.footer.text}`,
-                            iconURL: embed.footer.iconURL,
-                        });
-                    }
-                    return newEmbed.setFooter({ text: `Page ${currentPage}/${queue.length}` });
-                };
+                if (embed.footer?.text) {
+                    embed.setFooter({
+                        text: `Page 1/${queue.length} | ${embed.footer.text}`,
+                        iconURL: embed.footer.iconURL,
+                    });
+                }
 
-                await interaction.reply({ embeds: [changeFooter()], components: [components()], ephemeral: true });
+                await interaction.followUp({ embeds: [embed], ephemeral: true });
+                // const generateButtons = (state: boolean) => {
+                //     const checkState = (name: string) => {
+                //         if (queue.length === 1) return true;
+                //         if (["first", "previous"].includes(name) && currentPage === 1) return true;
+                //         if (["next", "last"].includes(name) && currentPage === queue.length) return true;
+                //         return false;
+                //     };
+                //     let names = ["first", "previous", "next", "last"];
+                //     names.push("stop");
+                //     const buttons = names.reduce((accumulator: MessageButton[], name) => {
+                //         accumulator.push(
+                //             new MessageButton()
+                //                 .setCustomId(name)
+                //                 .setDisabled(state || checkState(name))
+                //                 .setLabel(this.defaultLabels[name])
+                //                 .setStyle(this.defaultStyles[name])
+                //         );
+                //         return accumulator;
+                //     }, []);
+                //     return buttons;
+                // };
+                // const components = (state = false) => new MessageActionRow().addComponents(generateButtons(state));
+                // const changeFooter = () => {
+                //     const embed = queue[currentPage - 1];
+                //     const newEmbed = new MessageEmbed(embed);
+                //     if (embed?.footer?.text) {
+                //         return newEmbed.setFooter({
+                //             text: `Page ${currentPage}/${queue.length} | ${embed.footer.text}`,
+                //             iconURL: embed.footer.iconURL,
+                //         });
+                //     }
+                //     return newEmbed.setFooter({ text: `Page ${currentPage}/${queue.length}` });
+                // };
 
-                const collector = interaction.channel?.createMessageComponentCollector({
-                    filter: (i) => i.user.id === interaction.user.id && !interaction.user.bot,
-                    componentType: "BUTTON",
-                    time: ms("30s"),
-                });
-                if (isNullish(collector)) return;
+                // await interaction.reply({ embeds: [changeFooter()], components: [components()], ephemeral: true });
 
-                collector.on("collect", async (i) => {
-                    try {
-                        const id = i.customId;
-                        if (id === "first") currentPage = 1;
-                        if (id === "previous") currentPage--;
-                        if (id === "next") currentPage++;
-                        if (id === "last") currentPage = queue.length;
-                        if (id === "stop") {
-                            collector.stop("user");
-                            await i.update({ embeds: [changeFooter()], components: [components(true)] });
-                            return;
-                        }
+                // const collector = interaction.channel?.createMessageComponentCollector({
+                //     filter: (i) => i.user.id === interaction.user.id && !interaction.user.bot,
+                //     componentType: "BUTTON",
+                //     time: ms("30s"),
+                // });
+                // if (isNullish(collector)) return;
 
-                        collector.resetTimer();
-                        await i.update({ embeds: [changeFooter()], components: [components()] });
-                    } catch (error) {}
-                });
-                collector.on("end", (_, reason) => {
-                    try {
-                        if (reason == "user" || reason == "time") interaction.editReply({ components: [components(true)] });
-                        else return;
-                    } catch (error) {}
-                });
+                // collector.on("collect", async (i) => {
+                //     try {
+                //         const id = i.customId;
+                //         if (id === "first") currentPage = 1;
+                //         if (id === "previous") currentPage--;
+                //         if (id === "next") currentPage++;
+                //         if (id === "last") currentPage = queue.length;
+                //         if (id === "stop") {
+                //             collector.stop("user");
+                //             await i.update({ embeds: [changeFooter()], components: [components(true)] });
+                //             return;
+                //         }
+
+                //         collector.resetTimer();
+                //         await i.update({ embeds: [changeFooter()], components: [components()] });
+                //     } catch (error) {}
+                // });
+                // collector.on("end", (_, reason) => {
+                //     try {
+                //         if (reason == "user" || reason == "time") interaction.editReply({ components: [components(true)] });
+                //         else return;
+                //     } catch (error) {}
+                // });
 
                 break;
         }

@@ -4,7 +4,7 @@ import { mins, sec } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
-import { Guild, Message, MessageEmbed } from "discord.js";
+import { Guild, Message, MessageButton, MessageEmbed } from "discord.js";
 import { Events, KazagumoPlayer } from "kazagumo";
 import ms from "ms";
 
@@ -20,13 +20,23 @@ export class ClientListener extends Listener {
     public async run(player: KazagumoPlayer) {
         const { client } = this.container;
         const guild = client.guilds.cache.get(player.guildId) ?? (await client.guilds.fetch(player.guildId));
-        const channel = container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId));
+        const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId));
         if (isNullish(guild) || isNullish(player) || isNullish(channel)) return;
 
         if (player.queue.current) return;
 
-        const msg = player.data.get("nowPlayingMessage");
-        if (!isNullish(msg) && msg instanceof Message && msg.deletable) msg.delete();
+        const npMessage = player.data.get("nowPlayingMessage");
+
+        if (channel && channel.isText() && npMessage instanceof Message) {
+            const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id));
+
+            if (!isNullish(msg) && msg.editable) {
+                const row = npMessage.components;
+                const disabled = row[0].components.map((button) => (button as MessageButton).setStyle("SECONDARY").setDisabled(true));
+
+                msg.edit({ components: [{ type: "ACTION_ROW", components: disabled }] });
+            }
+        }
         // if (channel.isText()) channel.send({ embeds: [{ description: "There are no more tracks", color: embedColor.error }] });
 
         await this.setup(guild, player);
