@@ -23,7 +23,10 @@ export class ClientListener extends Listener {
 
         const embed = new MessageEmbed() //
             .setDescription(
-                `Started playing ${title} [${convertTime(Number(track.length))}]${data?.requester ? ` ~ ${track.requester}` : ""}`
+                [
+                    `Started playing ${title} [${track.isStream ? `Live` : convertTime(Number(track.length))}]`,
+                    `${data?.requester ? ` ~ ${track.requester}` : ""}`,
+                ].join("")
             )
             .setColor(embedColor.default);
         const buttons = [
