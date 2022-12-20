@@ -81,3 +81,17 @@ export function formatPerms(string: string) {
     });
     return words.join("");
 }
+
+export function decodeEntities(encodedString: string) {
+    var translate_re = /&(nbsp|amp|quot|lt|gt);/g;
+    var translate: { [key: string]: string } = {
+        nbsp: " ",
+        amp: "&",
+        quot: '"',
+        lt: "<",
+        gt: ">",
+    };
+    return encodedString
+        .replace(translate_re, (_, entity) => translate[entity])
+        .replace(/&#(\d+);/gi, (_, numStr) => String.fromCharCode(parseInt(numStr, 10)));
+}

@@ -38,7 +38,8 @@ export class ClientListener extends Listener {
         const id = interaction.customId as "buttonPauseOrResume" | "buttonSkip" | "buttonStop" | "buttonShowQueue";
         const checkMember = this.checkMember(interaction.guild!, interaction.member as GuildMember);
 
-        await interaction.deferUpdate();
+        if (id === "buttonPauseOrResume" || id === "buttonShowQueue" || id === "buttonSkip" || id === "buttonStop")
+            await interaction.deferUpdate();
 
         if (!isNullish(checkMember)) {
             interaction.followUp({ embeds: [checkMember], ephemeral: true });
