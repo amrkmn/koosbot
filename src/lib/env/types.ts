@@ -30,6 +30,7 @@ export interface KoosEnv {
     REDIS_PASSWORD_SECRET?: string;
     SPOTIFY_ID?: string;
     SPOTIFY_SECRET?: string;
+    GENIUS_TOKEN?: string;
 
     PORT?: IntegerString;
 }
