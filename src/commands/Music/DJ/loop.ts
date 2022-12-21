@@ -7,14 +7,10 @@ import { Message, MessageEmbed } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: `Cycles through all three loop modes (queue, song, off).`,
+    description: `Change the current loop mode (queue, song, off).`,
     preconditions: ["VoiceOnly", "DJ"],
     usage: {
-        types: [
-            { type: "queue", description: "Loop the queue.", subcommand: true },
-            { type: "song", description: "Loop the current playing song.", subcommand: true },
-            { type: "off", description: "Turn looping off", subcommand: true },
-        ],
+        type: ["queue", "song", "off"],
     },
 })
 export class UserCommand extends KoosCommand {

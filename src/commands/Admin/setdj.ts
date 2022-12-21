@@ -10,11 +10,11 @@ import { removeItem } from "#utils/functions";
 import { PermissionLevels } from "#lib/types/Enums";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: "Show the current DJ roles.",
+    description: "Add or remove a DJ role.",
     aliases: ["dj"],
     permissionLevels: PermissionLevels.Administrator,
     usage: {
-        types: [{ type: "role", description: "Add/Remove a DJ role.", required: true }],
+        types: [{ type: "role" }],
     },
 })
 export class AdminCommand extends KoosCommand {

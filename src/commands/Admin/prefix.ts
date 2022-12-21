@@ -9,10 +9,10 @@ import { Args, ResultError } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: `Show the current prefix.`,
+    description: `Lets you set a new prefix.`,
     permissionLevels: PermissionLevels.Administrator,
     usage: {
-        types: [{ type: "new prefix", required: true, description: "Lets you set a new prefix." }],
+        types: [{ type: "new prefix", required: false }],
     },
 })
 export class AdminCommadn extends KoosCommand {

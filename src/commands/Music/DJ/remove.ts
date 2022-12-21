@@ -12,10 +12,7 @@ import { KoosCommand } from "#lib/extensions";
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["rm", "del", "delete"],
     usage: {
-        type: [
-            { type: "position", required: true },
-            { type: "to", required: false },
-        ],
+        types: [{ type: "position", required: true }, { type: "to" }],
     },
 })
 export class UserCommand extends KoosCommand {

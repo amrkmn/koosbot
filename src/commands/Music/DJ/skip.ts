@@ -8,11 +8,11 @@ import { KazagumoPlayer } from "kazagumo";
 import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: "Skip to the next track.",
+    description: "Skip to the next track or to a specific track in the queue.",
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["s", "n", "next"],
     usage: {
-        types: [{ type: "to", description: "Skips to a specific track in the queue.", required: true }],
+        types: [{ type: "to" }],
     },
 })
 export class UserCommand extends KoosCommand {

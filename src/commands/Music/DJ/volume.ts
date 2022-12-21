@@ -8,17 +8,11 @@ import { Message, MessageEmbed } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: "View the current player's volume.",
+    description: "Lets you change the bots output volume.",
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["v", "vol"],
     usage: {
-        types: [
-            {
-                type: "1-200",
-                required: true,
-                description: "Lets you change the bots output volume.",
-            },
-        ],
+        types: [{ type: "1-200", required: false }],
     },
 })
 export class UserCommand extends KoosCommand {
