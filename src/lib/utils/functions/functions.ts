@@ -48,8 +48,11 @@ export function removeItem<T>(array: Array<T>, value: T): Array<T> {
     return newArray;
 }
 
-export function chunk<T>(array: Array<T>, n: number) {
-    return Array.from(Array(Math.ceil(array.length / n)), (_, i) => array.slice(i * n, i * n + n));
+export function chunk<T>(array: Array<T>, chunkSize: number) {
+    if (!Array.isArray(array)) throw new TypeError("entries must be an array.");
+    if (!Number.isInteger(chunkSize)) throw new TypeError("chunkSize must be an integer.");
+    if (chunkSize < 1) throw new RangeError("chunkSize must be 1 or greater.");
+    return Array.from(Array(Math.ceil(array.length / chunkSize)), (_, i) => array.slice(i * chunkSize, i * chunkSize + chunkSize));
 }
 
 export function trimString(string: string, length: number) {
