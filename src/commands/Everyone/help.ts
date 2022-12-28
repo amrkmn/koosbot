@@ -5,8 +5,8 @@ import { isString } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args, SapphirePrefix } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
-import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
-import { Collection, Message, EmbedFieldData } from "discord.js";
+// import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
+import { Collection, Message } from "discord.js";
 
 const categoryLevel: { [key: string]: number } = {
     Admin: PermissionLevels.Administrator,
@@ -25,9 +25,7 @@ const categoryLevel: { [key: string]: number } = {
 export class UserCommand extends KoosCommand {
     public async messageRun(message: Message, args: Args) {
         const prefix = await this.client.fetchPrefix(message);
-        const command = await args.pickResult("commandName",);
-
-        // console.log(command.isErr() && command.err().unwrap().identifier);
+        const command = await args.pickResult("commandName");
 
         if (command.isOk()) {
             const commandSuccess = command.unwrap();
@@ -43,7 +41,7 @@ export class UserCommand extends KoosCommand {
                     {
                         fields: [
                             { name: `${buildedCommand.name} ${aliases ? `(${aliases})` : ``}`, value: buildedCommand.description },
-                            { name: `• Usage`, value: usage },
+                            { name: `• Usage ${buildedCommand.slashOnly ? `(Slash only)` : ``}`, value: usage },
                             { name: `• Permission`, value: `\`${buildedCommand.category}\`` },
                         ],
                         color: embedColor.default,
@@ -74,8 +72,9 @@ export class UserCommand extends KoosCommand {
         const description = command.description || "No description provided";
         const aliases = command.aliases || [];
         const category = `${command.fullCategory.at(-1) ?? command.category}`;
+        const slashOnly = command.slashOnly;
 
-        return { name, description, aliases, category };
+        return { name, description, aliases, category, slashOnly };
     }
 
     parseUsage(command: KoosCommand, prefix: SapphirePrefix) {
@@ -154,7 +153,7 @@ export class UserCommand extends KoosCommand {
         commands.sort((_, __, a, b) => categoryLevel[a] - categoryLevel[b]);
         for (const [category, list] of commands) {
             helpMessage.push({
-                name: `${category} commands (${list.length})`,
+                name: `${category} commands`,
                 value: list.map((cmd) => `\`${cmd.name}\``).join(", "),
             });
         }
@@ -167,14 +166,14 @@ export class UserCommand extends KoosCommand {
         await Promise.all(
             commands.map(async (cmd) => {
                 const command = cmd as unknown as KoosCommand;
-                if (command.hidden || !command.enabled) return;
+                if (command.hidden || !command.enabled || command.slashOnly) return;
 
                 const result = await cmd.preconditions.messageRun(message, command as any, { command: null! });
-                if (result.err().isSome() && Reflect.get(result.err().unwrap(), "identifier") === "OwnerOnly") return;
+                if (result.isErr() && Reflect.get(result.err().unwrap(), "identifier") === "OwnerOnly") return;
 
-                const category = filtered.get(`${command.fullCategory.at(-1) ?? command.category}`);
+                const category = filtered.get(`${command.category}`);
                 if (category) category.push(command);
-                else filtered.set(`${command.fullCategory.at(-1) ?? command.category}`, [command as KoosCommand]);
+                else filtered.set(`${command.category}`, [command as KoosCommand]);
             })
         );
 

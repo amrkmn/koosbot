@@ -30,6 +30,7 @@ export class KoosCommand extends Command {
     public readonly permissionLevel: PermissionLevels;
     public readonly usage?: CommandUsageOptions;
     public readonly hidden: boolean;
+    public readonly slashOnly: boolean;
 
     constructor(ctx: Command.Context, options: KoosCommand.Options) {
         super(ctx, { ...options, ...KoosCommand.resolvePreConditions(ctx, options) });
@@ -42,6 +43,7 @@ export class KoosCommand extends Command {
         this.client = this.container.client;
         this.permissionLevel = options.permissionLevels ?? PermissionLevels.Everyone;
         this.hidden = options.hidden ?? false;
+        this.slashOnly = options.slashOnly ?? false;
         this.usage =
             !isNullish(usage) && isString(usage)
                 ? {
@@ -99,6 +101,7 @@ export namespace KoosCommand {
         guarded?: boolean;
         bucket?: number;
         cooldown?: number;
+        slashOnly?: boolean;
     };
     export type ChatInputInteraction = Command.ChatInputInteraction;
     export type AutocompleteInteraction = Command.AutocompleteInteraction;

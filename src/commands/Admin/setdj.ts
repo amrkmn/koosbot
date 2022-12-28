@@ -60,7 +60,7 @@ export class AdminCommand extends KoosCommand {
             return new MessageEmbed().setDescription(`There is no DJ role set.`).setColor(embedColor.warn);
         if (!roleId)
             return new MessageEmbed()
-                .setFields([{ name: `Configured DJ role:`, value: `${zws}\n${dj.join("\n")}` }])
+                .setDescription(`**__Configured DJ role:__**\n\n${dj.join("\n")}`)
                 .setColor(embedColor.default);
 
         const idAdded = data.dj.includes(roleId) ? false : true;

@@ -9,13 +9,14 @@ export class UserArgument extends Argument<KoosCommand> {
         const commands = this.container.stores.get("commands");
         const found = commands.get(parameter.toLowerCase()) as KoosCommand | undefined;
         if (found) {
-            console.log(this.isAllowed(found, context));
+            if (found.slashOnly)
+                return this.error({ parameter, message: `I couldn't find that command`, identifier: "commandNotFound" });
             return this.isAllowed(found, context)
                 ? this.ok(found)
                 : this.error({
                       parameter,
                       identifier: "commandCannotResolve",
-                      message: `I could not resolve "${parameter}" to a command! Make sure you typed its name or one of its aliases correctly!`,
+                      message: `I could not resolve \`${parameter}\` to a command! Make sure you typed its name or one of its aliases correctly!`,
                   });
         }
 

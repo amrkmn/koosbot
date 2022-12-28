@@ -13,9 +13,10 @@ import { Buttons } from "#lib/types/Enums";
 })
 export class ClientListener extends Listener {
     public async run(player: KazagumoPlayer, track: KazagumoTrack) {
-        const data = await this.container.db.guilds.findUnique({ where: { id: player.guildId } });
-        const channel =
-            this.container.client.channels.cache.get(player.textId) ?? (await this.container.client.channels.fetch(player.textId));
+        const { client, db } = this.container;
+
+        const data = await db.guilds.findUnique({ where: { id: player.guildId } });
+        const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId));
         if (!channel) return;
 
         let title =

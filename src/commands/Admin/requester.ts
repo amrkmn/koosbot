@@ -5,13 +5,14 @@ import { embedColor } from "#utils/constants";
 import { send } from "@sapphire/plugin-editable-commands";
 import { Emojis, PermissionLevels } from "#lib/types/Enums";
 import { Args } from "@sapphire/framework";
+import { isNullish } from "@sapphire/utilities";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Enables/disables if the requester is shown on each track.",
     permissionLevels: PermissionLevels.Administrator,
     aliases: ["req"],
     usage: {
-        type: ["true", "false"],
+        type: ["enable", "disable"],
         required: true,
     },
 })
@@ -40,9 +41,17 @@ export class UserCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message, args: Args) {
-        const enable = await args.pick("boolean").catch(() => undefined);
+        const enable = await args.pick("enum", { enum: ["enable", "disable"] }).catch(() => undefined);
+        if (isNullish(enable))
+            return send(message, {
+                embeds: [{ description: "Please enter an input.", color: embedColor.error }],
+            });
 
-        send(message, { embeds: [await this.requester(message.guildId!, enable)] });
+        let input: boolean;
+        if (enable === "enable") input = true;
+        else input = false;
+
+        send(message, { embeds: [await this.requester(message.guildId!, input)] });
     }
 
     private async requester(guildId: string, enable?: boolean) {

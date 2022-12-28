@@ -13,21 +13,6 @@ import ms from "ms";
     event: Events.InteractionCreate,
 })
 export class ClientListener extends Listener {
-    defaultLabels: { [key: string]: any } = {
-        first: "<<",
-        previous: "<",
-        next: ">",
-        last: ">>",
-        stop: "\u200b",
-    };
-    defaultStyles: { [key: string]: any } = {
-        first: "SECONDARY",
-        previous: "SECONDARY",
-        next: "SECONDARY",
-        last: "SECONDARY",
-        stop: "DANGER",
-    };
-
     public async run(interaction: CommandInteraction) {
         if (!interaction.isButton()) return;
         const player = this.container.kazagumo.getPlayer(interaction.guildId!);
@@ -38,8 +23,7 @@ export class ClientListener extends Listener {
         const id = interaction.customId as "buttonPauseOrResume" | "buttonSkip" | "buttonStop" | "buttonShowQueue";
         const checkMember = this.checkMember(interaction.guild!, interaction.member as GuildMember);
 
-        if (id === "buttonPauseOrResume" || id === "buttonShowQueue" || id === "buttonSkip" || id === "buttonStop")
-            await interaction.deferUpdate();
+        if (["buttonPauseOrResume", "buttonShowQueue", "buttonSkip", "buttonStop"].includes(id)) await interaction.deferUpdate();
 
         if (!isNullish(checkMember)) {
             interaction.followUp({ embeds: [checkMember], ephemeral: true });
