@@ -25,20 +25,16 @@ export class ClientListener extends Listener {
 
         if (["buttonPauseOrResume", "buttonShowQueue", "buttonSkip", "buttonStop"].includes(id)) await interaction.deferUpdate();
 
-        if (!isNullish(checkMember)) {
-            interaction.followUp({ embeds: [checkMember], ephemeral: true });
-            return;
-        }
+        if (!isNullish(checkMember)) return interaction.followUp({ embeds: [checkMember], ephemeral: true });
+
         switch (id) {
             case "buttonPauseOrResume":
                 player.pause(!player.paused);
                 msg.edit({ components: [this.buttons(player.paused)] });
                 break;
             case "buttonSkip":
-                if (this.checkDJ(interaction, player, data.dj)) {
-                    player.skip();
-                    return;
-                }
+                if (this.checkDJ(interaction, player, data.dj)) return player.skip();
+
                 interaction.followUp({
                     embeds: [{ description: `This button can only use by DJ or the song requester.`, color: embedColor.error }],
                     ephemeral: true,
