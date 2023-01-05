@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { PermissionLevels } from "#lib/types/Enums";
+import { permissionLevels } from "#lib/utils/constants";
 import { embedColor } from "#utils/constants";
 import { isString } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
@@ -9,10 +9,10 @@ import { send } from "@sapphire/plugin-editable-commands";
 import { Collection, Message } from "discord.js";
 
 const categoryLevel: { [key: string]: number } = {
-    Admin: PermissionLevels.Administrator,
-    DJ: PermissionLevels.DJ,
-    Everyone: PermissionLevels.Everyone,
-    General: PermissionLevels.Everyone,
+    Admin: permissionLevels.administrator,
+    DJ: permissionLevels.dj,
+    Everyone: permissionLevels.everyone,
+    General: permissionLevels.everyone,
 };
 
 @ApplyOptions<KoosCommand.Options>({

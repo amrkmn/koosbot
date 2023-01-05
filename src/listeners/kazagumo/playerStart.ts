@@ -4,7 +4,7 @@ import { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
 import { embedColor } from "#utils/constants";
 import { convertTime } from "#utils/functions";
-import { Buttons } from "#lib/types/Enums";
+import { buttons } from "#lib/utils/constants";
 
 @ApplyOptions<Listener.Options>({
     emitter: container.kazagumo,
@@ -30,13 +30,13 @@ export class ClientListener extends Listener {
                 ].join("")
             )
             .setColor(embedColor.default);
-        const buttons = [
-            new MessageButton().setLabel("Pause").setCustomId(Buttons.PauseOrResume).setStyle("SUCCESS"),
-            new MessageButton().setLabel("Skip").setCustomId(Buttons.Skip).setStyle("PRIMARY"),
-            new MessageButton().setLabel("Stop").setCustomId(Buttons.Stop).setStyle("DANGER"),
-            new MessageButton().setLabel("Show Queue").setCustomId(Buttons.ShowQueue).setStyle("SECONDARY"),
+        const playerButtons = [
+            new MessageButton().setLabel("Pause").setCustomId(buttons.pauseOrResume).setStyle("SUCCESS"),
+            new MessageButton().setLabel("Skip").setCustomId(buttons.skip).setStyle("PRIMARY"),
+            new MessageButton().setLabel("Stop").setCustomId(buttons.stop).setStyle("DANGER"),
+            new MessageButton().setLabel("Show Queue").setCustomId(buttons.showQueue).setStyle("SECONDARY"),
         ];
-        const row = new MessageActionRow().setComponents(buttons);
+        const row = new MessageActionRow().setComponents(playerButtons);
 
         if (channel.isText()) {
             const msg = await channel.send({ embeds: [embed], components: [row] });

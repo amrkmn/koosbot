@@ -1,5 +1,5 @@
 import { Command, PreconditionEntryResolvable, SapphireClient, UserPermissionsPrecondition } from "@sapphire/framework";
-import { PermissionLevels } from "#lib/types/Enums";
+import { permissionLevels } from "#lib/utils/constants";
 import { isString } from "#utils/functions";
 import { isNullish } from "@sapphire/utilities";
 import { Time } from "@sapphire/timestamp";
@@ -27,7 +27,7 @@ interface CommandUsageOptions {
 
 export class KoosCommand extends Command {
     public client: SapphireClient;
-    public readonly permissionLevel: PermissionLevels;
+    public readonly permissionLevel: number;
     public readonly usage?: CommandUsageOptions;
     public readonly hidden: boolean;
     public readonly slashOnly: boolean;
@@ -41,7 +41,7 @@ export class KoosCommand extends Command {
         options.requiredUserPermissions = options.permissions;
 
         this.client = this.container.client;
-        this.permissionLevel = options.permissionLevels ?? PermissionLevels.Everyone;
+        this.permissionLevel = options.permissionLevels ?? permissionLevels.everyone;
         this.hidden = options.hidden ?? false;
         this.slashOnly = options.slashOnly ?? false;
         this.usage =
@@ -84,10 +84,10 @@ export class KoosCommand extends Command {
 
     protected static resolvePermissionLevelPreCondition(permissionLevel = 0): PreconditionEntryResolvable | null {
         if (permissionLevel === 0) return null;
-        if (permissionLevel <= PermissionLevels.Administrator) {
+        if (permissionLevel <= permissionLevels.administrator) {
             return ["OwnerOnly", "Administrator"];
         }
-        if (permissionLevel <= PermissionLevels.BotOwner) return "OwnerOnly";
+        if (permissionLevel <= permissionLevels.botOwner) return "OwnerOnly";
         return null;
     }
 }

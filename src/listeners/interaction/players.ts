@@ -1,4 +1,4 @@
-import { Buttons } from "#lib/types/Enums";
+import { buttons } from "#lib/utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, Events } from "@sapphire/framework";
 import { Message, CommandInteraction, MessageButton, MessageActionRow, MessageEmbed, GuildMember, Guild } from "discord.js";
@@ -7,6 +7,7 @@ import { KazagumoPlayer } from "kazagumo";
 import { convertTime } from "#utils/functions";
 import { embedColor } from "#utils/constants";
 import ms from "ms";
+import { stripIndents } from "common-tags";
 
 @ApplyOptions<Listener.Options>({
     name: "players",
@@ -23,7 +24,7 @@ export class ClientListener extends Listener {
         const id = interaction.customId as "buttonPauseOrResume" | "buttonSkip" | "buttonStop" | "buttonShowQueue";
         const checkMember = this.checkMember(interaction.guild!, interaction.member as GuildMember);
 
-        if (["buttonPauseOrResume", "buttonShowQueue", "buttonSkip", "buttonStop"].includes(id)) await interaction.deferUpdate();
+        if (Object.values(buttons).includes(id)) await interaction.deferUpdate();
 
         if (!isNullish(checkMember)) return interaction.followUp({ embeds: [checkMember], ephemeral: true });
 
@@ -169,10 +170,10 @@ export class ClientListener extends Listener {
 
     private buttons(paused = false) {
         return new MessageActionRow().setComponents(
-            new MessageButton({ style: "SUCCESS", label: !paused ? "Pause" : "Resume", customId: Buttons.PauseOrResume }),
-            new MessageButton({ style: "PRIMARY", label: "Skip", customId: Buttons.Skip }),
-            new MessageButton({ style: "DANGER", label: "Stop", customId: Buttons.Stop }),
-            new MessageButton({ style: "SECONDARY", label: "Show Queue", customId: Buttons.ShowQueue })
+            new MessageButton({ style: "SUCCESS", label: !paused ? "Pause" : "Resume", customId: buttons.pauseOrResume }),
+            new MessageButton({ style: "PRIMARY", label: "Skip", customId: buttons.skip }),
+            new MessageButton({ style: "DANGER", label: "Stop", customId: buttons.stop }),
+            new MessageButton({ style: "SECONDARY", label: "Show Queue", customId: buttons.showQueue })
         );
     }
 
@@ -195,13 +196,13 @@ export class ClientListener extends Listener {
         if (player.queue.isEmpty) {
             const embed = new MessageEmbed()
                 .setDescription(
-                    [
-                        `__Now playing:__`,
-                        `${nowPlaying} [${timeLeft}]${data?.requester ? ` ~ ${current.requester}` : ``}`,
-                        ``,
-                        `__Up next:__`,
-                        `No other tracks here`,
-                    ].join("\n")
+                    stripIndents`
+                        __Now playing:__
+                        ${nowPlaying} [${timeLeft}]${data?.requester ? ` ~ ${current.requester}` : ``}
+
+                        __Up next:__
+                        No other tracks here
+                    `
                 )
                 .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
                 .setColor(embedColor.default);
@@ -231,13 +232,13 @@ export class ClientListener extends Listener {
             embeds.push(
                 new MessageEmbed()
                     .setDescription(
-                        [
-                            `__Now playing:__`,
-                            `${nowPlaying} [${timeLeft}]${data?.requester ? ` ~ ${current.requester}` : ``}`,
-                            ``,
-                            `__Up next:__`,
-                            `${upNext}`,
-                        ].join("\n")
+                        stripIndents`
+                            __Now playing:__
+                            ${nowPlaying} [${timeLeft}]${data?.requester ? ` ~ ${current.requester}` : ``}
+
+                            __Up next:__
+                            ${upNext}
+                        `
                     )
                     .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
                     .setColor(embedColor.default)

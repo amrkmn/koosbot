@@ -6,6 +6,7 @@ import { Args } from "@sapphire/framework";
 import { reply } from "@sapphire/plugin-editable-commands";
 import { Message, MessageEmbed, TextChannel, User } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
+import { stripIndents } from "common-tags";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Display the current queue.",
@@ -73,13 +74,13 @@ export class UserCommand extends KoosCommand {
         if (player.queue.isEmpty) {
             const embed = new MessageEmbed()
                 .setDescription(
-                    [
-                        `__Now playing:__`,
-                        `${nowPlaying} [${timeLeft}]${data?.requester ? ` ~ ${current.requester}` : ``}`,
-                        ``,
-                        `__Up next:__`,
-                        `No other tracks here`,
-                    ].join("\n")
+                    stripIndents`
+                        __Now playing:__
+                        ${nowPlaying} [${timeLeft}]${data?.requester ? ` ~ ${current.requester}` : ``}
+
+                        __Up next:__
+                        No other tracks here
+                    `
                 )
                 .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
                 .setColor(embedColor.default);
@@ -109,13 +110,13 @@ export class UserCommand extends KoosCommand {
             embeds.push(
                 new MessageEmbed()
                     .setDescription(
-                        [
-                            `__Now playing:__`,
-                            `${nowPlaying} [${timeLeft}]${data?.requester ? ` ~ ${current.requester}` : ``}`,
-                            ``,
-                            `__Up next:__`,
-                            `${upNext}`,
-                        ].join("\n")
+                        stripIndents`
+                            __Now playing:__
+                            ${nowPlaying} [${timeLeft}]${data?.requester ? ` ~ ${current.requester}` : ``}
+
+                            __Up next:__
+                            ${upNext}
+                        `
                     )
                     .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
                     .setColor(embedColor.default)

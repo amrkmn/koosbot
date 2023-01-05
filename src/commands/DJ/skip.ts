@@ -24,7 +24,11 @@ export class UserCommand extends KoosCommand {
                 builder //
                     .setName(this.name)
                     .setDescription(this.description)
-                    .addNumberOption((option) => option.setName("to").setDescription("Skips to a specific track in the queue.")),
+                    .addNumberOption((option) =>
+                        option //
+                            .setName("to")
+                            .setDescription("Skips to a specific track in the queue.")
+                    ),
             { idHints: ["1050092756636274778", "1050094681654055064"] }
         );
     }

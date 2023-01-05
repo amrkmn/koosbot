@@ -3,13 +3,13 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { MessageEmbed, Message } from "discord.js";
 import { embedColor } from "#utils/constants";
 import { send } from "@sapphire/plugin-editable-commands";
-import { Emojis, PermissionLevels } from "#lib/types/Enums";
+import { emojis, permissionLevels } from "#lib/utils/constants";
 import { Args } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Enables/disables if the requester is shown on each track.",
-    permissionLevels: PermissionLevels.Administrator,
+    permissionLevels: permissionLevels.administrator,
     aliases: ["req"],
     usage: {
         type: ["enable", "disable"],
@@ -68,8 +68,8 @@ export class UserCommand extends KoosCommand {
         return new MessageEmbed()
             .setDescription(
                 requester
-                    ? `${Emojis.Yes} Requester will be shown permanently on each track.`
-                    : `${Emojis.No} Requester is no longer shown permanently on each track.`
+                    ? `${emojis.yes} Requester will be shown permanently on each track.`
+                    : `${emojis.no} Requester is no longer shown permanently on each track.`
             )
             .setColor(requester ? embedColor.success : embedColor.error);
     }

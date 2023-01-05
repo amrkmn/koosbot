@@ -7,12 +7,12 @@ import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { isNullishOrEmpty } from "@sapphire/utilities";
 import { removeItem } from "#utils/functions";
-import { PermissionLevels } from "#lib/types/Enums";
+import { permissionLevels } from "#lib/utils/constants";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Add or remove a DJ role.",
     aliases: ["dj"],
-    permissionLevels: PermissionLevels.Administrator,
+    permissionLevels: permissionLevels.administrator,
     usage: {
         types: [{ type: "role" }],
     },

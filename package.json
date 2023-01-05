@@ -1,6 +1,6 @@
 {
   "name": "koosbot-shoukaku",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "type": "module",
@@ -27,6 +27,7 @@
     "#utils/*": "./dist/lib/utils/*.js"
   },
   "devDependencies": {
+    "@types/common-tags": "^1.8.1",
     "@types/ms": "^0.7.31",
     "@types/node": "^18.11.9",
     "prisma": "^4.6.1",
@@ -51,6 +52,7 @@
     "@types/pluralize": "^0.0.29",
     "bullmq": "^3.3.0",
     "colorette": "^2.0.19",
+    "common-tags": "^1.8.2",
     "discord-api-types": "^0.33.5",
     "discord.js": "13.12.0",
     "dotenv-cra": "^3.0.2",

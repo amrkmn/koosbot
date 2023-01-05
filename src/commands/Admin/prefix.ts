@@ -1,6 +1,6 @@
 import { envParseString } from "#env";
 import { KoosCommand } from "#lib/extensions";
-import { PermissionLevels } from "#lib/types/Enums";
+import { permissionLevels } from "#lib/utils/constants";
 import { embedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { isNullish } from "@sapphire/utilities";
@@ -10,7 +10,7 @@ import { send } from "@sapphire/plugin-editable-commands";
 
 @ApplyOptions<KoosCommand.Options>({
     description: `Lets you set a new prefix.`,
-    permissionLevels: PermissionLevels.Administrator,
+    permissionLevels: permissionLevels.administrator,
     usage: {
         types: [{ type: "new prefix", required: false }],
     },
