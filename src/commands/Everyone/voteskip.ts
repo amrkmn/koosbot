@@ -72,7 +72,7 @@ export class UserCommand extends KoosCommand {
         const embed = new MessageEmbed() //
             .setDescription(`${title} has been skip`)
             .setColor(embedColor.success);
-        const roles = [...member.roles.cache.keys()].filter((id) => data?.dj.includes(id));
+        const roles = [...member.roles.cache.keys()].filter((id) => data?.dj.includes(id) ?? false);
 
         if (data && !isNullishOrEmpty(roles)) {
             player.skip();
@@ -94,13 +94,13 @@ export class UserCommand extends KoosCommand {
                 votes.add(member.id);
             }
 
-            const voters = channel.members.filter((voter) => votes.has(voter.id)).size;
+            const voters = channel.members.filter((member) => votes.has(member.id));
             const required = listeners.size;
 
-            msg += voted ? "" : `, ${voters}/${required} (${required} ${pluralize("vote", required)} required)`;
+            msg += voted ? "" : `, ${voters.size}/${required} (${required} ${pluralize("vote", required)} required)`;
 
-            if (voters >= required) {
-                for (let [voterId] of channel.members.filter((voter) => votes.has(voter.id))) {
+            if (voters.size >= required) {
+                for (let [voterId] of voters) {
                     votes.delete(voterId);
                 }
                 msg = `${title} has been skipped`;
