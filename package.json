@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "build": "tsc -b src",
+    "build": "yarn clean && tsc -b src",
     "watch": "tsc-watch -b src --onSuccess \"yarn start\"",
     "dev": "yarn clean && yarn build && yarn start",
     "start": "node --preserve-symlinks --enable-source-maps --no-warnings dist/index.js",
