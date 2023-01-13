@@ -6,6 +6,7 @@ import { AutocompleteInteraction } from "discord.js";
 
 @ApplyOptions<InteractionHandler.Options>({
     interactionHandlerType: InteractionHandlerTypes.Autocomplete,
+    enabled: false,
 })
 export class AutocompleteHandler extends InteractionHandler {
     public override async run(interaction: AutocompleteInteraction, result: InteractionHandler.ParseResult<this>) {

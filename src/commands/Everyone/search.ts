@@ -82,7 +82,7 @@ export class UserCommand extends KoosCommand {
             options.push({
                 label: cutText(`${playlistName}`, 100),
                 description: `Duration: ${convertTime(duration)} | Tracks: ${tracks.length}`,
-                value: `${query}`,
+                value: `playlist`,
             });
         } else {
             let i = 0;
@@ -135,7 +135,7 @@ export class UserCommand extends KoosCommand {
                     ? selected.sourceName === "youtube"
                         ? `[${selected.title}](${selected.uri})`
                         : `[${selected.title} by ${selected.author}](${selected.uri})`
-                    : `[${playlistName}](${interaction.values.at(0)})`;
+                    : `[${playlistName}](${query})`;
 
                 if (!player) {
                     if (!canJoinVoiceChannel(member.voice.channel)) {

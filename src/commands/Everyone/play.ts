@@ -1,7 +1,7 @@
 import { Args } from "@sapphire/framework";
 import { ApplyOptions } from "@sapphire/decorators";
-import { GuildMember, Message, MessageEmbed, VoiceBasedChannel } from "discord.js";
-import { send } from "@sapphire/plugin-editable-commands";
+import { ApplicationCommandOptionChoiceData, GuildMember, Message, MessageEmbed, VoiceBasedChannel } from "discord.js";
+import { send, track } from "@sapphire/plugin-editable-commands";
 import { KazagumoPlayer, KazagumoTrack } from "kazagumo";
 import { embedColor } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
@@ -9,6 +9,7 @@ import { guilds } from "@prisma/client";
 import pluralize from "pluralize";
 import { isNullish } from "@sapphire/utilities";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
+import { cutText } from "#utils/functions";
 
 interface PlayOptions {
     message: Message | KoosCommand.ChatInputInteraction;
@@ -24,6 +25,8 @@ interface PlayOptions {
     usage: "query",
 })
 export class UserCommand extends KoosCommand {
+    private tracks: string[] = [];
+
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>
@@ -51,7 +54,9 @@ export class UserCommand extends KoosCommand {
         const channel = member.voice.channel as VoiceBasedChannel;
         let player = kazagumo.getPlayer(interaction.guildId!);
 
-        return interaction.followUp({ embeds: [await this.play(query, { message: interaction, player, channel, data })] });
+        return interaction.followUp({
+            embeds: [await this.play(this.tracks[Number(query)], { message: interaction, player, channel, data })],
+        });
     }
 
     public async messageRun(message: Message, args: Args) {
@@ -66,6 +71,37 @@ export class UserCommand extends KoosCommand {
         let player = kazagumo.getPlayer(message.guildId!);
 
         return send(message, { embeds: [await this.play(query, { message, player, channel, data })] });
+    }
+
+    public async autocompleteRun(interaction: KoosCommand.AutocompleteInteraction) {
+        const { kazagumo } = this.container;
+        const query = interaction.options.getFocused(true);
+
+        if (!query.value) return interaction.respond([]);
+        let { tracks, type, playlistName } = await kazagumo.search(query.value, { requester: interaction.member });
+
+        if (type === "PLAYLIST") {
+            this.tracks = [query.value];
+            return interaction.respond([{ name: cutText(`${playlistName}`, 100), value: "0" }]);
+        } else {
+            const options: ApplicationCommandOptionChoiceData[] = [];
+
+            tracks = tracks.slice(0, 10);
+
+            this.tracks = tracks.map((track) => track.uri);
+            tracks.forEach((track, i) => {
+                const title =
+                    track.sourceName === "youtube" //
+                        ? `${track.title}`
+                        : `${track.title} by ${track.author}`;
+                options.push({
+                    name: `${cutText(title, 100)}`,
+                    value: `${i}`,
+                });
+            });
+
+            return interaction.respond(options);
+        }
     }
 
     private async play(query: string, { message, player, channel, data }: PlayOptions) {
