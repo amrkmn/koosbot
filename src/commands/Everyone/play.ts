@@ -25,7 +25,7 @@ interface PlayOptions {
     usage: "query",
 })
 export class UserCommand extends KoosCommand {
-    private tracks: string[] = [];
+    private tracks: Map<string, string[]> = new Map<string, string[]>();
 
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
@@ -46,16 +46,22 @@ export class UserCommand extends KoosCommand {
 
     public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
         const { kazagumo, db } = this.container;
-        const data = await db.guilds.findUnique({ where: { id: `${interaction.guildId}` } });
+        const guildId = `${interaction.guildId}`;
         const query = interaction.options.getString("query", true)!;
+
+        const data = await db.guilds.findUnique({ where: { id: guildId } });
         await interaction.deferReply();
 
         const member = interaction.member! as GuildMember;
         const channel = member.voice.channel as VoiceBasedChannel;
+
+        let tracks = this.tracks.get(`${guildId}:${member.id}`) ?? [];
         let player = kazagumo.getPlayer(interaction.guildId!);
+        let selected = tracks[Number(query)];
+        this.tracks.delete(`${guildId}:${member.id}`);
 
         return interaction.followUp({
-            embeds: [await this.play(this.tracks[Number(query)], { message: interaction, player, channel, data })],
+            embeds: [await this.play(selected, { message: interaction, player, channel, data })],
         });
     }
 
@@ -76,19 +82,24 @@ export class UserCommand extends KoosCommand {
     public async autocompleteRun(interaction: KoosCommand.AutocompleteInteraction) {
         const { kazagumo } = this.container;
         const query = interaction.options.getFocused(true);
+        const guildId = `${interaction.guildId}`;
+        const memberId = (interaction.member as GuildMember).id;
 
         if (!query.value) return interaction.respond([]);
         let { tracks, type, playlistName } = await kazagumo.search(query.value, { requester: interaction.member });
 
         if (type === "PLAYLIST") {
-            this.tracks = [query.value];
+            this.tracks.set(`${guildId}:${memberId}`, [query.value]);
             return interaction.respond([{ name: cutText(`${playlistName}`, 100), value: "0" }]);
         } else {
             const options: ApplicationCommandOptionChoiceData[] = [];
 
             tracks = tracks.slice(0, 10);
 
-            this.tracks = tracks.map((track) => track.uri);
+            this.tracks.set(
+                `${guildId}:${memberId}`,
+                tracks.map((track) => track.uri)
+            );
             tracks.forEach((track, i) => {
                 const title =
                     track.sourceName === "youtube" //
