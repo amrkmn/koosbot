@@ -13,7 +13,7 @@ export class ClientListener extends Listener {
     public async run(player: KazagumoPlayer) {
         const { client } = this.container;
         const npMessage = player.data.get("nowPlayingMessage");
-        const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId));
+        const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
 
         if (channel && channel.isText() && npMessage instanceof Message) {
             const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id).catch(() => null));

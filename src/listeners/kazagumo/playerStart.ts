@@ -16,7 +16,7 @@ export class ClientListener extends Listener {
         const { client, db } = this.container;
 
         const data = await db.guilds.findUnique({ where: { id: player.guildId } });
-        const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId));
+        const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
         if (!channel) return;
 
         let title =

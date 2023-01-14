@@ -13,7 +13,7 @@ import { Events, KazagumoPlayer } from "kazagumo";
 export class ClientListener extends Listener {
     public async run(player: KazagumoPlayer) {
         const { client, logger } = this.container;
-        const guild = client.guilds.cache.get(player.guildId) ?? (await client.guilds.fetch(player.guildId));
+        const guild = client.guilds.cache.get(player.guildId) ?? (await client.guilds.fetch(player.guildId).catch(() => null));
         if (!guild) return;
 
         logger.info(
@@ -23,7 +23,7 @@ export class ClientListener extends Listener {
         );
 
         const npMessage = player.data.get("nowPlayingMessage");
-        const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId));
+        const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
 
         if (channel && channel.isText() && npMessage instanceof Message) {
             const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id).catch(() => null));

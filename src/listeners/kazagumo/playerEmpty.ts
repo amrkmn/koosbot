@@ -19,8 +19,8 @@ export class ClientListener extends Listener {
 
     public async run(player: KazagumoPlayer) {
         const { client } = this.container;
-        const guild = client.guilds.cache.get(player.guildId) ?? (await client.guilds.fetch(player.guildId));
-        const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId));
+        const guild = client.guilds.cache.get(player.guildId) ?? (await client.guilds.fetch(player.guildId).catch(() => null));
+        const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
         if (isNullish(guild) || isNullish(player) || isNullish(channel)) return;
 
         if (player.queue.current) return;
@@ -47,7 +47,7 @@ export class ClientListener extends Listener {
         if (typeof this.timeoutId !== "undefined") this.cancel();
 
         const { client } = this.container;
-        const channel = container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId));
+        const channel = container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
         if (isNullish(guild) || isNullish(player) || isNullish(channel)) return this.cancel();
 
         this.timeoutId = setTimeout(() => {
