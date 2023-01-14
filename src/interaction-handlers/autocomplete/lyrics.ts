@@ -1,4 +1,4 @@
-import { envParseString } from "#env";
+import { envParseString } from "@skyra/env-utilities";
 import { cutText } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { InteractionHandler, InteractionHandlerTypes } from "@sapphire/framework";

@@ -1,4 +1,4 @@
-import { envParseString } from "#env";
+import { envParseString } from "@skyra/env-utilities";
 import { MessageEmbed } from "discord.js";
 import { embedColor } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";

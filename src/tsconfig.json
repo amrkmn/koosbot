@@ -7,7 +7,6 @@
         "baseUrl": ".",
         "skipLibCheck": true,
         "paths": {
-            "#env": ["lib/env/index"],
             "#utils/*": ["lib/utils/*"],
             "#lib/interfaces": ["lib/types/interfaces/index"],
             "#lib/*": ["lib/*"],

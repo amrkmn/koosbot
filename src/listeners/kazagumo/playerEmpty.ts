@@ -1,4 +1,4 @@
-import { envParseString } from "#env";
+import { envParseString } from "@skyra/env-utilities";
 import { embedColor } from "#utils/constants";
 import { mins, sec } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";

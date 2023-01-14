@@ -1,4 +1,4 @@
-import { envParseString } from "#env";
+import { envParseString } from "@skyra/env-utilities";
 import type { KoosClient } from "#lib/extensions/KoosClient";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, Store } from "@sapphire/framework";

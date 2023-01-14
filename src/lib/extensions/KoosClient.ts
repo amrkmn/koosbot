@@ -6,7 +6,7 @@ import { resolve } from "path";
 import { Kazagumo, Plugins } from "kazagumo";
 import { Connectors, NodeOption, Shoukaku } from "shoukaku";
 import { KoosPlayer } from "#lib/extensions/KoosPlayer";
-import { envParseInteger, envParseString } from "#env";
+import { envParseNumber, envParseString } from "@skyra/env-utilities";
 import { ScheduledTaskRedisStrategy } from "@sapphire/plugin-scheduled-tasks/register-redis";
 import Spotify from "kazagumo-spotify";
 
@@ -38,7 +38,7 @@ export class KoosClient extends SapphireClient {
             baseUserDirectory: resolve(process.cwd(), "dist"),
             api: {
                 listenOptions: {
-                    port: envParseInteger("PORT", 3001),
+                    port: envParseNumber("PORT", 3001),
                     host: "0.0.0.0",
                 },
             },
@@ -46,7 +46,7 @@ export class KoosClient extends SapphireClient {
                 strategy: new ScheduledTaskRedisStrategy({
                     bull: {
                         connection: {
-                            port: envParseInteger("REDIS_PORT_SECRET"),
+                            port: envParseNumber("REDIS_PORT_SECRET"),
                             password: `${envParseString("REDIS_PASSWORD_SECRET")}`,
                             host: `${envParseString("REDIS_HOST_SECRET")}`,
                         },

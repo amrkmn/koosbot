@@ -57,7 +57,7 @@ export class UserCommand extends KoosCommand {
 
         let tracks = this.tracks.get(`${guildId}:${member.id}`) ?? [];
         let player = kazagumo.getPlayer(interaction.guildId!);
-        let selected = tracks[Number(query)];
+        let selected = isNaN(Number(query)) ? query : tracks[Number(query)];
         this.tracks.delete(`${guildId}:${member.id}`);
 
         return interaction.followUp({

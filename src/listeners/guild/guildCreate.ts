@@ -1,4 +1,4 @@
-import { envParseString } from "#env";
+import { envParseString } from "@skyra/env-utilities";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, Events } from "@sapphire/framework";
 import { Guild } from "discord.js";

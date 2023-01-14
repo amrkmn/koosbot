@@ -1,4 +1,4 @@
-import { envParseArray } from "#env";
+import { envParseArray } from "@skyra/env-utilities";
 import { Precondition } from "@sapphire/framework";
 import { isNullishOrEmpty } from "@sapphire/utilities";
 import type { CommandInteraction, Message, ContextMenuInteraction } from "discord.js";

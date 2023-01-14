@@ -2,7 +2,7 @@ import { KoosCommand } from "#lib/extensions";
 import { permissionLevels } from "#lib/utils/constants";
 import { KoosArgument } from "#lib/interfaces";
 import { Argument } from "@sapphire/framework";
-import { envParseArray } from "#env";
+import { envParseArray } from "@skyra/env-utilities";
 
 export class UserArgument extends Argument<KoosCommand> {
     public async run(parameter: string, context: KoosArgument.Context) {

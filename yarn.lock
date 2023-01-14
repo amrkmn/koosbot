@@ -264,6 +264,13 @@
   resolved "https://registry.yarnpkg.com/@skyra/editable-commands/-/editable-commands-2.1.4.tgz#f1549f1740c1f38707712f6c387f0cfa30732286"
   integrity sha512-W/m7GVmPCFKmEc49J4dLP6+TRlbBhXUPkN5KAV4PSzk5JaYLOTl5fgjEzHJOxtLHwiQBd36lrQdsWKxL+N9zBQ==
 
+"@skyra/env-utilities@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@skyra/env-utilities/-/env-utilities-1.1.0.tgz#582a583cbf9f215ecfe1c7f2f54c6a02088524f6"
+  integrity sha512-Zz/UA+EofLMj8fP+5hfBoA0sZ+5HN2q35j9rt2/X09LUUBzHZpDNK0Ay5vxkbqukfoHfEvVdaEe8JhkPsKrRDw==
+  dependencies:
+    dotenv-cra "^3.0.2"
+
 "@types/common-tags@^1.8.1":
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/@types/common-tags/-/common-tags-1.8.1.tgz#a5a49ca5ebbb58e0f8947f3ec98950c8970a68a9"

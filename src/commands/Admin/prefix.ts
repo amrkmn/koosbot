@@ -1,4 +1,4 @@
-import { envParseString } from "#env";
+import { envParseString } from "@skyra/env-utilities";
 import { KoosCommand } from "#lib/extensions";
 import { permissionLevels } from "#lib/utils/constants";
 import { embedColor } from "#utils/constants";
