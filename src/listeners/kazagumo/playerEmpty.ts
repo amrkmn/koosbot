@@ -28,7 +28,7 @@ export class ClientListener extends Listener {
         const npMessage = player.data.get("nowPlayingMessage");
 
         if (channel && channel.isText() && npMessage instanceof Message) {
-            const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id));
+            const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id).catch(() => null));
 
             if (!isNullish(msg) && msg.editable) {
                 const row = npMessage.components;
