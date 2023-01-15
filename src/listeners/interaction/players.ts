@@ -25,8 +25,15 @@ export class ClientListener extends Listener {
         const checkMember = this.checkMember(interaction.guild!, interaction.member as GuildMember);
 
         if (Object.values(buttons).includes(id)) await interaction.deferUpdate();
-
         if (!isNullish(checkMember)) return interaction.followUp({ embeds: [checkMember], ephemeral: true });
+        if (
+            ["buttonPauseOrResume", "buttonSkip", "buttonStop"].includes(id) && //
+            !this.checkDJ(interaction, player, data.dj)
+        )
+            return interaction.followUp({
+                embeds: [{ description: `This button can only be use by DJ.`, color: embedColor.error }],
+                ephemeral: true,
+            });
 
         switch (id) {
             case "buttonPauseOrResume":
@@ -34,23 +41,11 @@ export class ClientListener extends Listener {
                 msg.edit({ components: [this.buttons(player.paused)] });
                 break;
             case "buttonSkip":
-                if (this.checkDJ(interaction, player, data.dj)) return player.skip();
-
-                interaction.followUp({
-                    embeds: [{ description: `This button can only use by DJ or the song requester.`, color: embedColor.error }],
-                    ephemeral: true,
-                });
+                player.skip();
                 break;
             case "buttonStop":
-                if (this.checkDJ(interaction, player, data.dj)) {
-                    player.queue.clear();
-                    player.skip();
-                    return;
-                }
-                interaction.followUp({
-                    embeds: [{ description: `This button can only use by DJ or the song requester.`, color: embedColor.error }],
-                    ephemeral: true,
-                });
+                player.queue.clear();
+                player.skip();
                 break;
             case "buttonShowQueue":
                 const queue = await this.queue(player);
@@ -156,14 +151,14 @@ export class ClientListener extends Listener {
     private checkDJ(message: Message | CommandInteraction, player: KazagumoPlayer, dj: string[]) {
         const member = message.member as GuildMember;
 
-        const current = player.queue.current!;
-        const requester = current.requester;
+        // const current = player.queue.current!;
+        // const requester = current.requester;
 
         const roles = [...member.roles.cache.keys()].filter((id) => dj.includes(id));
 
-        if (requester instanceof GuildMember && requester.user.id === member.user.id) {
-            return requester.user.id === member.user.id;
-        }
+        // if (requester instanceof GuildMember && requester.user.id === member.user.id) {
+        //     return requester.user.id === member.user.id;
+        // }
 
         return !isNullishOrEmpty(roles);
     }

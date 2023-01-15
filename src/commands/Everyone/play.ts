@@ -92,23 +92,21 @@ export class UserCommand extends KoosCommand {
             this.tracks.set(`${guildId}:${memberId}`, [query.value]);
             return interaction.respond([{ name: cutText(`${playlistName}`, 100), value: "0" }]);
         } else {
-            const options: ApplicationCommandOptionChoiceData[] = [];
-
             tracks = tracks.slice(0, 10);
 
             this.tracks.set(
                 `${guildId}:${memberId}`,
                 tracks.map((track) => track.uri)
             );
-            tracks.forEach((track, i) => {
+            const options: ApplicationCommandOptionChoiceData[] = tracks.map((track, i) => {
                 const title =
                     track.sourceName === "youtube" //
                         ? `${track.title}`
                         : `${track.title} by ${track.author}`;
-                options.push({
+                return {
                     name: `${cutText(title, 100)}`,
                     value: `${i}`,
-                });
+                };
             });
 
             return interaction.respond(options);

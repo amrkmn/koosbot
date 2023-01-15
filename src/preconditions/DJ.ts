@@ -33,14 +33,14 @@ export class DJPrecondition extends Precondition<PreconditionOptions> {
     private checkDJ(message: Message | CommandInteraction, player: KazagumoPlayer, dj: string[]) {
         const member = message.member as GuildMember;
 
-        const current = player.queue.current!;
-        const requester = current.requester;
-
+        // const current = player.queue.current!;
+        // const requester = current.requester;
+        
         const roles = [...member.roles.cache.keys()].filter((id) => dj.includes(id));
-
-        if (requester instanceof GuildMember && requester.user.id === member.user.id) {
-            return requester.user.id === member.user.id;
-        }
+        
+        // if (requester instanceof GuildMember && requester.user.id === member.user.id) {
+        //     return requester.user.id === member.user.id;
+        // }
 
         return !isNullishOrEmpty(roles);
     }
