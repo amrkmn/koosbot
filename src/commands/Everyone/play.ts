@@ -38,7 +38,6 @@ export class UserCommand extends KoosCommand {
                             .setName("query")
                             .setDescription("Could be a link of the track, or a search term")
                             .setRequired(true)
-                            .setAutocomplete(true)
                     ),
             { idHints: ["1050092839700287521", "1050094765485609030"] }
         );
@@ -49,19 +48,19 @@ export class UserCommand extends KoosCommand {
         const guildId = `${interaction.guildId}`;
         const query = interaction.options.getString("query", true)!;
 
-        const data = await db.guilds.findUnique({ where: { id: guildId } });
         await interaction.deferReply();
+        const data = await db.guilds.findUnique({ where: { id: guildId } });
 
         const member = interaction.member! as GuildMember;
         const channel = member.voice.channel as VoiceBasedChannel;
 
-        let tracks = this.tracks.get(`${guildId}:${member.id}`) ?? [];
         let player = kazagumo.getPlayer(interaction.guildId!);
-        let selected = query.startsWith("autocomplete:") ? tracks[Number(query.split(":")[1])] : query;
-        this.tracks.delete(`${guildId}:${member.id}`);
+        // let tracks = this.tracks.get(`${guildId}:${member.id}`) ?? [];
+        // let selected = query.startsWith("autocomplete:") ? tracks[Number(query.split(":")[1])] : query;
+        // this.tracks.delete(`${guildId}:${member.id}`);
 
         return interaction.followUp({
-            embeds: [await this.play(selected, { message: interaction, player, channel, data })],
+            embeds: [await this.play(query, { message: interaction, player, channel, data })],
         });
     }
 
@@ -79,45 +78,44 @@ export class UserCommand extends KoosCommand {
         return send(message, { embeds: [await this.play(query, { message, player, channel, data })] });
     }
 
-    public async autocompleteRun(interaction: KoosCommand.AutocompleteInteraction) {
-        const { kazagumo } = this.container;
-        const query = interaction.options.getFocused(true);
-        const guildId = `${interaction.guildId}`;
-        const memberId = (interaction.member as GuildMember).id;
+    // public async autocompleteRun(interaction: KoosCommand.AutocompleteInteraction) {
+    //     const { kazagumo } = this.container;
+    //     const query = interaction.options.getFocused(true);
+    //     const guildId = `${interaction.guildId}`;
+    //     const memberId = (interaction.member as GuildMember).id;
 
-        if (!query.value) return interaction.respond([]);
-        let { tracks, type, playlistName } = await kazagumo.search(query.value, { requester: interaction.member });
+    //     if (!query.value) return interaction.respond([]);
+    //     let { tracks, type, playlistName } = await kazagumo.search(query.value, { requester: interaction.member });
 
-        if (type === "PLAYLIST") {
-            let tracks = [query.value];
-            this.tracks.set(`${guildId}:${memberId}`, tracks);
-            return interaction.respond([{ name: cutText(`${playlistName}`, 100), value: tracks.length }]);
-        } else {
-            tracks = tracks.slice(0, 10);
+    //     if (type === "PLAYLIST") {
+    //         let tracks = [query.value];
+    //         this.tracks.set(`${guildId}:${memberId}`, tracks);
+    //         return interaction.respond([{ name: cutText(`${playlistName}`, 100), value: tracks.length }]);
+    //     } else {
+    //         tracks = tracks.slice(0, 10);
 
-            this.tracks.set(
-                `${guildId}:${memberId}`,
-                tracks.map((track) => track.uri)
-            );
-            const options: ApplicationCommandOptionChoiceData[] = tracks.map((track, i) => {
-                const title =
-                    track.sourceName === "youtube" //
-                        ? `${track.title}`
-                        : `${track.title} by ${track.author}`;
-                return {
-                    name: `${cutText(title, 100)}`,
-                    value: `autocomplete:${i}`,
-                };
-            });
+    //         this.tracks.set(
+    //             `${guildId}:${memberId}`,
+    //             tracks.map((track) => track.uri)
+    //         );
+    //         const options: ApplicationCommandOptionChoiceData[] = tracks.map((track, i) => {
+    //             const title =
+    //                 track.sourceName === "youtube" //
+    //                     ? `${track.title}`
+    //                     : `${track.title} by ${track.author}`;
+    //             return {
+    //                 name: `${cutText(title, 100)}`,
+    //                 value: `autocomplete:${i}`,
+    //             };
+    //         });
 
-            return interaction.respond(options);
-        }
-    }
+    //         return interaction.respond(options);
+    //     }
+    // }
 
     private async play(query: string, { message, player, channel, data }: PlayOptions) {
         const { kazagumo } = this.container;
         const result = await kazagumo.search(query, { requester: message.member });
-        console.dir(result, { depth: null });
         if (!result.tracks.length) return new MessageEmbed({ description: `Something went wrong`, color: embedColor.error });
 
         let tracks: KazagumoTrack[] = [],
@@ -154,6 +152,7 @@ export class UserCommand extends KoosCommand {
             });
         }
 
+        console.log(tracks);
         player.queue.add(tracks);
         if (!player.playing && !player.paused) player.play();
 
