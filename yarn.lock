@@ -779,7 +779,7 @@ kazagumo-spotify@^1.1.5:
     kazagumo "^2.1.6"
     undici "^5.5.1"
 
-kazagumo@^2.1.6, kazagumo@^2.3.0:
+kazagumo@2.3.0, kazagumo@^2.1.6:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/kazagumo/-/kazagumo-2.3.0.tgz#425401103c499e81ef59e4ecf71a4f9751e894f9"
   integrity sha512-SuB6UnjqIEO53ujNFYWfKJia3iG5KPOdc3VSKEKeTr18f52d+Q7jYTBuiwoP5g4sms+muxQuhhWS5WcH1PYRMA==

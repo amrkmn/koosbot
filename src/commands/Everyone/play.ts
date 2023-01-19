@@ -57,7 +57,7 @@ export class UserCommand extends KoosCommand {
 
         let tracks = this.tracks.get(`${guildId}:${member.id}`) ?? [];
         let player = kazagumo.getPlayer(interaction.guildId!);
-        let selected = isNaN(Number(query)) ? query : tracks[Number(query)];
+        let selected = query.startsWith("autocomplete:") ? tracks[Number(query.split(":")[1])] : query;
         this.tracks.delete(`${guildId}:${member.id}`);
 
         return interaction.followUp({
@@ -89,8 +89,9 @@ export class UserCommand extends KoosCommand {
         let { tracks, type, playlistName } = await kazagumo.search(query.value, { requester: interaction.member });
 
         if (type === "PLAYLIST") {
-            this.tracks.set(`${guildId}:${memberId}`, [query.value]);
-            return interaction.respond([{ name: cutText(`${playlistName}`, 100), value: "0" }]);
+            let tracks = [query.value];
+            this.tracks.set(`${guildId}:${memberId}`, tracks);
+            return interaction.respond([{ name: cutText(`${playlistName}`, 100), value: tracks.length }]);
         } else {
             tracks = tracks.slice(0, 10);
 
@@ -105,7 +106,7 @@ export class UserCommand extends KoosCommand {
                         : `${track.title} by ${track.author}`;
                 return {
                     name: `${cutText(title, 100)}`,
-                    value: `${i}`,
+                    value: `autocomplete:${i}`,
                 };
             });
 
@@ -116,6 +117,7 @@ export class UserCommand extends KoosCommand {
     private async play(query: string, { message, player, channel, data }: PlayOptions) {
         const { kazagumo } = this.container;
         const result = await kazagumo.search(query, { requester: message.member });
+        console.dir(result, { depth: null });
         if (!result.tracks.length) return new MessageEmbed({ description: `Something went wrong`, color: embedColor.error });
 
         let tracks: KazagumoTrack[] = [],

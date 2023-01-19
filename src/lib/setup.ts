@@ -10,7 +10,6 @@ import { inspect } from "util";
 import { setup } from "@skyra/env-utilities";
 
 setup(resolve(process.cwd(), ".env"));
-console.log(process.env.NODE_ENV);
 inspect.defaultOptions.depth = 1;
 colorette.createColors({ useColor: true });
 
