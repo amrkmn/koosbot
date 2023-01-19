@@ -79,6 +79,7 @@ export class KoosClient extends SapphireClient {
         container.kazagumo = new Kazagumo(
             {
                 plugins: [
+                    //@ts-ignore
                     new Spotify({
                         clientId: `${envParseString("SPOTIFY_ID")}`,
                         clientSecret: `${envParseString("SPOTIFY_SECRET")}`,
