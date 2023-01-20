@@ -9,10 +9,11 @@ import { KoosPlayer } from "#lib/extensions/KoosPlayer";
 import { envParseNumber, envParseString } from "@skyra/env-utilities";
 import { ScheduledTaskRedisStrategy } from "@sapphire/plugin-scheduled-tasks/register-redis";
 import Spotify from "kazagumo-spotify";
+import { Client as GeniusClient } from "genius-lyrics";
 
 const NODES: NodeOption[] = [
     { name: "lavalink.aytea.ga", url: "lavalink.aytea.ga:443", auth: "maybeiwasboring", secure: true },
-    { name: "lavalink.minecuta.net", url: "lavalink.minecuta.net:2333", auth: "someoneisyou", secure: false },
+    // { name: "lavalink.minecuta.net", url: "lavalink.minecuta.net:2333", auth: "someoneisyou", secure: false },
     { name: "node1.lewdhutao.tech", url: "node1.lewdhutao.tech:1183", auth: "lewdhutao", secure: false },
     { name: "lava1.horizxon.studio", url: "lava1.horizxon.studio:80", auth: "horizxon.studio", secure: false },
     // { name: "lava2.horizxon.studio", url: "lava2.horizxon.studio:80", auth: "horizxon.studio", secure: false },
@@ -75,6 +76,7 @@ export class KoosClient extends SapphireClient {
     }
 
     public override async login(token?: string | undefined): Promise<string> {
+        container.genius = new GeniusClient(envParseString("GENIUS_TOKEN"));
         container.db = new PrismaClient();
         container.kazagumo = new Kazagumo(
             {
@@ -106,6 +108,7 @@ declare module "@sapphire/pieces" {
         db: PrismaClient;
         kazagumo: Kazagumo;
         shoukaku: Shoukaku;
+        genius: GeniusClient;
     }
 }
 

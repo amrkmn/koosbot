@@ -51,6 +51,7 @@
     "@skyra/env-utilities": "^1.1.0",
     "@types/pluralize": "^0.0.29",
     "bullmq": "^3.3.0",
+    "cheerio": "^1.0.0-rc.12",
     "colorette": "^2.0.19",
     "common-tags": "^1.8.2",
     "discord-api-types": "^0.33.5",

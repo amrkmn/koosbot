@@ -1,11 +1,11 @@
-import { envParseString } from "@skyra/env-utilities";
-import { MessageEmbed } from "discord.js";
+import { ApplicationCommandOptionChoiceData, MessageEmbed } from "discord.js";
 import { embedColor } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
 import { ApplyOptions } from "@sapphire/decorators";
-import { Client as GeniusClient } from "genius-lyrics";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { chunk, cutText, decodeEntities, pagination } from "#utils/functions";
+import { request } from "@aytea/request";
+import { load } from "cheerio";
 // import { Args } from "@sapphire/framework";
 // import { send } from "@sapphire/plugin-editable-commands";
 // import { Message, MessageSelectOptionData, MessageActionRow, MessageSelectMenu, TextChannel } from "discord.js";
@@ -17,8 +17,6 @@ import { chunk, cutText, decodeEntities, pagination } from "#utils/functions";
     slashOnly: true,
 })
 export class UserCommand extends KoosCommand {
-    genius = new GeniusClient(envParseString("GENIUS_TOKEN"));
-
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>
@@ -37,6 +35,8 @@ export class UserCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+        const { genius } = this.container;
+
         let query = interaction.options.getString("query", true);
         if (isNullish(query))
             return interaction.reply({
@@ -45,8 +45,12 @@ export class UserCommand extends KoosCommand {
             });
         await interaction.deferReply();
 
-        const song = await this.genius.songs.get(Number(query));
-        const lyrics = await song.lyrics();
+        const song = await genius.songs.get(Number(query));
+        const lyrics = await this.getLyrics(song.url).catch(() => undefined);
+        if (!lyrics)
+            return interaction.followUp({
+                embeds: [new MessageEmbed().setDescription("No result was found").setColor(embedColor.error)],
+            });
 
         const lyric = chunk(lyrics.split("\n"), 25);
 
@@ -54,7 +58,7 @@ export class UserCommand extends KoosCommand {
             prev.push(
                 new MessageEmbed()
                     .setDescription(`${decodeEntities(curr.map((x) => x.replace(/^\[[^\]]+\]$/g, "**$&**")).join("\n"))}`)
-                    .setTitle(`${cutText(song.title, 128)}`)
+                    .setTitle(`${cutText(song.fullTitle, 128)}`)
                     .setThumbnail(song.thumbnail)
                     .setURL(song.url)
                     .setColor(embedColor.default)
@@ -63,6 +67,50 @@ export class UserCommand extends KoosCommand {
         }, []);
 
         pagination({ channel: interaction, embeds, target: interaction.user, fastSkip: true });
+    }
+
+    public async autocompleteRun(interaction: KoosCommand.AutocompleteInteraction) {
+        const { genius } = this.container;
+
+        const query = interaction.options.getFocused(true);
+
+        if (isNullishOrEmpty(query.value)) return interaction.respond([]);
+        let songs = await genius.songs.search(query.value);
+        songs = songs.slice(0, 10);
+
+        const options: ApplicationCommandOptionChoiceData[] = songs.map((song) => ({
+            name: `${cutText(song.fullTitle, 100)}`,
+            value: `${song.id}`,
+        }));
+        return interaction.respond(options);
+    }
+
+    private async getLyrics(url: string) {
+        try {
+            const body = await request(url)
+                .agent(
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36"
+                )
+                .options({ throwOnError: true })
+                .text();
+
+            const $ = load(body);
+
+            const lyrics = $("div[class*='Lyrics__Container']")
+                .toArray()
+                .map((x) => {
+                    let ele = $(x);
+                    ele.find("div[class*='InreadContainer__Container']").replaceWith("\n");
+                    ele.find("br").replaceWith("\n");
+                    return ele.text();
+                })
+                .join("\n")
+                .trim();
+
+            return lyrics;
+        } catch (error) {
+            throw new Error("No result was found");
+        }
     }
 
     // public async messageRun(message: Message, args: Args) {
