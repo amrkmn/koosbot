@@ -152,7 +152,6 @@ export class UserCommand extends KoosCommand {
             });
         }
 
-        console.log(tracks);
         player.queue.add(tracks);
         if (!player.playing && !player.paused) player.play();
 
