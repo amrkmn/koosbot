@@ -34,7 +34,7 @@
     "typescript": "^4.9.3"
   },
   "dependencies": {
-    "@aytea/request": "^0.0.9",
+    "@aytea/request": "^0.1.1",
     "@prisma/client": "^4.6.1",
     "@sapphire/decorators": "^5.0.0",
     "@sapphire/discord.js-utilities": "^5.1.2",
@@ -58,7 +58,6 @@
     "discord.js": "13.12.0",
     "genius-lyrics": "^4.4.2",
     "kazagumo": "^2.3.0",
-    "kazagumo-spotify": "^1.1.5",
     "ms": "^2.1.3",
     "pluralize": "^8.0.0",
     "pretty-ms": "^8.0.0",

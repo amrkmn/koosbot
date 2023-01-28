@@ -8,8 +8,9 @@ import { Connectors, NodeOption, Shoukaku } from "shoukaku";
 import { KoosPlayer } from "#lib/extensions/KoosPlayer";
 import { envParseNumber, envParseString } from "@skyra/env-utilities";
 import { ScheduledTaskRedisStrategy } from "@sapphire/plugin-scheduled-tasks/register-redis";
-import Spotify from "kazagumo-spotify";
+// import Spotify from "kazagumo-spotify";
 import { Client as GeniusClient } from "genius-lyrics";
+import { KazagumoPlugin as Spotify } from "#lib/structures";
 
 const NODES: NodeOption[] = [
     { name: "lavalink.aytea.ga", url: "lavalink.aytea.ga:443", auth: "maybeiwasboring", secure: true },
@@ -81,7 +82,6 @@ export class KoosClient extends SapphireClient {
         container.kazagumo = new Kazagumo(
             {
                 plugins: [
-                    //@ts-ignore
                     new Spotify({
                         clientId: `${envParseString("SPOTIFY_ID")}`,
                         clientSecret: `${envParseString("SPOTIFY_SECRET")}`,

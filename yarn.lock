@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@aytea/request@^0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@aytea/request/-/request-0.0.9.tgz#a1ee58ff370170a9ea77a637d23bb53cb479559b"
-  integrity sha512-2fN8p2vMTfDk1sBPXMZDqelTiHkNWtC7Iej7P7KDNKt3e3Tp+8PTZjP4yCacyh1Z6l56ZrKYNncYMnowJY1BVw==
+"@aytea/request@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@aytea/request/-/request-0.1.1.tgz#67889147b9b4f781e25f98b9cd5f74d37cb673fd"
+  integrity sha512-uGdfD/vVNVmIT7X9nzzBXVO1t/oRS+ro4/yEP+Fvk5pEB5r/8ykOhYkPaTDoryU0eQlL5HMTXtgaW9zbIY1aFQ==
   dependencies:
     undici "5.10.0"
 
@@ -771,22 +771,6 @@ isexe@^2.0.0:
   resolved "https://registry.yarnpkg.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
   integrity sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==
 
-kazagumo-spotify@^1.1.5:
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/kazagumo-spotify/-/kazagumo-spotify-1.1.5.tgz#84af5ee801aa466a6f4ba3f2a4ac6c1902cb7889"
-  integrity sha512-tlJdaY8jiWZ2h2+S9KEqmQkIQweIPunAomQ5xwZwrV7q0HYOrwkBrRqmEGKf8ukuT4HVAWNKVnOYG6RlCPNljw==
-  dependencies:
-    kazagumo "^2.1.6"
-    undici "^5.5.1"
-
-kazagumo@^2.1.6:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/kazagumo/-/kazagumo-2.3.0.tgz#425401103c499e81ef59e4ecf71a4f9751e894f9"
-  integrity sha512-SuB6UnjqIEO53ujNFYWfKJia3iG5KPOdc3VSKEKeTr18f52d+Q7jYTBuiwoP5g4sms+muxQuhhWS5WcH1PYRMA==
-  dependencies:
-    events "^3.3.0"
-    shoukaku "^3.2.2"
-
 kazagumo@^2.3.0:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/kazagumo/-/kazagumo-2.3.2.tgz#4553315f9618f3a45811b35411602b3b27da34bc"
@@ -1222,7 +1206,7 @@ undici@5.10.0:
   resolved "https://registry.yarnpkg.com/undici/-/undici-5.10.0.tgz#dd9391087a90ccfbd007568db458674232ebf014"
   integrity sha512-c8HsD3IbwmjjbLvoZuRI26TZic+TSEe8FPMLLOkN1AfYRhdjnKBU6yL+IwcSCbdZiX4e5t0lfMDLDCqj4Sq70g==
 
-undici@^5.5.1, undici@^5.8.0:
+undici@^5.8.0:
   version "5.13.0"
   resolved "https://registry.yarnpkg.com/undici/-/undici-5.13.0.tgz#56772fba89d8b25e39bddc8c26a438bd73ea69bb"
   integrity sha512-UDZKtwb2k7KRsK4SdXWG7ErXiL7yTGgLWvk2AXO1JMjgjh404nFo6tWSCM2xMpJwMPx3J8i/vfqEh1zOqvj82Q==
