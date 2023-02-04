@@ -60,7 +60,7 @@ export class UserCommand extends KoosCommand {
         let selected = query.startsWith("autocomplete:") ? tracks[Number(query.split(":")[1])] : query;
         this.tracks.delete(`${guildId}:${member.id}`);
 
-        return interaction.followUp({
+        interaction.followUp({
             embeds: [await this.play(selected, { message: interaction, player, channel, data })],
         });
     }
@@ -76,7 +76,7 @@ export class UserCommand extends KoosCommand {
         const channel = message.member?.voice.channel as VoiceBasedChannel;
         let player = kazagumo.getPlayer(message.guildId!);
 
-        return send(message, { embeds: [await this.play(query, { message, player, channel, data })] });
+        send(message, { embeds: [await this.play(query, { message, player, channel, data })] });
     }
 
     public async autocompleteRun(interaction: KoosCommand.AutocompleteInteraction) {
@@ -94,7 +94,8 @@ export class UserCommand extends KoosCommand {
         if (type === "PLAYLIST") {
             let tracks = [query.value];
             this.tracks.set(`${guildId}:${memberId}`, tracks);
-            return interaction.respond([{ name: cutText(`${playlistName}`, 100), value: `autocomplete:${tracks.length - 1}` }]);
+            interaction.respond([{ name: cutText(`${playlistName}`, 100), value: `autocomplete:${tracks.length - 1}` }]);
+            return;
         } else {
             tracks = tracks.slice(0, 10);
 
@@ -114,7 +115,8 @@ export class UserCommand extends KoosCommand {
                 };
             });
 
-            return interaction.respond(options);
+            interaction.respond(options);
+            return;
         }
     }
 
