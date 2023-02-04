@@ -1,18 +1,17 @@
 import { KoosCommand } from "#lib/extensions";
-import { permissionLevels } from "#lib/utils/constants";
+import { PermissionLevels } from "#lib/utils/constants";
 import { embedColor } from "#utils/constants";
 import { isString } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args, SapphirePrefix } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
-// import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { Collection, Message } from "discord.js";
 
 const categoryLevel: { [key: string]: number } = {
-    Admin: permissionLevels.administrator,
-    DJ: permissionLevels.dj,
-    Everyone: permissionLevels.everyone,
-    General: permissionLevels.everyone,
+    Admin: PermissionLevels.Administrator,
+    DJ: PermissionLevels.DJ,
+    Everyone: PermissionLevels.Everyone,
+    General: PermissionLevels.Everyone,
 };
 
 @ApplyOptions<KoosCommand.Options>({

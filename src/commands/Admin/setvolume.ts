@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { permissionLevels } from "#lib/utils/constants";
+import { PermissionLevels } from "#lib/utils/constants";
 import { embedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
@@ -10,7 +10,7 @@ import { Message, MessageEmbed } from "discord.js";
 @ApplyOptions<KoosCommand.Options>({
     description: "Lets you change the bots default output volume.",
     aliases: ["setvol"],
-    permissionLevels: permissionLevels.administrator,
+    permissionLevels: PermissionLevels.Administrator,
     usage: {
         types: [{ type: "1-200" }],
     },

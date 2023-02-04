@@ -1,6 +1,6 @@
 import { envParseString } from "@skyra/env-utilities";
 import { KoosCommand } from "#lib/extensions";
-import { permissionLevels } from "#lib/utils/constants";
+import { PermissionLevels } from "#lib/utils/constants";
 import { embedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { isNullish } from "@sapphire/utilities";
@@ -10,7 +10,7 @@ import { send } from "@sapphire/plugin-editable-commands";
 
 @ApplyOptions<KoosCommand.Options>({
     description: `Lets you set a new prefix.`,
-    permissionLevels: permissionLevels.administrator,
+    permissionLevels: PermissionLevels.Administrator,
     usage: {
         types: [{ type: "new prefix", required: false }],
     },

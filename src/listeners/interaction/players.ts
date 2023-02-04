@@ -1,4 +1,4 @@
-import { buttons } from "#lib/utils/constants";
+import { Buttons } from "#lib/utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, Events } from "@sapphire/framework";
 import { Message, CommandInteraction, MessageButton, MessageActionRow, MessageEmbed, GuildMember, Guild } from "discord.js";
@@ -21,10 +21,10 @@ export class ClientListener extends Listener {
         if (isNullish(player) || isNullish(data)) return;
 
         const msg = player.data.get("nowPlayingMessage") as Message;
-        const id = interaction.customId as "buttonPauseOrResume" | "buttonSkip" | "buttonStop" | "buttonShowQueue";
+        const id = interaction.customId as Buttons;
         const checkMember = this.checkMember(interaction.guild!, interaction.member as GuildMember);
 
-        if (Object.values(buttons).includes(id)) await interaction.deferUpdate();
+        if (Object.values(Buttons).includes(id)) await interaction.deferUpdate();
         if (!isNullish(checkMember)) return interaction.followUp({ embeds: [checkMember], ephemeral: true });
         if (
             ["buttonPauseOrResume", "buttonSkip", "buttonStop"].includes(id) && //
@@ -165,10 +165,10 @@ export class ClientListener extends Listener {
 
     private buttons(paused = false) {
         return new MessageActionRow().setComponents(
-            new MessageButton({ style: "SUCCESS", label: !paused ? "Pause" : "Resume", customId: buttons.pauseOrResume }),
-            new MessageButton({ style: "PRIMARY", label: "Skip", customId: buttons.skip }),
-            new MessageButton({ style: "DANGER", label: "Stop", customId: buttons.stop }),
-            new MessageButton({ style: "SECONDARY", label: "Show Queue", customId: buttons.showQueue })
+            new MessageButton({ style: "SUCCESS", label: !paused ? "Pause" : "Resume", customId: Buttons.PauseOrResume }),
+            new MessageButton({ style: "PRIMARY", label: "Skip", customId: Buttons.Skip }),
+            new MessageButton({ style: "DANGER", label: "Stop", customId: Buttons.Stop }),
+            new MessageButton({ style: "SECONDARY", label: "Show Queue", customId: Buttons.ShowQueue })
         );
     }
 

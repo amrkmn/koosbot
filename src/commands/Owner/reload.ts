@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { permissionLevels } from "#lib/utils/constants";
+import { PermissionLevels } from "#lib/utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args, Piece, Store } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
@@ -9,17 +9,17 @@ import { Message } from "discord.js";
 @ApplyOptions<KoosCommand.Options>({
     description: "Reloads a Sapphire piece, or all pieces of a Sapphire store.",
     aliases: ["r"],
-    permissionLevels: permissionLevels.botOwner,
+    permissionLevels: PermissionLevels.BotOwner,
     hidden: true,
 })
 export class OwnerCommand extends KoosCommand {
     public async messageRun(message: Message, args: Args) {
-        const content = await this.reloadAny(message, args);
+        const content = await this.reloadAny(args);
         return send(message, content);
     }
 
     // @ts-ignore
-    async reloadAny(message: Message, args: Args) {
+    async reloadAny(args: Args) {
         if (args.finished) return "Please enter something for me to reload.";
         const everything = await args.pickResult(OwnerCommand.everything);
         if (everything.ok().isSome()) return this.reloadEverything();

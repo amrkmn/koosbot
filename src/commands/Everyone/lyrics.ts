@@ -1,11 +1,12 @@
-import { ApplicationCommandOptionChoiceData, MessageEmbed } from "discord.js";
-import { embedColor } from "#utils/constants";
+import { ApplicationCommandOptionChoiceData, Message, MessageEmbed } from "discord.js";
+import { embedColor, Emojis, userAgent } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { chunk, cutText, decodeEntities, pagination } from "#utils/functions";
 import { request } from "@aytea/request";
-import { load } from "cheerio";
+import * as cheerio from "cheerio";
+import { send } from "@sapphire/plugin-editable-commands";
 // import { Args } from "@sapphire/framework";
 // import { send } from "@sapphire/plugin-editable-commands";
 // import { Message, MessageSelectOptionData, MessageActionRow, MessageSelectMenu, TextChannel } from "discord.js";
@@ -13,7 +14,7 @@ import { load } from "cheerio";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Get the lyrics of a song.",
-    // aliases: ["ly"],
+    aliases: ["ly"],
     slashOnly: true,
 })
 export class UserCommand extends KoosCommand {
@@ -69,6 +70,10 @@ export class UserCommand extends KoosCommand {
         pagination({ channel: interaction, embeds, target: interaction.user, fastSkip: true });
     }
 
+    public async messageRun(message: Message) {
+        return send(message, `${Emojis.No} This command can only be used with the slash command.`);
+    }
+
     public async autocompleteRun(interaction: KoosCommand.AutocompleteInteraction) {
         const { genius } = this.container;
 
@@ -87,20 +92,15 @@ export class UserCommand extends KoosCommand {
 
     private async getLyrics(url: string) {
         try {
-            const body = await request(url)
-                .agent(
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36"
-                )
-                .options({ throwOnError: true })
-                .text();
+            const body = await request(url).agent(userAgent).options({ throwOnError: true }).text();
 
-            const $ = load(body);
+            const $ = cheerio.load(body);
 
-            const lyrics = $("div[class*='Lyrics__Container']")
+            const lyrics = $("div[data-lyrics-container=true]")
                 .toArray()
                 .map((x) => {
                     let ele = $(x);
-                    ele.find("div[class*='InreadContainer__Container']").replaceWith("\n");
+                    ele.find("div[data-exclude-from-selection=true]").replaceWith("\n");
                     ele.find("br").replaceWith("\n");
                     return ele.text();
                 })
