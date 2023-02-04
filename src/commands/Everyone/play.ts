@@ -156,7 +156,6 @@ export class UserCommand extends KoosCommand {
                 voiceId: channel!.id,
                 deaf: true,
                 volume: isNullish(data) ? 100 : data.volume,
-                loadBalancer: true,
             });
         }
 
