@@ -14,9 +14,11 @@ declare module "@skyra/env-utilities" {
 
         DISCORD_TOKEN?: string;
         DATABASE_URL_SECRET?: string;
+
         REDIS_HOST_SECRET?: string;
         REDIS_PORT_SECRET?: NumberString;
         REDIS_PASSWORD_SECRET?: string;
+
         SPOTIFY_ID?: string;
         SPOTIFY_SECRET?: string;
         GENIUS_TOKEN?: string;

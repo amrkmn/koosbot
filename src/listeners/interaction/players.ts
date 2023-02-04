@@ -21,7 +21,7 @@ export class ClientListener extends Listener {
         if (isNullish(player) || isNullish(data)) return;
 
         const msg = player.data.get("nowPlayingMessage") as Message;
-        const id = interaction.customId as Buttons;
+        const id = interaction.customId as "buttonPauseOrResume" | "buttonSkip" | "buttonStop" | "buttonShowQueue";
         const checkMember = this.checkMember(interaction.guild!, interaction.member as GuildMember);
 
         if (Object.values(Buttons).includes(id)) await interaction.deferUpdate();

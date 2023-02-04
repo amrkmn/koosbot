@@ -30,6 +30,7 @@ export class ClientListener extends Listener {
                 ],
             })
         );
+        client.user?.setActivity({ type: "LISTENING", name: `/play` });
         client.logger.info(`Logged in as ${client.user?.tag}`);
         this.printStoreDebugInformation();
 
