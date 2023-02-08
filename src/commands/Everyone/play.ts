@@ -62,7 +62,7 @@ export class UserCommand extends KoosCommand {
         let selected = query.startsWith("a:") ? tracks[index] : query;
         this.tracks.delete(`${guildId}:${member.id}`);
 
-        interaction.editReply({
+        await interaction.editReply({
             embeds: [await this.play(selected, { message: interaction, player, channel, data })],
         });
     }
@@ -73,12 +73,14 @@ export class UserCommand extends KoosCommand {
         const attachment = message.attachments.first();
         const query = attachment ? attachment.proxyURL : await args.rest("string").catch(() => undefined);
         if (!query)
-            return send(message, { embeds: [{ description: "Please provide an URL or search query", color: embedColor.error }] });
+            return await send(message, {
+                embeds: [{ description: "Please provide an URL or search query", color: embedColor.error }],
+            });
 
         const channel = message.member?.voice.channel as VoiceBasedChannel;
         let player = kazagumo.getPlayer(message.guildId!);
 
-        send(message, { embeds: [await this.play(query, { message, player, channel, data })] });
+        await send(message, { embeds: [await this.play(query, { message, player, channel, data })] });
     }
 
     public async autocompleteRun(interaction: KoosCommand.AutocompleteInteraction) {
