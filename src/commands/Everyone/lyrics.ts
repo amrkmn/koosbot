@@ -46,8 +46,12 @@ export class UserCommand extends KoosCommand {
             });
         await interaction.deferReply();
 
-        const song = await genius.songs.get(Number(query));
-        const lyrics = await this.getLyrics(song.url).catch(() => undefined);
+        const song = await genius.songs.get(Number(query)).catch(() => undefined);
+        const lyrics = await this.getLyrics(song?.url).catch(() => undefined);
+        if (!song)
+            return interaction.followUp({
+                embeds: [new MessageEmbed().setDescription("Something went wrong!").setColor(embedColor.error)],
+            });
         if (!lyrics)
             return interaction.followUp({
                 embeds: [new MessageEmbed().setDescription("No result was found").setColor(embedColor.error)],
@@ -67,7 +71,7 @@ export class UserCommand extends KoosCommand {
             return prev;
         }, []);
 
-        pagination({ channel: interaction, embeds, target: interaction.user, fastSkip: true });
+        await pagination({ channel: interaction, embeds, target: interaction.user, fastSkip: true });
     }
 
     public async messageRun(message: Message) {
@@ -90,7 +94,8 @@ export class UserCommand extends KoosCommand {
         return interaction.respond(options);
     }
 
-    private async getLyrics(url: string) {
+    private async getLyrics(url?: string) {
+        if (!url) throw new Error(`Something went wrong!`);
         try {
             const body = await request(url).agent(userAgent).options({ throwOnError: true }).text();
 
