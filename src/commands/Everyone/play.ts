@@ -104,10 +104,6 @@ export class UserCommand extends KoosCommand {
                 tracks.map((track) => track.uri)
             );
             const options: ApplicationCommandOptionChoiceData[] = tracks.map((track, i) => {
-                // const title =
-                //     track.sourceName === "youtube" //
-                //         ? `${track.title}`
-                //         : `${track.title} by ${track.author}`;
                 const title = `${track.title} by ${track.author}`;
                 return {
                     name: `${cutText(title, 100)}`,
