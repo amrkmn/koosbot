@@ -1,13 +1,13 @@
 import { Args } from "@sapphire/framework";
 import { ApplyOptions } from "@sapphire/decorators";
 import { ApplicationCommandOptionChoiceData, GuildMember, Message, MessageEmbed, VoiceBasedChannel } from "discord.js";
-import { send, track } from "@sapphire/plugin-editable-commands";
+import { send } from "@sapphire/plugin-editable-commands";
 import { KazagumoPlayer, KazagumoTrack } from "kazagumo";
 import { embedColor } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
 import { guilds } from "@prisma/client";
 import pluralize from "pluralize";
-import { isNullish } from "@sapphire/utilities";
+import { filterNullishAndEmpty, isNullish } from "@sapphire/utilities";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
 import { cutText } from "#utils/functions";
 
@@ -45,22 +45,24 @@ export class UserCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+        await interaction.deferReply();
+
         const { kazagumo, db } = this.container;
         const guildId = `${interaction.guildId}`;
         const query = interaction.options.getString("query", true)!;
 
-        await interaction.deferReply();
         const data = await db.guilds.findUnique({ where: { id: guildId } });
 
         const member = interaction.member! as GuildMember;
         const channel = member.voice.channel as VoiceBasedChannel;
 
+        let index = Number(query.split(":").filter(filterNullishAndEmpty)[1]);
         let player = kazagumo.getPlayer(interaction.guildId!);
         let tracks = this.tracks.get(`${guildId}:${member.id}`) ?? [];
-        let selected = query.startsWith("a:") ? tracks[Number(query.split(":")[1])] : query;
+        let selected = query.startsWith("a:") ? tracks[index] : query;
         this.tracks.delete(`${guildId}:${member.id}`);
 
-        interaction.followUp({
+        interaction.editReply({
             embeds: [await this.play(selected, { message: interaction, player, channel, data })],
         });
     }
@@ -118,8 +120,9 @@ export class UserCommand extends KoosCommand {
 
     private async play(query: string, { message, player, channel, data }: PlayOptions) {
         const { kazagumo } = this.container;
-        const result = await kazagumo.search(query, { requester: message.member });
-        if (!result.tracks.length) return new MessageEmbed({ description: `Something went wrong!`, color: embedColor.error });
+        const result = await kazagumo.search(query, { requester: message.member }).catch(() => undefined);
+        if (!result || !result.tracks.length)
+            return new MessageEmbed({ description: `Something went wrong!`, color: embedColor.error });
 
         let tracks: KazagumoTrack[] = [],
             msg: string = "";
