@@ -1,4 +1,4 @@
-# fly.toml file generated for koosbot on 2022-12-07T18:04:57+08:00
+# fly.toml file generated for koosbot on 2023-02-10T12:31:42+08:00
 
 app = "koosbot"
 kill_signal = "SIGINT"
