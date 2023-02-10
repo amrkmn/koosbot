@@ -98,8 +98,7 @@ export class UserCommand extends KoosCommand {
         if (type === "PLAYLIST") {
             let tracks = [query.value];
             this.tracks.set(`${guildId}:${memberId}`, tracks);
-            interaction.respond([{ name: cutText(`${playlistName}`, 100), value: `a:${tracks.length - 1}` }]);
-            return;
+            return interaction.respond([{ name: cutText(`${playlistName}`, 100), value: `a:${tracks.length - 1}` }]);
         } else {
             tracks = tracks.slice(0, 10);
 
@@ -115,8 +114,7 @@ export class UserCommand extends KoosCommand {
                 };
             });
 
-            interaction.respond(options);
-            return;
+            return interaction.respond(options);
         }
     }
 
