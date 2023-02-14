@@ -34,34 +34,41 @@ export class UserCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
-        const enable = interaction.options.getBoolean("enable") ?? undefined;
+        const enable = interaction.options.getBoolean("enable")!;
 
         await interaction.deferReply();
         interaction.followUp({ embeds: [await this.requester(interaction.guildId!, enable)] });
     }
 
     public async messageRun(message: Message, args: Args) {
-        const enable = await args.pick("enum", { enum: ["enable", "disable"] }).catch(() => undefined);
-        if (isNullish(enable))
+        const options = ["enable", "disable", "true", "false"];
+        const input = await args.pick("enum", { enum: options, caseInsensitive: true }).catch((e) => {
+            let identifier = `${Reflect.get(e.value, "identifier")}`;
+            return identifier === "argsMissing" ? undefined : identifier;
+        });
+        if (isNullish(input))
             return send(message, {
                 embeds: [{ description: "Please enter an input.", color: embedColor.error }],
             });
+        if (input === "enumError")
+            return send(message, {
+                embeds: [{ description: `Please enter a correct input. (${options.join(", ")})`, color: embedColor.error }],
+            });
 
-        let input: boolean;
-        if (enable === "enable") input = true;
-        else input = false;
+        let enable: boolean;
+        if (["enable", "true"].includes(input.toLowerCase())) enable = true;
+        else enable = false;
 
-        send(message, { embeds: [await this.requester(message.guildId!, input)] });
+        send(message, { embeds: [await this.requester(message.guildId!, enable)] });
     }
 
-    private async requester(guildId: string, enable?: boolean) {
+    private async requester(guildId: string, enable: boolean) {
         const { db } = this.container;
-        const data = await db.guilds.findUnique({ where: { id: guildId } });
 
         const { requester } = await db.guilds.upsert({
             where: { id: guildId },
-            update: { requester: enable ?? !data?.requester },
-            create: { id: guildId, requester: enable ?? true },
+            update: { requester: enable },
+            create: { id: guildId, requester: enable },
             select: { requester: true },
         });
 

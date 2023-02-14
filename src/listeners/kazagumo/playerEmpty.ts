@@ -1,6 +1,6 @@
 import { envParseString } from "@skyra/env-utilities";
 import { embedColor } from "#utils/constants";
-import { mins, sec } from "#utils/functions";
+import { time } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
@@ -15,7 +15,7 @@ import ms from "ms";
 })
 export class ClientListener extends Listener {
     timeoutId: NodeJS.Timeout | undefined;
-    leaveAfter: number = envParseString("NODE_ENV") === "production" ? mins(3) : sec(25);
+    leaveAfter: number = envParseString("NODE_ENV") === "production" ? time("mins", 3) : time("sec", 25);
 
     public async run(player: KazagumoPlayer) {
         const { client } = this.container;
@@ -47,7 +47,8 @@ export class ClientListener extends Listener {
         if (typeof this.timeoutId !== "undefined") this.cancel();
 
         const { client } = this.container;
-        const channel = container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
+        const channel =
+            container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
         if (isNullish(guild) || isNullish(player) || isNullish(channel)) return this.cancel();
 
         this.timeoutId = setTimeout(() => {

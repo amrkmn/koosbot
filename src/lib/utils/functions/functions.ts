@@ -2,7 +2,7 @@ import { container } from "@sapphire/framework";
 
 export async function databasePing() {
     const startTime = process.hrtime.bigint();
-    await container.db.guilds.findMany();
+    await container.db.guilds.findMany({ take: 1 });
     const endTime = process.hrtime.bigint() - startTime;
 
     return convertHrtime(endTime).milliseconds;

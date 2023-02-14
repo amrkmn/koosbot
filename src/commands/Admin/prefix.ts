@@ -35,9 +35,9 @@ export class AdminCommadn extends KoosCommand {
 
     private async prefix(guildId: string, guildName: string, input?: string) {
         const { db } = this.container;
-        const data = await db.guilds.findUnique({ where: { id: guildId } });
 
         if (isNullish(input)) {
+            const data = await db.guilds.findUnique({ where: { id: guildId } });
             let prefix = "";
             if (isNullish(data)) prefix = `${envParseString("CLIENT_PREFIX")}`;
             else if (data.prefix === "NONE") prefix = `${envParseString("CLIENT_PREFIX")}`;

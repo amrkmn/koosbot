@@ -21,6 +21,6 @@ export function years(years: number): number {
     return years * Time.Year;
 }
 
-export function time({ unit, time }: { unit: "sec" | "mins" | "hours" | "months" | "years"; time: number }) {
+export function time(unit: "sec" | "mins" | "hours" | "months" | "years", time: number) {
     return { sec, mins, hours, months, years }[unit](time);
 }
