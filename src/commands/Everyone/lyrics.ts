@@ -10,6 +10,7 @@ import { send } from "@sapphire/plugin-editable-commands";
 import { Args } from "@sapphire/framework";
 import { Message, MessageSelectOptionData, MessageActionRow, MessageSelectMenu, TextChannel } from "discord.js";
 import ms from "ms";
+import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Get the lyrics of a song.",
@@ -47,14 +48,8 @@ export class UserCommand extends KoosCommand {
 
         const song = await genius.songs.get(Number(query)).catch(() => undefined);
         const lyrics = await this.getLyrics(song?.url).catch(() => undefined);
-        if (!song)
-            return interaction.followUp({
-                embeds: [new MessageEmbed().setDescription("Something went wrong!").setColor(embedColor.error)],
-            });
-        if (!lyrics)
-            return interaction.followUp({
-                embeds: [new MessageEmbed().setDescription("No result was found").setColor(embedColor.error)],
-            });
+        if (!song) return interaction.followUp({ embeds: [{ description: "Something went wrong!", color: embedColor.error }] });
+        if (!lyrics) return interaction.followUp({ embeds: [{ description: "No result was found", color: embedColor.error }] });
 
         const lyric = chunk(lyrics.split("\n"), 25);
 
@@ -82,9 +77,12 @@ export class UserCommand extends KoosCommand {
             return `${player.queue.current?.title}`;
         });
 
-        const { embed, row } = await this.lyrics(query);
+        const { embed, selectMenu } = await this.lyrics(query);
 
-        const msg = await send(message, { embeds: [embed], components: row ? [row] : undefined });
+        const msg = await send(message, {
+            embeds: [embed],
+            components: selectMenu ? [new MessageActionRow().addComponents(selectMenu)] : undefined,
+        });
 
         const collector = msg.createMessageComponentCollector({
             filter: (i) => {
@@ -98,7 +96,7 @@ export class UserCommand extends KoosCommand {
                 return true;
             },
             componentType: "SELECT_MENU",
-            idle: ms("1m"),
+            time: ms("1m"),
         });
 
         collector.on("collect", async (i) => {
@@ -106,9 +104,15 @@ export class UserCommand extends KoosCommand {
             await i.deferUpdate();
             const id = i.customId;
             if (id !== "lyricsOptions") return;
+            const input = Number(i.values[0]);
+            if (isNaN(input) && i.values[0] === "cancel") {
+                await send(message, { embeds: [{ description: `Canceled the search`, color: embedColor.default }] });
+                collector.stop("cancel");
+                return;
+            }
 
             await send(message, { embeds: [{ description: "Fetching lyrics...", color: embedColor.default }] });
-            const song = await this.container.genius.songs.get(Number(i.values[0])).catch(() => undefined);
+            const song = await this.container.genius.songs.get(input).catch(() => undefined);
             const lyrics = await this.getLyrics(song?.url).catch(() => undefined);
             if (!song) {
                 send(message, {
@@ -141,6 +145,15 @@ export class UserCommand extends KoosCommand {
             pagination({ channel: message.channel as TextChannel, embeds, target: message.author, fastSkip: true });
             collector.stop("selected");
             return;
+        });
+        collector.on("end", async (_, reason) => {
+            if (reason === "time") {
+                let timedOutRow = selectMenu
+                    ? new MessageActionRow().setComponents(selectMenu.setPlaceholder("Timed out").setDisabled(true))
+                    : undefined;
+                await send(message, { embeds: [embed], components: timedOutRow ? [timedOutRow] : undefined });
+                return;
+            }
         });
     }
     // public async messageRun(message: Message) {
@@ -195,17 +208,21 @@ export class UserCommand extends KoosCommand {
 
         if (isNullishOrEmpty(result)) return { embed: new MessageEmbed().setDescription("No result").setColor(embedColor.error) };
 
-        const description = result.map(({ fullTitle, url }, i) => `**${i + 1}.** [${fullTitle}](${url})`);
-        const options: MessageSelectOptionData[] = result.map((song, i) => ({
-            label: cutText(`${i + 1}. ${song.fullTitle}`, 100),
+        // const description = result.map(({ fullTitle, url }, i) => `**${i + 1}.** [${fullTitle}](${url})`);
+        const options: MessageSelectOptionData[] = result.map((song) => ({
+            label: cutText(`${song.title}`, 100),
+            description: cutText(`by ${song.artist.name}`, 100),
             value: `${song.id}`,
         }));
+        options.push({ label: `Cancel`, description: "Cancel this search", value: `cancel` });
 
         const selectMenu = new MessageSelectMenu().setCustomId("lyricsOptions").setOptions(options).setPlaceholder("Make a selection");
 
         return {
-            embed: new MessageEmbed().setDescription(description.join("\n")).setColor(embedColor.default),
-            row: new MessageActionRow().setComponents(selectMenu),
+            embed: new MessageEmbed()
+                .setDescription(`There are ${result.length} ${pluralize("result", result.length)}`)
+                .setColor(embedColor.default),
+            selectMenu,
         };
     }
 }
