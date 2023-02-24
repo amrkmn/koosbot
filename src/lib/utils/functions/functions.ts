@@ -55,8 +55,8 @@ export function chunk<T>(array: Array<T>, chunkSize: number) {
     return Array.from(Array(Math.ceil(array.length / chunkSize)), (_, i) => array.slice(i * chunkSize, i * chunkSize + chunkSize));
 }
 
-export function trimString(string: string, length: number) {
-    return string.length > length ? string.substring(0, length - 3) + "..." : string;
+export function trimString(str: string, length: number) {
+    return str.length > length ? `${str.substring(0, length - 3)}...` : str;
 }
 
 export function cutText(str: string, length: number) {

@@ -59,12 +59,10 @@ export class AdminCommand extends KoosCommand {
         if (!roleId && isNullishOrEmpty(dj))
             return new MessageEmbed().setDescription(`There is no DJ role set.`).setColor(embedColor.warn);
         if (!roleId)
-            return new MessageEmbed()
-                .setDescription(`**__Configured DJ role:__**\n\n${dj.join("\n")}`)
-                .setColor(embedColor.default);
+            return new MessageEmbed().setDescription(`**__Configured DJ role:__**\n\n${dj.join("\n")}`).setColor(embedColor.default);
 
-        const idAdded = data.dj.includes(roleId) ? false : true;
-        const roles = data.dj.includes(roleId) //
+        const isNewRole = data.dj.includes(roleId) ? false : true;
+        const roles = isNewRole //
             ? removeItem(data.dj, roleId)
             : [...data.dj, roleId];
 
@@ -75,7 +73,7 @@ export class AdminCommand extends KoosCommand {
         });
 
         return new MessageEmbed()
-            .setDescription(idAdded ? `Added <@&${roleId}> to the DJ roles` : `Removed <@&${roleId}> from the DJ roles.`)
+            .setDescription(isNewRole ? `Added <@&${roleId}> to the DJ roles` : `Removed <@&${roleId}> from the DJ roles.`)
             .setColor(embedColor.default);
     }
 }

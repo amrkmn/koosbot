@@ -7,7 +7,6 @@ import { Kazagumo, Plugins } from "kazagumo";
 import { Connectors, NodeOption, Shoukaku } from "shoukaku";
 import { KoosPlayer } from "#lib/extensions/KoosPlayer";
 import { envParseNumber, envParseString } from "@skyra/env-utilities";
-// import { ScheduledTaskRedisStrategy } from "@sapphire/plugin-scheduled-tasks/register-redis";
 import { Client as GeniusClient } from "genius-lyrics";
 import { KazagumoPlugin as Spotify } from "#lib/structures";
 
