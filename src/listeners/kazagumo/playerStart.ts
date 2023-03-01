@@ -5,6 +5,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { embedColor } from "#utils/constants";
 import { convertTime } from "#utils/functions";
 import { Buttons } from "#lib/utils/constants";
+import { oneLine } from "common-tags";
 
 @ApplyOptions<Listener.Options>({
     emitter: container.kazagumo,
@@ -24,10 +25,10 @@ export class ClientListener extends Listener {
 
         const embed = new MessageEmbed() //
             .setDescription(
-                [
-                    `Started playing ${title} [${track.isStream ? `Live` : convertTime(Number(track.length))}]`,
-                    `${data?.requester ? ` ~ ${track.requester}` : ""}`,
-                ].join("")
+                oneLine`
+                    ${title} [${track.isStream ? `Live` : convertTime(Number(track.length))}]
+                    ${data?.requester ? ` ~ ${track.requester}` : ""}
+                `
             )
             .setColor(embedColor.default);
         const playerButtons = [

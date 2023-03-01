@@ -4,6 +4,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, Events } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
+import { oneLine } from "common-tags";
 import { Message, MessageEmbed } from "discord.js";
 
 @ApplyOptions<Listener.Options>({
@@ -32,10 +33,10 @@ export class ClientListener extends Listener {
                 embeds = [
                     new MessageEmbed()
                         .setDescription(
-                            [
-                                `Started playing ${title} [${track.isStream ? `Live` : convertTime(Number(track.length))}]`,
-                                `${data?.requester ? ` ~ ${track.requester}` : ""}`,
-                            ].join("")
+                            oneLine`
+                                ${title} [${track.isStream ? `Live` : convertTime(Number(track.length))}]
+                                ${data?.requester ? ` ~ ${track.requester}` : ""}
+                            `
                         )
                         .setColor(embedColor.default),
                 ];
