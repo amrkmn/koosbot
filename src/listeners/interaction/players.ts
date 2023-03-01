@@ -6,7 +6,6 @@ import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { KazagumoPlayer } from "kazagumo";
 import { convertTime } from "#utils/functions";
 import { embedColor } from "#utils/constants";
-import ms from "ms";
 import { stripIndents } from "common-tags";
 
 @ApplyOptions<Listener.Options>({
