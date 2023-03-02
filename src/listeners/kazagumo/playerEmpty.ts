@@ -53,7 +53,7 @@ export class ClientListener extends Listener {
 
         this.timeoutId = setTimeout(() => {
             if (player.queue.current) return this.cancel();
-            if (player.queue.isEmpty && !isNullish(guild.me?.voice.channelId)) {
+            if (player.queue.isEmpty && !isNullish(guild.members.me?.voice.channelId)) {
                 player.destroy();
                 if (channel.isText())
                     channel.send({
