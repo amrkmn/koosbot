@@ -132,13 +132,13 @@ export class ClientListener extends Listener {
     private checkMember(guild: Guild | null, member: GuildMember) {
         if (!guild) return new MessageEmbed({ description: "You cannot run this message command in DMs.", color: embedColor.error });
         if (
-            !isNullish(guild.me) &&
+            !isNullish(guild.members.me) &&
             member.voice.channel !== null && //
-            guild.me.voice.channel !== null &&
-            member.voice.channelId !== guild.me!.voice.channelId
+            guild.members.me.voice.channel !== null &&
+            member.voice.channelId !== guild.members.me!.voice.channelId
         )
             return new MessageEmbed({
-                description: `You aren't connected to the same voice channel as I am. I'm currently connected to ${guild.me.voice.channel}`,
+                description: `You aren't connected to the same voice channel as I am. I'm currently connected to ${guild.members.me.voice.channel}`,
                 color: embedColor.error,
             });
 
