@@ -5,13 +5,12 @@ import { envParseString } from "@skyra/env-utilities";
 import { Guild, Message, MessageActionRow, MessageButton, MessageEmbed, VoiceBasedChannel, VoiceState } from "discord.js";
 import { Buttons, embedColor } from "#utils/constants";
 import { KazagumoPlayer } from "kazagumo";
-import { reply } from "@sapphire/plugin-editable-commands";
 import { time } from "#utils/functions";
-import { oneLine } from "common-tags";
 import ms from "ms";
 
 @ApplyOptions<Listener.Options>({
     event: Events.VoiceStateUpdate,
+    enabled: false,
 })
 export class ClientListener extends Listener {
     timeoutId: NodeJS.Timeout | undefined;
@@ -57,9 +56,7 @@ export class ClientListener extends Listener {
             new MessageButton().setLabel("Stop").setCustomId(Buttons.Stop).setStyle("DANGER"),
             new MessageButton().setLabel("Show Queue").setCustomId(Buttons.ShowQueue).setStyle("SECONDARY"),
         ];
-        const row = new MessageActionRow().setComponents(playerButtons);
-
-        return row;
+        return new MessageActionRow().setComponents(playerButtons);
     }
 
     checkState(oldState: VoiceState, newState: VoiceState) {
@@ -70,18 +67,11 @@ export class ClientListener extends Listener {
         else return "MOVED";
     }
 
-    deleteMessage(msg: Message, time: number) {
-        setTimeout(() => {
-            if (msg.deletable) msg.delete();
-        }, time);
-    }
-
     async setup(guild: Guild | null, player: KazagumoPlayer) {
         if (typeof this.timeoutId !== "undefined") this.cancel();
 
         const { client } = this.container;
-        const channel =
-            this.container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
+        const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
         if (isNullish(guild) || isNullish(player) || isNullish(channel)) return this.cancel();
 
         this.timeoutId = setTimeout(() => {
