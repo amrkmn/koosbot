@@ -22,25 +22,29 @@ export class UserCommand extends KoosCommand {
 
     public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
         await interaction.deferReply();
-        const msg = (await interaction.followUp({ embeds: [{ description: "Ping?", color: embedColor.default }] })) as Message;
+        const [msg, database] = await Promise.all([
+            (await interaction.followUp({ embeds: [{ description: "Ping?", color: embedColor.default }] })) as Message,
+            databasePing(),
+        ]);
 
         if (isMessageInstance(msg)) {
             const diff = msg.createdTimestamp - interaction.createdTimestamp;
             const ping = Math.round(this.container.client.ws.ping);
-            const database = Math.round(await databasePing());
-            const content = `Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms. Database: ${database}ms.)`;
+            const content = `Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms. Database: ${Math.round(database)}ms.)`;
 
             interaction.editReply({ embeds: [{ description: content, color: embedColor.default }] });
         }
     }
 
     public async messageRun(message: Message) {
-        const msg = await send(message, { embeds: [{ description: "Ping?", color: embedColor.default }] });
+        const [msg, database] = await Promise.all([
+            send(message, { embeds: [{ description: "Ping?", color: embedColor.default }] }),
+            databasePing(),
+        ]);
 
         const diff = msg.createdTimestamp - message.createdTimestamp;
         const ping = Math.round(this.container.client.ws.ping);
-        const database = Math.round(await databasePing());
-        const content = `Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms. Database: ${database}ms.)`;
+        const content = `Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms. Database: ${Math.round(database)}ms.)`;
 
         return send(message, { embeds: [{ description: content, color: embedColor.default }] });
     }
