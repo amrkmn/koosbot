@@ -5,7 +5,7 @@ import { send } from "@sapphire/plugin-editable-commands";
 import { KazagumoPlayer, KazagumoTrack } from "kazagumo";
 import { embedColor } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
-import { guilds } from "@prisma/client";
+import { Guilds } from "@prisma/client";
 import pluralize from "pluralize";
 import { filterNullishAndEmpty, isNullish } from "@sapphire/utilities";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
@@ -15,7 +15,7 @@ interface PlayOptions {
     message: Message | KoosCommand.ChatInputInteraction;
     player: KazagumoPlayer | undefined;
     channel: VoiceBasedChannel;
-    data: guilds | null;
+    data: Guilds | null;
 }
 
 @ApplyOptions<KoosCommand.Options>({

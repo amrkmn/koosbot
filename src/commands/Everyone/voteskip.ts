@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { guilds } from "@prisma/client";
+import { Guilds } from "@prisma/client";
 import { ApplyOptions } from "@sapphire/decorators";
 import { KazagumoPlayer } from "kazagumo";
 import { Message, GuildMember, MessageEmbed } from "discord.js";
@@ -56,7 +56,7 @@ export class UserCommand extends KoosCommand {
     }
 
     private async voteskip(
-        data: guilds | null,
+        data: Guilds | null,
         messageOrInteraction: Message | KoosCommand.ChatInputInteraction,
         player: KazagumoPlayer
     ) {

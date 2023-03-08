@@ -9,7 +9,7 @@
     "watch": "tsc-watch -b src --onSuccess \"yarn start\"",
     "dev": "yarn clean && yarn build && yarn start",
     "start": "node --preserve-symlinks --enable-source-maps --no-warnings dist/index.js",
-    "generate": "npx prisma@^4.6.1 generate",
+    "generate": "npx prisma generate",
     "clean": "node scripts/clean.mjs"
   },
   "keywords": [],
@@ -30,13 +30,13 @@
     "@types/ms": "^0.7.31",
     "@types/node": "^18.11.9",
     "@types/pluralize": "^0.0.29",
-    "prisma": "^4.6.1",
+    "prisma": "^4.11.0",
     "tsc-watch": "^5.0.3",
     "typescript": "^4.9.3"
   },
   "dependencies": {
     "@aytea/request": "^0.1.1",
-    "@prisma/client": "^4.6.1",
+    "@prisma/client": "^4.11.0",
     "@sapphire/decorators": "^5.0.0",
     "@sapphire/discord.js-utilities": "^5.1.2",
     "@sapphire/duration": "^1.0.0",
