@@ -34,7 +34,7 @@ export class UserCommand extends KoosCommand {
                             .setRequired(true)
                             .setAutocomplete(true)
                     ),
-            { idHints: ["1083766062421643335"] }
+            { idHints: ["1083766062421643335", "1083767461142347807"] }
         );
     }
 
