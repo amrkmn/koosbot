@@ -19,7 +19,7 @@ import { Kazagumo } from "kazagumo";
 import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: `Searches and lets you choose a song.`,
+    description: `Searches and lets you choose a track.`,
     preconditions: ["VoiceOnly"],
     usage: "query",
 })
