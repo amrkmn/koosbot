@@ -12,7 +12,7 @@ export class ClientListener extends Listener<typeof Events.GuildCreate> {
         const { db } = this.container;
 
         try {
-            await db.guilds.upsert({
+            await db.guild.upsert({
                 where: { id: guild.id },
                 update: {},
                 create: { id: guild.id, prefix: envParseString("CLIENT_PREFIX") },

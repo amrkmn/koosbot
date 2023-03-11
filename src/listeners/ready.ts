@@ -34,11 +34,15 @@ export class ClientListener extends Listener {
         client.logger.info(`Logged in as ${client.user?.tag}`);
         this.printStoreDebugInformation();
 
-        // client.guilds.cache.map(async (guild) => {
-        //     await this.container.db.guilds
-        //         .upsert({ where: { id: guild.id }, update: {}, create: { id: guild.id, prefix: envParseString("CLIENT_PREFIX") } })
-        //         .catch(() => undefined);
-        // });
+        client.guilds.cache.map(async (guild) => {
+            await this.container.db.guild
+                .upsert({
+                    where: { id: guild.id },
+                    update: { prefix: envParseString("CLIENT_PREFIX") },
+                    create: { id: guild.id, prefix: envParseString("CLIENT_PREFIX") },
+                })
+                .catch(() => undefined);
+        });
     }
 
     private printStoreDebugInformation() {

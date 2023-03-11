@@ -65,7 +65,7 @@ export class UserCommand extends KoosCommand {
     private async requester(guildId: string, enable: boolean) {
         const { db } = this.container;
 
-        const { requester } = await db.guilds.upsert({
+        const { requester } = await db.guild.upsert({
             where: { id: guildId },
             update: { requester: enable },
             create: { id: guildId, requester: enable },

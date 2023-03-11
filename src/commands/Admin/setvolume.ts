@@ -49,7 +49,7 @@ export class AdminCommand extends KoosCommand {
 
     private async setVolume(guildId: string, input?: number) {
         const { db } = this.container;
-        const data = await db.guilds.findUnique({ where: { id: guildId } });
+        const data = await db.guild.findUnique({ where: { id: guildId } });
 
         if (typeof input === "undefined") {
             let volume = 0;
@@ -58,7 +58,7 @@ export class AdminCommand extends KoosCommand {
             return new MessageEmbed().setDescription(`Current default volume is \`${volume}%\``).setColor(embedColor.default);
         }
 
-        await db.guilds.update({ where: { id: guildId }, data: { volume: input } });
+        await db.guild.update({ where: { id: guildId }, data: { volume: input } });
         return new MessageEmbed().setDescription(`Changed the default volume to \`${input}%\``).setColor(embedColor.default);
     }
 }

@@ -65,7 +65,7 @@ export class UserCommand extends KoosCommand {
     private async search(kazagumo: Kazagumo, message: Message | KoosCommand.ChatInputInteraction, query: string) {
         if (message instanceof CommandInteraction && !message.deferred) await message.deferReply();
         const member = message.member as GuildMember;
-        const data = await this.container.db.guilds.findUnique({ where: { id: `${message.guildId}` } });
+        const data = await this.container.db.guild.findUnique({ where: { id: `${message.guildId}` } });
         const options: MessageSelectOptionData[] = [];
 
         let { tracks, type, playlistName } = await kazagumo.search(query, { requester: message.member });

@@ -15,7 +15,7 @@ export class ClientListener extends Listener {
         const { kazagumo, db } = this.container;
 
         const player = kazagumo.getPlayer(message.guildId!);
-        const data = await db.guilds.findUnique({ where: { id: message.guildId! } });
+        const data = await db.guild.findUnique({ where: { id: message.guildId! } });
         if (isNullish(player) || isNullish(data)) return;
 
         const npMessage = player.data.get("nowPlayingMessage");

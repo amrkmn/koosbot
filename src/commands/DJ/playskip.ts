@@ -13,9 +13,9 @@ import { oneLine } from "common-tags";
 import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: "Insert the tracks right after the current song playing.",
-    aliases: ["pt"],
-    preconditions: ["VoiceOnly"],
+    description: "Play the tracks right away.",
+    aliases: ["ps"],
+    preconditions: ["VoiceOnly", "DJ"],
     usage: "query",
 })
 export class UserCommand extends KoosCommand {
@@ -34,7 +34,7 @@ export class UserCommand extends KoosCommand {
                             .setRequired(true)
                             .setAutocomplete(true)
                     ),
-            { idHints: ["1083766062421643335", "1083767461142347807"] }
+            { idHints: ["1083766060437737552", "1083767462132187237"] }
         );
     }
 
@@ -45,7 +45,7 @@ export class UserCommand extends KoosCommand {
         const guildId = `${interaction.guildId}`;
         const query = interaction.options.getString("query", true)!;
 
-        const data = await db.guilds.findUnique({ where: { id: guildId } });
+        const data = await db.guild.findUnique({ where: { id: guildId } });
 
         const member = interaction.member! as GuildMember;
         const channel = member.voice.channel as VoiceBasedChannel;
@@ -58,13 +58,13 @@ export class UserCommand extends KoosCommand {
 
         // await this.playSkip(selected, { message: interaction, player, channel, data });
         await interaction.editReply({
-            embeds: [await this.playTop(selected, { message: interaction, player, channel, data })],
+            embeds: [await this.playSkip(selected, { message: interaction, player, channel, data })],
         });
     }
 
     public async messageRun(message: Message, args: Args) {
         const { kazagumo, db } = this.container;
-        const data = await db.guilds.findUnique({ where: { id: `${message.guildId}` } });
+        const data = await db.guild.findUnique({ where: { id: `${message.guildId}` } });
         const attachment = message.attachments.first();
         const query = attachment ? attachment.proxyURL : await args.rest("string").catch(() => undefined);
         if (!query)
@@ -76,7 +76,7 @@ export class UserCommand extends KoosCommand {
         let player = kazagumo.getPlayer(message.guildId!);
 
         // await this.playSkip(query, { message, player, channel, data });
-        await send(message, { embeds: [await this.playTop(query, { message, player, channel, data })] });
+        await send(message, { embeds: [await this.playSkip(query, { message, player, channel, data })] });
     }
 
     public async autocompleteRun(interaction: KoosCommand.AutocompleteInteraction) {
@@ -114,7 +114,7 @@ export class UserCommand extends KoosCommand {
         }
     }
 
-    private async playTop(query: string, { message, player, channel, data }: PlayOptions) {
+    private async playSkip(query: string, { message, player, channel, data }: PlayOptions) {
         const { kazagumo } = this.container;
         const result = await kazagumo.search(query, { requester: message.member }).catch(() => undefined);
         if (!result || !result.tracks.length)
@@ -134,16 +134,14 @@ export class UserCommand extends KoosCommand {
             });
         }
 
-        let tracks: KazagumoTrack[] = [],
-            msg: string = "";
+        let msg: string = "";
         switch (result.type) {
             case "PLAYLIST":
-                for (let track of result.tracks.reverse()) {
-                    player.queue.unshift(track);
-                }
+                for (let track of result.tracks.reverse()) player.queue.unshift(track);
+                const playlistLength = result.tracks.length;
                 msg = oneLine`
                     Queued playlist [${result.playlistName}](${query}) with
-                    ${tracks.length} ${pluralize("track", result.tracks.length)}
+                    ${playlistLength} ${pluralize("track", playlistLength)}
                 `;
                 break;
             case "SEARCH":
@@ -155,10 +153,12 @@ export class UserCommand extends KoosCommand {
                         : `[${track.title} by ${track.author}](${track.uri})`;
 
                 player.queue.unshift(track);
-                msg = `Queued ${title} at position #0`;
+                const position = player.queue.findIndex((x) => x.identifier === track.identifier);
+                msg = `Queued ${title} at position #${position}`;
                 break;
         }
 
+        player.skip();
         if (!player.playing && !player.paused) player.play();
 
         return new MessageEmbed({ description: msg, color: embedColor.default });

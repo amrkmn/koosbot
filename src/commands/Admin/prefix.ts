@@ -37,7 +37,7 @@ export class AdminCommadn extends KoosCommand {
         const { db } = this.container;
 
         if (isNullish(input)) {
-            const data = await db.guilds.findUnique({ where: { id: guildId } });
+            const data = await db.guild.findUnique({ where: { id: guildId } });
             let prefix = "";
             if (isNullish(data)) prefix = `${envParseString("CLIENT_PREFIX")}`;
             else if (data.prefix === "NONE") prefix = `${envParseString("CLIENT_PREFIX")}`;
@@ -48,7 +48,7 @@ export class AdminCommadn extends KoosCommand {
                 .setColor(embedColor.default);
         }
 
-        const output = await db.guilds.upsert({
+        const output = await db.guild.upsert({
             where: { id: guildId },
             update: { prefix: input },
             create: { id: guildId, prefix: input },

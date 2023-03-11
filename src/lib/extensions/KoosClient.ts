@@ -55,7 +55,7 @@ export class KoosClient extends SapphireClient {
         else if (input instanceof Message) guildId = input.guildId;
         else return [`${envParseString("CLIENT_PREFIX")}`] as SapphirePrefix;
 
-        const data = await container.db.guilds.findUnique({ where: { id: guildId! } });
+        const data = await container.db.guild.findUnique({ where: { id: guildId! } });
         return [
             data && data?.prefix === "NONE"
                 ? `${envParseString("CLIENT_PREFIX")}`

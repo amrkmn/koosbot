@@ -9,6 +9,7 @@ import { filterNullishAndEmpty, isNullish } from "@sapphire/utilities";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
 import { cutText } from "#utils/functions";
 import { PlayOptions } from "#lib/interfaces";
+import { oneLine } from "common-tags";
 import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
@@ -44,7 +45,7 @@ export class UserCommand extends KoosCommand {
         const guildId = `${interaction.guildId}`;
         const query = interaction.options.getString("query", true)!;
 
-        const data = await db.guilds.findUnique({ where: { id: guildId } });
+        const data = await db.guild.findUnique({ where: { id: guildId } });
 
         const member = interaction.member! as GuildMember;
         const channel = member.voice.channel as VoiceBasedChannel;
@@ -62,7 +63,7 @@ export class UserCommand extends KoosCommand {
 
     public async messageRun(message: Message, args: Args) {
         const { kazagumo, db } = this.container;
-        const data = await db.guilds.findUnique({ where: { id: `${message.guildId}` } });
+        const data = await db.guild.findUnique({ where: { id: `${message.guildId}` } });
         const attachment = message.attachments.first();
         const query = attachment ? attachment.proxyURL : await args.rest("string").catch(() => undefined);
         if (!query)
@@ -117,26 +118,6 @@ export class UserCommand extends KoosCommand {
         if (!result || !result.tracks.length)
             return new MessageEmbed({ description: `Something went wrong!`, color: embedColor.error });
 
-        let tracks: KazagumoTrack[] = [],
-            msg: string = "";
-        switch (result.type) {
-            case "PLAYLIST":
-                for (let track of result.tracks) tracks.push(track);
-                msg = `Queued playlist [${result.playlistName}](${query}) with ${tracks.length} ${pluralize("track", tracks.length)}`;
-                break;
-            case "SEARCH":
-            case "TRACK":
-                let [track] = result.tracks;
-                let title =
-                    track.sourceName === "youtube"
-                        ? `[${track.title}](${track.uri})`
-                        : `[${track.title} by ${track.author}](${track.uri})`;
-
-                tracks.push(track);
-                msg = `Queued ${title} at position #${Number(player?.queue.totalSize ?? 0)}`;
-                break;
-        }
-
         if (!player) {
             if (!canJoinVoiceChannel(channel))
                 return new MessageEmbed()
@@ -151,7 +132,31 @@ export class UserCommand extends KoosCommand {
             });
         }
 
-        player.queue.add(tracks);
+        let msg: string = "";
+
+        switch (result.type) {
+            case "PLAYLIST":
+                for (let track of result.tracks) player.queue.add(track);
+                const playlistLength = result.tracks.length;
+                msg = oneLine`
+                    Queued playlist [${result.playlistName}](${query}) with
+                    ${playlistLength} ${pluralize("track", playlistLength)}
+                `;
+                break;
+            case "SEARCH":
+            case "TRACK":
+                let [track] = result.tracks;
+                let title =
+                    track.sourceName === "youtube"
+                        ? `[${track.title}](${track.uri})`
+                        : `[${track.title} by ${track.author}](${track.uri})`;
+
+                player.queue.add(track);
+                const position = player.queue.findIndex((x) => x.identifier === track.identifier);
+                msg = `Queued ${title} at position #${position + 1}`;
+                break;
+        }
+
         if (!player.playing && !player.paused) player.play();
 
         return new MessageEmbed({ description: msg, color: embedColor.default });

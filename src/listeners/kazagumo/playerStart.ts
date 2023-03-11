@@ -16,7 +16,7 @@ export class ClientListener extends Listener {
     public async run(player: KazagumoPlayer, track: KazagumoTrack) {
         const { client, db } = this.container;
 
-        const data = await db.guilds.findUnique({ where: { id: player.guildId } });
+        const data = await db.guild.findUnique({ where: { id: player.guildId } });
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
         if (!channel) return;
 

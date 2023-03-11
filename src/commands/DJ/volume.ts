@@ -60,7 +60,7 @@ export class UserCommand extends KoosCommand {
         }
 
         player.setVolume(input);
-        await db.guilds.update({ where: { id: player.guildId }, data: { volume: input } });
+        await db.guild.update({ where: { id: player.guildId }, data: { volume: input } });
         return new MessageEmbed().setDescription(`Changed the volume to \`${player.volume * 100}%\``).setColor(embedColor.default);
     }
 }

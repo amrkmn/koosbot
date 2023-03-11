@@ -56,7 +56,7 @@ export class UserCommand extends KoosCommand {
     }
 
     private async queue(player: KazagumoPlayer) {
-        const data = await this.container.db.guilds.findUnique({ where: { id: player.guildId } });
+        const data = await this.container.db.guild.findUnique({ where: { id: player.guildId } });
         const current = player.queue.current!;
         let timeLeft = current.isStream //
             ? "Live"

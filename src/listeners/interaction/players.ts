@@ -16,7 +16,7 @@ export class ClientListener extends Listener {
     public async run(interaction: CommandInteraction) {
         if (!interaction.isButton()) return;
         const player = this.container.kazagumo.getPlayer(interaction.guildId!);
-        const data = await this.container.db.guilds.findUnique({ where: { id: interaction.guildId! } });
+        const data = await this.container.db.guild.findUnique({ where: { id: interaction.guildId! } });
         if (isNullish(player) || isNullish(data)) return;
 
         const msg = player.data.get("nowPlayingMessage") as Message;
@@ -172,7 +172,7 @@ export class ClientListener extends Listener {
     }
 
     private async queue(player: KazagumoPlayer) {
-        const data = await this.container.db.guilds.findUnique({ where: { id: player.guildId } });
+        const data = await this.container.db.guild.findUnique({ where: { id: player.guildId } });
         const current = player.queue.current!;
         let timeLeft = current.isStream //
             ? "Live"

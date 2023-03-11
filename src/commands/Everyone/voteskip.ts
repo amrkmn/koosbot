@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { Guilds } from "@prisma/client";
+import { Guild } from "@prisma/client";
 import { ApplyOptions } from "@sapphire/decorators";
 import { KazagumoPlayer } from "kazagumo";
 import { Message, GuildMember, MessageEmbed } from "discord.js";
@@ -28,7 +28,7 @@ export class UserCommand extends KoosCommand {
     public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
         const { db, kazagumo } = this.container;
         const player = kazagumo.getPlayer(interaction.guildId!)!;
-        const data = await db.guilds.findUnique({ where: { id: interaction.guildId! } });
+        const data = await db.guild.findUnique({ where: { id: interaction.guildId! } });
 
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
@@ -44,7 +44,7 @@ export class UserCommand extends KoosCommand {
     public async messageRun(message: Message) {
         const { db, kazagumo } = this.container;
         const player = kazagumo.getPlayer(message.guildId!)!;
-        const data = await db.guilds.findUnique({ where: { id: message.guildId! } });
+        const data = await db.guild.findUnique({ where: { id: message.guildId! } });
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
@@ -56,7 +56,7 @@ export class UserCommand extends KoosCommand {
     }
 
     private async voteskip(
-        data: Guilds | null,
+        data: Guild | null,
         messageOrInteraction: Message | KoosCommand.ChatInputInteraction,
         player: KazagumoPlayer
     ) {

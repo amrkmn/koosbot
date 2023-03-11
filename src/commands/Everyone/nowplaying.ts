@@ -52,7 +52,7 @@ export class UserCommand extends KoosCommand {
     }
 
     private async nowPlaying(player: KazagumoPlayer) {
-        const data = await this.container.db.guilds.findUnique({ where: { id: player.guildId } });
+        const data = await this.container.db.guild.findUnique({ where: { id: player.guildId } });
         const current = player.queue.current!;
         const title =
             current.sourceName === "youtube"
