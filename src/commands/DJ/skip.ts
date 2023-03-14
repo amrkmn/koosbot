@@ -10,7 +10,7 @@ import pluralize from "pluralize";
 @ApplyOptions<KoosCommand.Options>({
     description: "Skip to the next track or to a specific track in the queue.",
     preconditions: ["VoiceOnly", "DJ"],
-    aliases: ["s", "n", "next"],
+    aliases: ["n", "next"],
     usage: {
         types: [{ type: "to" }],
     },

@@ -13,10 +13,10 @@ import { KazagumoPlugin as Spotify } from "#lib/structures";
 const NODES: NodeOption[] = [
     // { name: "lavalink.aytea.ga", url: "lavalink.aytea.ga:443", auth: "maybeiwasboring", secure: true },
     // { name: "ssl.freelavalink.ga", url: "ssl.freelavalink.ga:443", auth: "www.freelavalink.ga", secure: true },
-    { name: "lava3.horizxon.studio", url: "lava3.horizxon.studio:80", auth: "horizxon.studio", secure: false },
     { name: "lavalink.lexnet.cc", url: "lavalink.lexnet.cc:443", auth: "lexn3tl@val!nk", secure: true },
     { name: "lava1.horizxon.studio", url: "lava1.horizxon.studio:80", auth: "horizxon.studio", secure: false },
-    // { name: "lava2.horizxon.studio", url: "lava2.horizxon.studio:80", auth: "horizxon.studio", secure: false },
+    { name: "lava2.horizxon.studio", url: "lava2.horizxon.studio:80", auth: "horizxon.studio", secure: false },
+    { name: "lava3.horizxon.studio", url: "lava3.horizxon.studio:80", auth: "horizxon.studio", secure: false },
     { name: "lava4.horizxon.studio", url: "lava4.horizxon.studio:80", auth: "horizxon.studio", secure: false },
 ];
 

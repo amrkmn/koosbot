@@ -20,6 +20,7 @@ import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
     description: `Searches and lets you choose a track.`,
+    aliases: ["s"],
     preconditions: ["VoiceOnly"],
     usage: "query",
 })

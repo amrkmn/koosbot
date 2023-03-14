@@ -38,7 +38,7 @@ export class UserCommand extends KoosCommand {
             });
         }
 
-        interaction.followUp({ embeds: [await this.voteskip(data, interaction, player)] });
+        interaction.followUp({ embeds: [await this.voteSkip(data, interaction, player)] });
     }
 
     public async messageRun(message: Message) {
@@ -52,10 +52,10 @@ export class UserCommand extends KoosCommand {
             });
         }
 
-        send(message, { embeds: [await this.voteskip(data, message, player)] });
+        send(message, { embeds: [await this.voteSkip(data, message, player)] });
     }
 
-    private async voteskip(
+    private async voteSkip(
         data: Guild | null,
         messageOrInteraction: Message | KoosCommand.ChatInputInteraction,
         player: KazagumoPlayer
