@@ -1,6 +1,7 @@
 import { KoosCommand } from "#lib/extensions";
 import { PermissionLevels } from "#lib/utils/constants";
 import { embedColor } from "#utils/constants";
+import { sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
@@ -9,7 +10,7 @@ import { Message, MessageEmbed } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Lets you change the bots default output volume.",
-    aliases: ["setvol"],
+    aliases: ["setvol", "svol"],
     permissionLevels: PermissionLevels.Administrator,
     usage: {
         types: [{ type: "1-200" }],
@@ -37,6 +38,7 @@ export class AdminCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message, args: Args) {
+        await sendLoadingMessage(message);
         const input = await args.pick("number").catch(() => undefined);
 
         if (input && (input > 200 || input < 1))

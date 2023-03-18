@@ -1,5 +1,6 @@
 import { KoosCommand } from "#lib/extensions";
 import { embedColor } from "#utils/constants";
+import { sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
@@ -34,6 +35,7 @@ export class UserCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message, args: Args) {
+        await sendLoadingMessage(message);
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${message.guildId}`);
         const input = await args.pick("number").catch(() => undefined);

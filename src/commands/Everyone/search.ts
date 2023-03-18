@@ -1,6 +1,6 @@
 import { KoosCommand } from "#lib/extensions";
 import { embedColor } from "#utils/constants";
-import { convertTime, cutText, mins } from "#utils/functions";
+import { convertTime, cutText, mins, sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
 import { Args } from "@sapphire/framework";
@@ -55,6 +55,7 @@ export class UserCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message, args: Args) {
+        await sendLoadingMessage(message);
         const { kazagumo } = this.container;
         const query = await args.rest("string").catch(() => undefined);
         if (!query)

@@ -7,6 +7,7 @@ import { isNullish } from "@sapphire/utilities";
 import { Message, MessageEmbed } from "discord.js";
 import { Args, ResultError } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
+import { sendLoadingMessage } from "#utils/functions";
 
 @ApplyOptions<KoosCommand.Options>({
     description: `Lets you set a new prefix.`,
@@ -17,6 +18,7 @@ import { send } from "@sapphire/plugin-editable-commands";
 })
 export class AdminCommadn extends KoosCommand {
     public async messageRun(message: Message, args: Args) {
+        await sendLoadingMessage(message);
         try {
             const input = await args.pick("string", { minimum: 1, maximum: 5 });
 

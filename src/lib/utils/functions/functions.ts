@@ -1,4 +1,7 @@
+import { embedColor, Emojis } from "#utils/constants";
 import { container } from "@sapphire/framework";
+import { send } from "@sapphire/plugin-editable-commands";
+import { Message, MessageEmbed } from "discord.js";
 
 export async function databasePing() {
     const startTime = process.hrtime.bigint();
@@ -97,4 +100,10 @@ export function decodeEntities(encodedString: string) {
     return encodedString
         .replace(translate_re, (_, entity) => translate[entity])
         .replace(/&#(\d+);/gi, (_, numStr) => String.fromCharCode(parseInt(numStr, 10)));
+}
+
+export function sendLoadingMessage(message: Message) {
+    return send(message, {
+        embeds: [new MessageEmbed().setDescription(`${Emojis.Loading} This might take a few seconds`).setColor(embedColor.default)],
+    });
 }

@@ -6,6 +6,7 @@ import { send } from "@sapphire/plugin-editable-commands";
 import { Emojis, PermissionLevels } from "#lib/utils/constants";
 import { Args } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
+import { sendLoadingMessage } from "#utils/functions";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Enables/disables if the requester is shown on each track.",
@@ -41,6 +42,7 @@ export class UserCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message, args: Args) {
+        await sendLoadingMessage(message);
         const options = ["enable", "disable", "true", "false"];
         const input = await args.pick("enum", { enum: options, caseInsensitive: true }).catch((e) => {
             let identifier = `${Reflect.get(e.value, "identifier")}`;

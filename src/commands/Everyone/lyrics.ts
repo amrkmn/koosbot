@@ -1,9 +1,9 @@
 import { ApplicationCommandOptionChoiceData, MessageEmbed } from "discord.js";
-import { embedColor, Emojis, userAgent } from "#utils/constants";
+import { embedColor, userAgent } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
-import { chunk, cutText, decodeEntities, pagination } from "#utils/functions";
+import { chunk, cutText, decodeEntities, pagination, sendLoadingMessage } from "#utils/functions";
 import { request } from "@aytea/request";
 import * as cheerio from "cheerio";
 import { send } from "@sapphire/plugin-editable-commands";
@@ -15,7 +15,7 @@ import pluralize from "pluralize";
 @ApplyOptions<KoosCommand.Options>({
     description: "Get the lyrics of a song.",
     aliases: ["ly"],
-    slashOnly: true,
+    usage: "query",
 })
 export class UserCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
@@ -47,9 +47,10 @@ export class UserCommand extends KoosCommand {
         await interaction.deferReply();
 
         const song = await genius.songs.get(Number(query)).catch(() => undefined);
-        const lyrics = await this.getLyrics(song?.url).catch(() => undefined);
-        if (!song) return interaction.followUp({ embeds: [{ description: "Something went wrong!", color: embedColor.error }] });
-        if (!lyrics) return interaction.followUp({ embeds: [{ description: "No result was found", color: embedColor.error }] });
+        if (!song) return interaction.followUp({ embeds: [{ description: "No result was found", color: embedColor.error }] });
+
+        const lyrics = await this.getLyrics(song.url).catch(() => undefined);
+        if (!lyrics) return interaction.followUp({ embeds: [{ description: "Something went wrong!", color: embedColor.error }] });
 
         const lyric = chunk(lyrics.split("\n"), 25);
 
@@ -68,6 +69,7 @@ export class UserCommand extends KoosCommand {
         await pagination({ channel: interaction, embeds, target: interaction.user, fastSkip: true });
     }
     public async messageRun(message: Message, args: Args) {
+        await sendLoadingMessage(message);
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(message.guildId!)!;
         const query = await args.rest("string").catch(() => {

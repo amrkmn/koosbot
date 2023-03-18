@@ -7,7 +7,7 @@ import { embedColor } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
 import { filterNullishAndEmpty, isNullish } from "@sapphire/utilities";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
-import { cutText } from "#utils/functions";
+import { cutText, sendLoadingMessage } from "#utils/functions";
 import { PlayOptions } from "#lib/interfaces";
 import { oneLine } from "common-tags";
 import pluralize from "pluralize";
@@ -62,6 +62,7 @@ export class UserCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message, args: Args) {
+        await sendLoadingMessage(message);
         const { kazagumo, db } = this.container;
         const data = await db.guild.findUnique({ where: { id: `${message.guildId}` } });
         const attachment = message.attachments.first();

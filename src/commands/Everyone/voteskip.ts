@@ -7,6 +7,7 @@ import { embedColor } from "#utils/constants";
 import { isNullishOrEmpty } from "@sapphire/utilities";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import pluralize from "pluralize";
+import { sendLoadingMessage } from "#utils/functions";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Lets you vote for skipping the current track.",
@@ -42,6 +43,7 @@ export class UserCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message) {
+        await sendLoadingMessage(message);
         const { db, kazagumo } = this.container;
         const player = kazagumo.getPlayer(message.guildId!)!;
         const data = await db.guild.findUnique({ where: { id: message.guildId! } });

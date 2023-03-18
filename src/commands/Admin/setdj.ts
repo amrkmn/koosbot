@@ -6,7 +6,7 @@ import { MessageEmbed, Message, Role } from "discord.js";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { isNullishOrEmpty } from "@sapphire/utilities";
-import { removeItem } from "#utils/functions";
+import { removeItem, sendLoadingMessage } from "#utils/functions";
 import { PermissionLevels } from "#lib/utils/constants";
 
 @ApplyOptions<KoosCommand.Options>({
@@ -43,6 +43,7 @@ export class AdminCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message, args: Args) {
+        await sendLoadingMessage(message);
         const role = await args.pick("role").catch(() => undefined);
         if (!role && args.finished) return send(message, { embeds: [await this.setdj(message.guildId!, undefined)] });
         if (!role) return send(message, { embeds: [{ description: `Role not found.`, color: embedColor.error }] });
