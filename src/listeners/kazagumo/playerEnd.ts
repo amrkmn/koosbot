@@ -1,7 +1,7 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, container } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
-import { Message, MessageButton, TextChannel } from "discord.js";
+import { Message, MessageButton } from "discord.js";
 import { Events, KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<Listener.Options>({
@@ -24,8 +24,6 @@ export class ClientListener extends Listener {
 
                 msg.edit({ components: [{ type: "ACTION_ROW", components: disabled }] });
             }
-            return;
         }
-        return;
     }
 }

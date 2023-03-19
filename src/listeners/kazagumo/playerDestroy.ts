@@ -2,6 +2,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, container } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
 import { cyan } from "colorette";
+import { oneLine } from "common-tags";
 import { Message, MessageButton } from "discord.js";
 import { Events, KazagumoPlayer } from "kazagumo";
 
@@ -17,9 +18,9 @@ export class ClientListener extends Listener {
         if (!guild) return;
 
         logger.info(
-            `[${cyan(guild.shardId || 0)}] - Player has been destroyed in ${guild.name}[${cyan(guild.id)}] on ${cyan(
-                player.shoukaku.node.name
-            )} node`
+            oneLine`
+                [${cyan(guild.shardId || 0)}] 
+                - Player has been destroyed in ${guild.name}[${cyan(guild.id)}] on ${cyan(player.shoukaku.node.name)} node`
         );
 
         const npMessage = player.data.get("nowPlayingMessage");
@@ -34,8 +35,6 @@ export class ClientListener extends Listener {
 
                 msg.edit({ components: [{ type: "ACTION_ROW", components: disabled }] });
             }
-            return;
         }
-        return;
     }
 }

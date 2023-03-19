@@ -2,6 +2,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, container } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
 import { cyan } from "colorette";
+import { oneLine } from "common-tags";
 import { Events, KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<Listener.Options>({
@@ -11,15 +12,16 @@ import { Events, KazagumoPlayer } from "kazagumo";
 })
 export class ClientListener extends Listener {
     public async run(player: KazagumoPlayer) {
-        const guild =
-            this.container.client.guilds.cache.get(player.guildId) ??
-            (await this.container.client.guilds.fetch(player.guildId).catch(() => null));
+        const { client, logger } = this.container;
+
+        const guild = client.guilds.cache.get(player.guildId) ?? (await client.guilds.fetch(player.guildId).catch(() => null));
         if (isNullish(guild)) return;
 
-        this.container.logger.info(
-            `[${cyan(guild.shardId || 0)}] - Player has been created in ${guild.name}[${cyan(guild.id)}] on ${cyan(
-                player.shoukaku.node.name
-            )} node`
+        logger.info(
+            oneLine`
+                [${cyan(guild.shardId || 0)}] 
+                - Player has been created in ${guild.name}[${cyan(guild.id)}] on ${cyan(player.shoukaku.node.name)} node
+            `
         );
     }
 }
