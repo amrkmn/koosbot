@@ -13,11 +13,11 @@ import { KazagumoPlugin as Spotify } from "#lib/structures";
 const NODES: NodeOption[] = [
     // { name: "lavalink.aytea.ga", url: "lavalink.aytea.ga:443", auth: "maybeiwasboring", secure: true },
     // { name: "ssl.freelavalink.ga", url: "ssl.freelavalink.ga:443", auth: "www.freelavalink.ga", secure: true },
-    { name: "lavalink.lexnet.cc", url: "lavalink.lexnet.cc:443", auth: "lexn3tl@val!nk", secure: true },
-    { name: "lava1.horizxon.studio", url: "lava1.horizxon.studio:80", auth: "horizxon.studio", secure: false },
-    { name: "lava2.horizxon.studio", url: "lava2.horizxon.studio:80", auth: "horizxon.studio", secure: false },
-    { name: "lava3.horizxon.studio", url: "lava3.horizxon.studio:80", auth: "horizxon.studio", secure: false },
-    { name: "lava4.horizxon.studio", url: "lava4.horizxon.studio:80", auth: "horizxon.studio", secure: false },
+    { name: "node1", url: "narco.buses.rocks:2269", auth: "glasshost1984", secure: false },
+    { name: "node2", url: "lava1.horizxon.studio:80", auth: "horizxon.studio", secure: false },
+    { name: "node3", url: "lava2.horizxon.studio:80", auth: "horizxon.studio", secure: false },
+    { name: "node4", url: "lava3.horizxon.studio:80", auth: "horizxon.studio", secure: false },
+    { name: "node5", url: "lava4.horizxon.studio:80", auth: "horizxon.studio", secure: false },
 ];
 
 export class KoosClient extends SapphireClient {
