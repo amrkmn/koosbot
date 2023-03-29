@@ -10,7 +10,7 @@ import { reply, send } from "@sapphire/plugin-editable-commands";
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["rp", "restart"],
 })
-export class UserCommand extends KoosCommand {
+export class ReplayCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>

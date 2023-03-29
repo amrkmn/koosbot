@@ -24,7 +24,7 @@ import pluralize from "pluralize";
     preconditions: ["VoiceOnly"],
     usage: "query",
 })
-export class UserCommand extends KoosCommand {
+export class SearchCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>

@@ -18,7 +18,7 @@ import pluralize from "pluralize";
     preconditions: ["VoiceOnly", "DJ"],
     usage: "query",
 })
-export class UserCommand extends KoosCommand {
+export class PlaySkipCommand extends KoosCommand {
     private tracks: Map<string, string[]> = new Map<string, string[]>();
 
     public override registerApplicationCommands(registery: KoosCommand.Registry) {

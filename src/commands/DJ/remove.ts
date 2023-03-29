@@ -15,7 +15,7 @@ import { KoosCommand } from "#lib/extensions";
         types: [{ type: "position", required: true }, { type: "to" }],
     },
 })
-export class UserCommand extends KoosCommand {
+export class RemoveCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>

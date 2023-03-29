@@ -2,7 +2,6 @@ import { Args } from "@sapphire/framework";
 import { ApplyOptions } from "@sapphire/decorators";
 import { ApplicationCommandOptionChoiceData, GuildMember, Message, MessageEmbed, VoiceBasedChannel } from "discord.js";
 import { send } from "@sapphire/plugin-editable-commands";
-import { KazagumoTrack } from "kazagumo";
 import { embedColor } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
 import { filterNullishAndEmpty, isNullish } from "@sapphire/utilities";
@@ -18,7 +17,7 @@ import pluralize from "pluralize";
     preconditions: ["VoiceOnly"],
     usage: "query",
 })
-export class UserCommand extends KoosCommand {
+export class PlayCommand extends KoosCommand {
     private tracks: Map<string, string[]> = new Map<string, string[]>();
 
     public override registerApplicationCommands(registery: KoosCommand.Registry) {

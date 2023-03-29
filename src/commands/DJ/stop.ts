@@ -9,7 +9,7 @@ import { KazagumoPlayer } from "kazagumo";
     description: "Stops the player and clear the queue.",
     preconditions: ["VoiceOnly", "DJ"],
 })
-export class UserCommand extends KoosCommand {
+export class StopCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>

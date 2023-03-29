@@ -21,7 +21,7 @@ const categoryLevel: { [key: string]: number } = {
         type: "command",
     },
 })
-export class UserCommand extends KoosCommand {
+export class HelpCommand extends KoosCommand {
     public async messageRun(message: Message, args: Args) {
         const prefix = await this.client.fetchPrefix(message);
         const command = await args.pickResult("commandName");

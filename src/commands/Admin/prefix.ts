@@ -16,7 +16,7 @@ import { sendLoadingMessage } from "#utils/functions";
         types: [{ type: "new prefix", required: false }],
     },
 })
-export class AdminCommadn extends KoosCommand {
+export class PrefixCommand extends KoosCommand {
     public async messageRun(message: Message, args: Args) {
         await sendLoadingMessage(message);
         try {

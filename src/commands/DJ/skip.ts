@@ -15,7 +15,7 @@ import pluralize from "pluralize";
         types: [{ type: "to" }],
     },
 })
-export class UserCommand extends KoosCommand {
+export class SkipCommand extends KoosCommand {
     public votes = new Set<string>();
 
     public override registerApplicationCommands(registery: KoosCommand.Registry) {

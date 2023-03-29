@@ -13,7 +13,7 @@ import { sendLoadingMessage } from "#utils/functions";
     description: "Lets you vote for skipping the current track.",
     preconditions: ["VoiceOnly"],
 })
-export class UserCommand extends KoosCommand {
+export class VoteSkipCommand extends KoosCommand {
     public votes = new Set<string>();
 
     public override registerApplicationCommands(registery: KoosCommand.Registry) {

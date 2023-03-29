@@ -16,7 +16,7 @@ import { Message, MessageEmbed } from "discord.js";
         types: [{ type: "1-200" }],
     },
 })
-export class AdminCommand extends KoosCommand {
+export class SetVolumeCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>

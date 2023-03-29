@@ -9,7 +9,7 @@ import type { Message } from "discord.js";
 @ApplyOptions<KoosCommand.Options>({
     description: "Get the bot's latency.",
 })
-export class UserCommand extends KoosCommand {
+export class PingCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>

@@ -1,7 +1,7 @@
 import { Argument, ArgumentContext, Piece } from "@sapphire/framework";
 import { oneLine } from "common-tags";
 
-export class UserArgument extends Argument<Piece> {
+export class PieceArgument extends Argument<Piece> {
     public async run(parameter: string, context: ArgumentContext) {
         for (const store of this.container.stores.values()) {
             const piece = store.get(parameter);

@@ -16,7 +16,7 @@ import { KazagumoPlayer } from "kazagumo";
         types: [{ type: "1-200", required: false }],
     },
 })
-export class UserCommand extends KoosCommand {
+export class VolumeCommand extends KoosCommand {
     public override async registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>

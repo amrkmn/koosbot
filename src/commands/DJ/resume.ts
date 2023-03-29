@@ -10,7 +10,7 @@ import { KazagumoPlayer } from "kazagumo";
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["continue"],
 })
-export class UserCommand extends KoosCommand {
+export class ResumeCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>

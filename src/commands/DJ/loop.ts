@@ -13,7 +13,7 @@ import { KazagumoPlayer } from "kazagumo";
         type: ["queue", "song", "off"],
     },
 })
-export class UserCommand extends KoosCommand {
+export class LoopCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>

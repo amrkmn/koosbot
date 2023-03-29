@@ -28,7 +28,7 @@ type HasteBinResponse = {
     permissionLevels: PermissionLevels.BotOwner,
     typing: false,
 })
-export class AdminCommand extends KoosCommand {
+export class EvalCommand extends KoosCommand {
     private codeRegex = /```(?:(?<lang>\S+)\n)?\s?(?<code>[^]+?)\s?```/s;
 
     private request = request;

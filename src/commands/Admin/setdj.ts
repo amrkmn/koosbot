@@ -17,7 +17,7 @@ import { PermissionLevels } from "#lib/utils/constants";
         types: [{ type: "role" }],
     },
 })
-export class AdminCommand extends KoosCommand {
+export class SetDJCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>

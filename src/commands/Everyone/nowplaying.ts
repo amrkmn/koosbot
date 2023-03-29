@@ -12,7 +12,7 @@ import prettyMs from "pretty-ms";
     aliases: ["np"],
     preconditions: ["VoiceOnly"],
 })
-export class UserCommand extends KoosCommand {
+export class NowPlayingCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>

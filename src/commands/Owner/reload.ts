@@ -12,7 +12,7 @@ import { Message } from "discord.js";
     permissionLevels: PermissionLevels.BotOwner,
     hidden: true,
 })
-export class OwnerCommand extends KoosCommand {
+export class ReloadCommand extends KoosCommand {
     public async messageRun(message: Message, args: Args) {
         const content = await this.reloadAny(args);
         return send(message, content);
@@ -21,7 +21,7 @@ export class OwnerCommand extends KoosCommand {
     // @ts-ignore
     async reloadAny(args: Args) {
         if (args.finished) return "Please enter something for me to reload.";
-        const everything = await args.pickResult(OwnerCommand.everything);
+        const everything = await args.pickResult(ReloadCommand.everything);
         if (everything.ok().isSome()) return this.reloadEverything();
 
         const store = await args.pickResult("store");

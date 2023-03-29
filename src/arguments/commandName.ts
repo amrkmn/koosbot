@@ -5,7 +5,7 @@ import { Argument } from "@sapphire/framework";
 import { envParseArray } from "@skyra/env-utilities";
 import { oneLine } from "common-tags";
 
-export class UserArgument extends Argument<KoosCommand> {
+export class CommandNameArgument extends Argument<KoosCommand> {
     public async run(parameter: string, context: KoosArgument.Context) {
         const commands = this.container.stores.get("commands");
         const found = commands.get(parameter.toLowerCase()) as KoosCommand | undefined;

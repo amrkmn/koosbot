@@ -17,7 +17,7 @@ import pluralize from "pluralize";
     aliases: ["ly"],
     usage: "query",
 })
-export class UserCommand extends KoosCommand {
+export class LyricsCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>

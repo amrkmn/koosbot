@@ -17,7 +17,7 @@ import { sendLoadingMessage } from "#utils/functions";
         required: true,
     },
 })
-export class UserCommand extends KoosCommand {
+export class RequesterCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>

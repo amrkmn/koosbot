@@ -10,7 +10,7 @@ import { KoosCommand } from "#lib/extensions";
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["sh"],
 })
-export class UserCommand extends KoosCommand {
+export class ShuffleCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand(
             (builder) =>
