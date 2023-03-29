@@ -1,4 +1,5 @@
 import { Argument, ArgumentContext, Piece } from "@sapphire/framework";
+import { oneLine } from "common-tags";
 
 export class UserArgument extends Argument<Piece> {
     public async run(parameter: string, context: ArgumentContext) {
@@ -10,10 +11,10 @@ export class UserArgument extends Argument<Piece> {
             context,
             parameter,
             identifier: `arguments:piece`,
-            message: [
-                `I could not resolve \`${parameter}\` to a piece!`,
-                `Make sure you typed its name or one of its aliases correctly!`,
-            ].join(" "),
+            message: oneLine`
+                I could not resolve \`${parameter}\` to a piece!
+                Make sure you typed its name or one of its aliases correctly!
+            `,
         });
     }
 }

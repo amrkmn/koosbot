@@ -1,4 +1,5 @@
 import { Argument, ArgumentContext, Piece, Store } from "@sapphire/framework";
+import { oneLine } from "common-tags";
 
 export class StoreArgument extends Argument<Store<Piece>> {
     public possibles: readonly string[] = [];
@@ -10,10 +11,10 @@ export class StoreArgument extends Argument<Store<Piece>> {
             parameter,
             identifier: "arguments:store",
             context: { ...context, possibles: this.possibles },
-            message: [
-                `I could not resolve \`${parameter}\` to a valid store!`,
-                `**Hint**: the following are supported: ${this.possibles.join(", ")}.`,
-            ].join(" "),
+            message: oneLine`
+                I could not resolve \`${parameter}\` to a valid store!
+                **Hint**: the following are supported: ${this.possibles.join(", ")}.
+            `,
         });
     }
 

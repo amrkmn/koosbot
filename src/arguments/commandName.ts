@@ -3,6 +3,7 @@ import { PermissionLevels } from "#lib/utils/constants";
 import { KoosArgument } from "#lib/interfaces";
 import { Argument } from "@sapphire/framework";
 import { envParseArray } from "@skyra/env-utilities";
+import { oneLine } from "common-tags";
 
 export class UserArgument extends Argument<KoosCommand> {
     public async run(parameter: string, context: KoosArgument.Context) {
@@ -16,7 +17,10 @@ export class UserArgument extends Argument<KoosCommand> {
                 : this.error({
                       parameter,
                       identifier: "commandCannotResolve",
-                      message: `I could not resolve \`${parameter}\` to a command! Make sure you typed its name or one of its aliases correctly!`,
+                      message: oneLine`
+                        I could not resolve \`${parameter}\` to a command!
+                        Make sure you typed its name or one of its aliases correctly!
+                      `,
                   });
         }
 
