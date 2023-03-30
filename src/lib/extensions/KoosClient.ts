@@ -16,8 +16,8 @@ const NODES: NodeOption[] = [
     { name: "node1", url: "narco.buses.rocks:2269", auth: "glasshost1984", secure: false },
     { name: "node2", url: "lava1.horizxon.studio:80", auth: "horizxon.studio", secure: false },
     { name: "node3", url: "lava2.horizxon.studio:80", auth: "horizxon.studio", secure: false },
-    { name: "node4", url: "lava3.horizxon.studio:80", auth: "horizxon.studio", secure: false },
-    { name: "node5", url: "lava4.horizxon.studio:80", auth: "horizxon.studio", secure: false },
+    // { name: "node4", url: "lava3.horizxon.studio:80", auth: "horizxon.studio", secure: false },
+    { name: "node4", url: "lava4.horizxon.studio:80", auth: "horizxon.studio", secure: false },
 ];
 
 export class KoosClient extends SapphireClient {
