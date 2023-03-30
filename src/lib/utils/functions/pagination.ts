@@ -7,6 +7,9 @@ import {
     ActionRowBuilder,
     ButtonInteraction,
     Message,
+    ButtonStyle,
+    MessageCollectorOptionsParams,
+    ComponentType,
 } from "discord.js";
 
 interface PaginationOptions {
@@ -28,12 +31,12 @@ export const pagination = async (options: PaginationOptions) => {
         last: ">>",
         stop: "\u200b",
     };
-    const defaultStyles: { [key: string]: any } = {
-        first: "SECONDARY",
-        previous: "SECONDARY",
-        next: "SECONDARY",
-        last: "SECONDARY",
-        stop: "DANGER",
+    const defaultStyles: { [key: string]: ButtonStyle } = {
+        first: ButtonStyle.Secondary,
+        previous: ButtonStyle.Secondary,
+        next: ButtonStyle.Secondary,
+        last: ButtonStyle.Secondary,
+        stop: ButtonStyle.Danger,
     };
     let currentPage = page ? page : 1;
 
@@ -80,37 +83,34 @@ export const pagination = async (options: PaginationOptions) => {
     const defaultFilter = (interaction: ButtonInteraction) =>
         interaction.user.id === target.id && interaction.message.id == initialMessage.id;
     const filter = defaultFilter;
-    const collectorOptions = () => {
-        const opt: { [key: string]: any } = { filter, componentType: "BUTTON" };
-        if (max) opt["max"] = max;
-        if (time) opt["time"] = time;
-        return opt;
-    };
-    const collector = initialMessage.createMessageComponentCollector(collectorOptions());
+    const collector = initialMessage.createMessageComponentCollector({
+        componentType: ComponentType.Button,
+        filter,
+        max,
+        time,
+    });
 
-    if (collector) {
-        collector.on("collect", async (interaction) => {
-            try {
-                await interaction.deferUpdate();
-                const id = interaction.customId;
-                if (id === "first") currentPage = 1;
-                if (id === "previous") currentPage--;
-                if (id === "next") currentPage++;
-                if (id === "last") currentPage = embeds.length;
-                if (id === "stop") {
-                    collector.stop("user");
-                    initialMessage.edit({ embeds: [changeFooter()], components: components(true) });
-                    return;
-                }
-                collector.resetTimer();
-                await initialMessage.edit({ embeds: [changeFooter()], components: components() });
-            } catch (error) {}
-        });
-        collector.on("end", (_, reason) => {
-            try {
-                if (reason == "user" || reason == "time") initialMessage.edit({ components: components(true) });
-                else return;
-            } catch (error) {}
-        });
-    } else return;
+    collector.on("collect", async (interaction) => {
+        try {
+            await interaction.deferUpdate();
+            const id = interaction.customId;
+            if (id === "first") currentPage = 1;
+            if (id === "previous") currentPage--;
+            if (id === "next") currentPage++;
+            if (id === "last") currentPage = embeds.length;
+            if (id === "stop") {
+                collector.stop("user");
+                initialMessage.edit({ embeds: [changeFooter()], components: components(true) });
+                return;
+            }
+            collector.resetTimer();
+            await initialMessage.edit({ embeds: [changeFooter()], components: components() });
+        } catch (error) {}
+    });
+    collector.on("end", (_, reason) => {
+        try {
+            if (reason == "user" || reason == "time") initialMessage.edit({ components: components(true) });
+            else return;
+        } catch (error) {}
+    });
 };
