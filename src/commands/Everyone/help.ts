@@ -1,6 +1,6 @@
 import { KoosCommand } from "#lib/extensions";
 import { PermissionLevel } from "#lib/utils/constants";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { isString } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args, SapphirePrefix } from "@sapphire/framework";
@@ -43,13 +43,13 @@ export class HelpCommand extends KoosCommand {
                             { name: `• Usage ${buildedCommand.slashOnly ? `(Slash only)` : ``}`, value: usage },
                             { name: `• Permission`, value: `\`${buildedCommand.category}\`` },
                         ],
-                        color: EmbedColor.Default,
+                        color: KoosColor.Default,
                     },
                 ],
             });
         } else if (command.isErr() && ["commandCannotResolve", "commandNotFound"].includes(command.err().unwrap().identifier))
             return send(message, {
-                embeds: [{ description: `${command.err().unwrap().message}`, color: EmbedColor.Error }],
+                embeds: [{ description: `${command.err().unwrap().message}`, color: KoosColor.Error }],
             });
 
         const help = await this.buildHelp(message);
@@ -58,7 +58,7 @@ export class HelpCommand extends KoosCommand {
             embeds: [
                 {
                     fields: help,
-                    color: EmbedColor.Default,
+                    color: KoosColor.Default,
                     footer: { text: `Use ${prefix}help [ command ] to get more information about a command` },
                     author: { name: `${this.client.user?.username}'s Command List`, icon_url: this.client.user?.displayAvatarURL() },
                 },

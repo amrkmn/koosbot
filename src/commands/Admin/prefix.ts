@@ -1,7 +1,7 @@
 import { envParseString } from "@skyra/env-utilities";
 import { KoosCommand } from "#lib/extensions";
 import { PermissionLevel } from "#lib/utils/constants";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { isNullish } from "@sapphire/utilities";
 import { Message, EmbedBuilder } from "discord.js";
@@ -30,7 +30,7 @@ export class PrefixCommand extends KoosCommand {
                 });
             else if (error instanceof ResultError && error.value.identifier === "stringTooLong")
                 return send(message, {
-                    embeds: [{ description: "Prefix must be shorter than 5 characters.", color: EmbedColor.Error }],
+                    embeds: [{ description: "Prefix must be shorter than 5 characters.", color: KoosColor.Error }],
                 });
         }
     }
@@ -47,7 +47,7 @@ export class PrefixCommand extends KoosCommand {
 
             return new EmbedBuilder()
                 .setDescription(`Prefix in **${guildName}** is set to: \`${prefix}\``)
-                .setColor(EmbedColor.Default);
+                .setColor(KoosColor.Default);
         }
 
         const output = await db.guild.upsert({
@@ -57,6 +57,6 @@ export class PrefixCommand extends KoosCommand {
             select: { prefix: true },
         });
 
-        return new EmbedBuilder().setDescription(`The prefix has been changed to \`${output.prefix}\``).setColor(EmbedColor.Success);
+        return new EmbedBuilder().setDescription(`The prefix has been changed to \`${output.prefix}\``).setColor(KoosColor.Success);
     }
 }

@@ -1,7 +1,7 @@
 import { KoosCommand } from "#lib/extensions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { EmbedBuilder, Message } from "discord.js";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { send } from "@sapphire/plugin-editable-commands";
 import { Emoji, PermissionLevel } from "#lib/utils/constants";
 import { Args } from "@sapphire/framework";
@@ -50,11 +50,11 @@ export class RequesterCommand extends KoosCommand {
         });
         if (isNullish(input))
             return send(message, {
-                embeds: [{ description: "Please enter an input.", color: EmbedColor.Error }],
+                embeds: [{ description: "Please enter an input.", color: KoosColor.Error }],
             });
         if (input === "enumError")
             return send(message, {
-                embeds: [{ description: `Please enter a correct input. (${options.join(", ")})`, color: EmbedColor.Error }],
+                embeds: [{ description: `Please enter a correct input. (${options.join(", ")})`, color: KoosColor.Error }],
             });
 
         let enable: boolean;
@@ -80,6 +80,6 @@ export class RequesterCommand extends KoosCommand {
                     ? `${Emoji.Yes} Requester will be shown permanently on each track.`
                     : `${Emoji.No} Requester is no longer shown permanently on each track.`
             )
-            .setColor(requester ? EmbedColor.Success : EmbedColor.Error);
+            .setColor(requester ? KoosColor.Success : KoosColor.Error);
     }
 }

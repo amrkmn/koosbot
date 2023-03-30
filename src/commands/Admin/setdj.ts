@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { EmbedColor, zws } from "#utils/constants";
+import { KoosColor, zws } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { EmbedBuilder, Message, Role } from "discord.js";
 // import { isNullishOrEmpty } from "@sapphire/utilities";
@@ -46,7 +46,7 @@ export class SetDJCommand extends KoosCommand {
         await sendLoadingMessage(message);
         const role = await args.pick("role").catch(() => undefined);
         if (!role && args.finished) return send(message, { embeds: [await this.setdj(message.guildId!, undefined)] });
-        if (!role) return send(message, { embeds: [{ description: `Role not found.`, color: EmbedColor.Error }] });
+        if (!role) return send(message, { embeds: [{ description: `Role not found.`, color: KoosColor.Error }] });
 
         send(message, { embeds: [await this.setdj(message.guildId!, role.id)] });
     }
@@ -54,13 +54,13 @@ export class SetDJCommand extends KoosCommand {
     private async setdj(guildId: string, roleId?: string) {
         const { db } = this.container;
         const data = await db.guild.findUnique({ where: { id: guildId } });
-        if (!data) return new EmbedBuilder().setDescription(`There is no DJ role set.`).setColor(EmbedColor.Warn);
+        if (!data) return new EmbedBuilder().setDescription(`There is no DJ role set.`).setColor(KoosColor.Warn);
 
         const dj = data.dj.map((id) => `<@&${id}>`);
         if (!roleId && isNullishOrEmpty(dj))
-            return new EmbedBuilder().setDescription(`There is no DJ role set.`).setColor(EmbedColor.Warn);
+            return new EmbedBuilder().setDescription(`There is no DJ role set.`).setColor(KoosColor.Warn);
         if (!roleId)
-            return new EmbedBuilder().setDescription(`**__Configured DJ role:__**\n\n${dj.join("\n")}`).setColor(EmbedColor.Default);
+            return new EmbedBuilder().setDescription(`**__Configured DJ role:__**\n\n${dj.join("\n")}`).setColor(KoosColor.Default);
 
         const isNewRole = data.dj.includes(roleId) ? false : true;
         const roles = isNewRole //
@@ -75,6 +75,6 @@ export class SetDJCommand extends KoosCommand {
 
         return new EmbedBuilder()
             .setDescription(isNewRole ? `Added <@&${roleId}> to the DJ roles` : `Removed <@&${roleId}> from the DJ roles.`)
-            .setColor(EmbedColor.Default);
+            .setColor(KoosColor.Default);
     }
 }

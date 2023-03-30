@@ -2,7 +2,7 @@ import { Listener, container } from "@sapphire/framework";
 import { KazagumoPlayer, KazagumoTrack, Events } from "kazagumo";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { convertTime } from "#utils/functions";
 import { Button } from "#lib/utils/constants";
 import { oneLine } from "common-tags";
@@ -30,7 +30,7 @@ export class ClientListener extends Listener {
                     ${data?.requester ? ` ~ ${track.requester}` : ""}
                 `
             )
-            .setColor(EmbedColor.Default);
+            .setColor(KoosColor.Default);
         const playerButtons = [
             new ButtonBuilder().setLabel("Pause").setCustomId(Button.PauseOrResume).setStyle(ButtonStyle.Success),
             new ButtonBuilder().setLabel("Skip").setCustomId(Button.Skip).setStyle(ButtonStyle.Primary),

@@ -3,7 +3,7 @@ import { Events, Listener } from "@sapphire/framework";
 import { isNullish, Nullish } from "@sapphire/utilities";
 import { envParseString } from "@skyra/env-utilities";
 import { Guild, Message, ActionRowBuilder, ButtonBuilder, EmbedBuilder, VoiceBasedChannel, VoiceState, ButtonStyle } from "discord.js";
-import { Button, EmbedColor } from "#utils/constants";
+import { Button, KoosColor } from "#utils/constants";
 import { KazagumoPlayer } from "kazagumo";
 import { time } from "#utils/functions";
 import ms from "ms";
@@ -82,7 +82,7 @@ export class ClientListener extends Listener {
                         embeds: [
                             new EmbedBuilder()
                                 .setDescription(`No one was listening for ${ms(this.leaveAfter, { long: true })}, leaving.`)
-                                .setColor(EmbedColor.Error),
+                                .setColor(KoosColor.Error),
                         ],
                     });
             }

@@ -1,4 +1,4 @@
-import { EmbedColor, Emoji } from "#utils/constants";
+import { KoosColor, Emoji } from "#utils/constants";
 import { container } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { Message, EmbedBuilder } from "discord.js";
@@ -104,6 +104,6 @@ export function decodeEntities(encodedString: string) {
 
 export function sendLoadingMessage(message: Message) {
     return send(message, {
-        embeds: [new EmbedBuilder().setDescription(`${Emoji.Loading} This might take a few seconds`).setColor(EmbedColor.Default)],
+        embeds: [new EmbedBuilder().setDescription(`${Emoji.Loading} This might take a few seconds`).setColor(KoosColor.Default)],
     });
 }

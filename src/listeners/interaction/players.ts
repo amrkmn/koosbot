@@ -16,7 +16,7 @@ import {
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { KazagumoPlayer } from "kazagumo";
 import { convertTime } from "#utils/functions";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { stripIndents } from "common-tags";
 
 @ApplyOptions<Listener.Options>({
@@ -41,7 +41,7 @@ export class ClientListener extends Listener {
             !this.checkDJ(interaction, player, data.dj)
         )
             return interaction.followUp({
-                embeds: [{ description: `This button can only be use by DJ.`, color: EmbedColor.Error }],
+                embeds: [{ description: `This button can only be use by DJ.`, color: KoosColor.Error }],
                 ephemeral: true,
             });
 
@@ -141,7 +141,7 @@ export class ClientListener extends Listener {
     }
 
     private checkMember(guild: Guild | null, member: GuildMember) {
-        if (!guild) return new EmbedBuilder({ description: "You cannot run this message command in DMs.", color: EmbedColor.Error });
+        if (!guild) return new EmbedBuilder({ description: "You cannot run this message command in DMs.", color: KoosColor.Error });
         if (
             !isNullish(guild.members.me) &&
             member.voice.channel !== null && //
@@ -150,12 +150,12 @@ export class ClientListener extends Listener {
         )
             return new EmbedBuilder({
                 description: `You aren't connected to the same voice channel as I am. I'm currently connected to ${guild.members.me.voice.channel}`,
-                color: EmbedColor.Error,
+                color: KoosColor.Error,
             });
 
         return member.voice.channel !== null //
             ? undefined
-            : new EmbedBuilder({ description: "You aren't connected to a voice channel.", color: EmbedColor.Error });
+            : new EmbedBuilder({ description: "You aren't connected to a voice channel.", color: KoosColor.Error });
     }
 
     private checkDJ(message: Message | ButtonInteraction, player: KazagumoPlayer, dj: string[]) {
@@ -210,7 +210,7 @@ export class ClientListener extends Listener {
                     `
                 )
                 .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
-                .setColor(EmbedColor.Default);
+                .setColor(KoosColor.Default);
 
             return [embed];
         }
@@ -246,7 +246,7 @@ export class ClientListener extends Listener {
                         `
                     )
                     .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
-                    .setColor(EmbedColor.Default)
+                    .setColor(KoosColor.Default)
             );
         }
 

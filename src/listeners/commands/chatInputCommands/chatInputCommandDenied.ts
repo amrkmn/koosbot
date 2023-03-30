@@ -1,4 +1,4 @@
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener, UserError, ChatInputCommandDeniedPayload } from "@sapphire/framework";
 import prettyMs from "pretty-ms";
@@ -18,9 +18,9 @@ export class ClientListener extends Listener<typeof Events.ChatInputCommandDenie
             }
         }
 
-        if (interaction.deferred) return interaction.followUp({ embeds: [{ description: content, color: EmbedColor.Error }] });
+        if (interaction.deferred) return interaction.followUp({ embeds: [{ description: content, color: KoosColor.Error }] });
 
-        return interaction.reply({ embeds: [{ description: content, color: EmbedColor.Error }] });
+        return interaction.reply({ embeds: [{ description: content, color: KoosColor.Error }] });
     }
 
     private isVoiceOnlyError(error: UserError) {

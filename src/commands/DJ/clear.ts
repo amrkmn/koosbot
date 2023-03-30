@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { Message, EmbedBuilder } from "discord.js";
@@ -28,7 +28,7 @@ export class ClearCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -42,7 +42,7 @@ export class ClearCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
             });
         }
 
@@ -51,10 +51,10 @@ export class ClearCommand extends KoosCommand {
 
     private clear(player: KazagumoPlayer) {
         if (player.queue.isEmpty)
-            return new EmbedBuilder({ description: `There is currently no song in the queue.`, color: EmbedColor.Error });
+            return new EmbedBuilder({ description: `There is currently no song in the queue.`, color: KoosColor.Error });
 
         player.queue.clear();
 
-        return new EmbedBuilder({ description: `The queue has been cleared.`, color: EmbedColor.Default });
+        return new EmbedBuilder({ description: `The queue has been cleared.`, color: KoosColor.Default });
     }
 }

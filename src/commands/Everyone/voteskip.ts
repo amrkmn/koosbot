@@ -3,7 +3,7 @@ import { Guild } from "@prisma/client";
 import { ApplyOptions } from "@sapphire/decorators";
 import { KazagumoPlayer } from "kazagumo";
 import { Message, GuildMember, EmbedBuilder } from "discord.js";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { isNullishOrEmpty } from "@sapphire/utilities";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import pluralize from "pluralize";
@@ -34,7 +34,7 @@ export class VoteSkipCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -50,7 +50,7 @@ export class VoteSkipCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
             });
         }
 
@@ -73,7 +73,7 @@ export class VoteSkipCommand extends KoosCommand {
                 : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
         const embed = new EmbedBuilder() //
             .setDescription(`${title} has been skip`)
-            .setColor(EmbedColor.Success);
+            .setColor(KoosColor.Success);
         const roles = [...member.roles.cache.keys()].filter((id) => data?.dj.includes(id) ?? false);
 
         if (data && !isNullishOrEmpty(roles)) {
@@ -87,11 +87,11 @@ export class VoteSkipCommand extends KoosCommand {
 
             if (votes.has(member.id)) {
                 msg = `You have already voted`;
-                color = EmbedColor.Error;
+                color = KoosColor.Error;
                 voted = true;
             } else {
                 msg = `Skipping`;
-                color = EmbedColor.Success;
+                color = KoosColor.Success;
                 voted = false;
                 votes.add(member.id);
             }
@@ -106,7 +106,7 @@ export class VoteSkipCommand extends KoosCommand {
                     votes.delete(voterId);
                 }
                 msg = `${title} has been skipped`;
-                color = EmbedColor.Success;
+                color = KoosColor.Success;
                 player.skip();
                 return new EmbedBuilder({ description: msg, color });
             }

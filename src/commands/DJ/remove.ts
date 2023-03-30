@@ -1,4 +1,4 @@
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
@@ -47,12 +47,12 @@ export class RemoveCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (isNullish(position))
             return interaction.reply({
-                embeds: [{ description: "Please specify the song positions to remove.", color: EmbedColor.Error }],
+                embeds: [{ description: "Please specify the song positions to remove.", color: KoosColor.Error }],
                 ephemeral: true,
             });
         if (!player || (player && !player.queue.current))
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
                 ephemeral: true,
             });
 
@@ -67,12 +67,12 @@ export class RemoveCommand extends KoosCommand {
 
         if (isNullish(position)) {
             return reply(message, {
-                embeds: [{ description: "Please specify the song positions to remove.", color: EmbedColor.Error }],
+                embeds: [{ description: "Please specify the song positions to remove.", color: KoosColor.Error }],
             });
         }
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
             });
         }
 
@@ -86,16 +86,16 @@ export class RemoveCommand extends KoosCommand {
         if (position > player.queue.size || (to && to > player.queue.size))
             return new EmbedBuilder({
                 description: `The queue doesn't have that many tracks (Total tracks: ${player.queue.size})`,
-                color: EmbedColor.Error,
+                color: KoosColor.Error,
             });
         if (position < 1)
             return new EmbedBuilder({
                 description: `The position number must be from 1 to ${player.queue.size}`,
-                color: EmbedColor.Error,
+                color: KoosColor.Error,
             });
         if (to && to <= player.queue.size && to > position) {
             player.queue.splice(position - 1, to - position + 1);
-            return new EmbedBuilder({ description: `Removed song from index ${position} to ${to}`, color: EmbedColor.Default });
+            return new EmbedBuilder({ description: `Removed song from index ${position} to ${to}`, color: KoosColor.Default });
         }
 
         const track = player.queue[position - 1];
@@ -105,6 +105,6 @@ export class RemoveCommand extends KoosCommand {
                 : `[${track.title} by ${track.author}](${track.uri})`;
         player.queue.remove(position - 1);
 
-        return new EmbedBuilder({ description: `Removed ${title} from the queue`, color: EmbedColor.Default });
+        return new EmbedBuilder({ description: `Removed ${title} from the queue`, color: KoosColor.Default });
     }
 }

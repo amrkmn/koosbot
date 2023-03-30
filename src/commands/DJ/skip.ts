@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
@@ -41,7 +41,7 @@ export class SkipCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -56,7 +56,7 @@ export class SkipCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
             });
         }
 
@@ -67,9 +67,9 @@ export class SkipCommand extends KoosCommand {
         let embed: EmbedBuilder;
         if (typeof amount === "number" && amount > 1) {
             if (amount > player.queue.length)
-                return new EmbedBuilder().setDescription("Cannot skip more than the queue length.").setColor(EmbedColor.Error);
+                return new EmbedBuilder().setDescription("Cannot skip more than the queue length.").setColor(KoosColor.Error);
             player.queue.splice(0, amount - 1);
-            embed = new EmbedBuilder().setDescription(`Skipped ${amount} ${pluralize("song", amount)}`).setColor(EmbedColor.Success);
+            embed = new EmbedBuilder().setDescription(`Skipped ${amount} ${pluralize("song", amount)}`).setColor(KoosColor.Success);
         } else {
             const current = player.queue.current!;
             const title =
@@ -79,7 +79,7 @@ export class SkipCommand extends KoosCommand {
 
             embed = new EmbedBuilder() //
                 .setDescription(`${title} has been skipped`)
-                .setColor(EmbedColor.Success);
+                .setColor(KoosColor.Success);
         }
 
         player.skip();

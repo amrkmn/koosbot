@@ -1,4 +1,4 @@
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { convertTime } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, Events } from "@sapphire/framework";
@@ -39,7 +39,7 @@ export class ClientListener extends Listener {
                                 ${data?.requester ? ` ~ ${track.requester}` : ""}
                             `
                         )
-                        .setColor(EmbedColor.Default)
+                        .setColor(KoosColor.Default)
                 );
             }
 

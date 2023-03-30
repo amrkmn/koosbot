@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
@@ -35,7 +35,7 @@ export class LoopCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -50,7 +50,7 @@ export class LoopCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
             });
         }
 
@@ -62,36 +62,36 @@ export class LoopCommand extends KoosCommand {
             switch (player.loop) {
                 case "none":
                     player.setLoop("queue");
-                    return new EmbedBuilder({ description: "Looping the queue activated.", color: EmbedColor.Default });
+                    return new EmbedBuilder({ description: "Looping the queue activated.", color: KoosColor.Default });
                 case "queue":
                     player.setLoop("track");
-                    return new EmbedBuilder({ description: "Looping the current song enabled.", color: EmbedColor.Default });
+                    return new EmbedBuilder({ description: "Looping the current song enabled.", color: KoosColor.Default });
                 case "track":
                     player.setLoop("none");
-                    return new EmbedBuilder({ description: "Looping disabled.", color: EmbedColor.Default });
+                    return new EmbedBuilder({ description: "Looping disabled.", color: KoosColor.Default });
             }
         } else {
             switch (type) {
                 case "song":
                     if (player.loop === "track") {
                         player.setLoop("none");
-                        return new EmbedBuilder({ description: "Looping disabled.", color: EmbedColor.Default });
+                        return new EmbedBuilder({ description: "Looping disabled.", color: KoosColor.Default });
                     }
                     player.setLoop("track");
-                    return new EmbedBuilder({ description: "Looping the current song enabled.", color: EmbedColor.Default });
+                    return new EmbedBuilder({ description: "Looping the current song enabled.", color: KoosColor.Default });
                 case "queue":
                     if (player.loop === "queue") {
                         player.setLoop("none");
-                        return new EmbedBuilder({ description: "Looping disabled.", color: EmbedColor.Default });
+                        return new EmbedBuilder({ description: "Looping disabled.", color: KoosColor.Default });
                     }
                     player.setLoop("queue");
-                    return new EmbedBuilder({ description: "Looping the queue activated.", color: EmbedColor.Default });
+                    return new EmbedBuilder({ description: "Looping the queue activated.", color: KoosColor.Default });
                 case "off":
                     if (player.loop === "none") {
-                        return new EmbedBuilder({ description: "Looping is already set to off.", color: EmbedColor.Default });
+                        return new EmbedBuilder({ description: "Looping is already set to off.", color: KoosColor.Default });
                     }
                     player.setLoop("none");
-                    return new EmbedBuilder({ description: "Looping disabled.", color: EmbedColor.Default });
+                    return new EmbedBuilder({ description: "Looping disabled.", color: KoosColor.Default });
             }
         }
     }

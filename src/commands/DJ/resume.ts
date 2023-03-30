@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { Message, EmbedBuilder } from "discord.js";
@@ -28,7 +28,7 @@ export class ResumeCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -42,7 +42,7 @@ export class ResumeCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
             });
         }
 
@@ -50,10 +50,10 @@ export class ResumeCommand extends KoosCommand {
     }
 
     private resume(player: KazagumoPlayer) {
-        if (!player.paused) return new EmbedBuilder({ description: `The song is not paused.`, color: EmbedColor.Warn });
+        if (!player.paused) return new EmbedBuilder({ description: `The song is not paused.`, color: KoosColor.Warn });
 
         player.pause(false);
 
-        return new EmbedBuilder({ description: `Resumed the song.`, color: EmbedColor.Default });
+        return new EmbedBuilder({ description: `Resumed the song.`, color: KoosColor.Default });
     }
 }

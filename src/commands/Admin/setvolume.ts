@@ -1,6 +1,6 @@
 import { KoosCommand } from "#lib/extensions";
 import { PermissionLevel } from "#lib/utils/constants";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
@@ -43,7 +43,7 @@ export class SetVolumeCommand extends KoosCommand {
 
         if (input && (input > 200 || input < 1))
             return send(message, {
-                embeds: [{ description: `The volume may not be less than 0 or more than 200`, color: EmbedColor.Error }],
+                embeds: [{ description: `The volume may not be less than 0 or more than 200`, color: KoosColor.Error }],
             });
 
         send(message, { embeds: [await this.setVolume(message.guildId!, input)] });
@@ -57,10 +57,10 @@ export class SetVolumeCommand extends KoosCommand {
             let volume = 0;
             if (isNullish(data)) volume = 100;
             else volume = data.volume;
-            return new EmbedBuilder().setDescription(`Current default volume is \`${volume}%\``).setColor(EmbedColor.Default);
+            return new EmbedBuilder().setDescription(`Current default volume is \`${volume}%\``).setColor(KoosColor.Default);
         }
 
         await db.guild.update({ where: { id: guildId }, data: { volume: input } });
-        return new EmbedBuilder().setDescription(`Changed the default volume to \`${input}%\``).setColor(EmbedColor.Default);
+        return new EmbedBuilder().setDescription(`Changed the default volume to \`${input}%\``).setColor(KoosColor.Default);
     }
 }

@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { progressBar } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
@@ -30,7 +30,7 @@ export class NowPlayingCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -44,7 +44,7 @@ export class NowPlayingCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
             });
         }
 
@@ -66,6 +66,6 @@ export class NowPlayingCommand extends KoosCommand {
             `${prettyMs(player.shoukaku.position, { secondsDecimalDigits: 0 }).replace("ms", "s")} / ` +
             `${!current.isStream ? prettyMs(duration, { secondsDecimalDigits: 0 }) : "∞"}`;
 
-        return new EmbedBuilder({ description, footer: { text: progress }, color: EmbedColor.Default });
+        return new EmbedBuilder({ description, footer: { text: progress }, color: KoosColor.Default });
     }
 }

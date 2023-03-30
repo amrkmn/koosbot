@@ -8,7 +8,7 @@ import {
     TextChannel,
     SelectMenuComponentOptionData,
 } from "discord.js";
-import { EmbedColor, userAgent } from "#utils/constants";
+import { KoosColor, userAgent } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
@@ -49,16 +49,16 @@ export class LyricsCommand extends KoosCommand {
         let query = interaction.options.getString("query", true);
         if (isNullish(query))
             return interaction.reply({
-                embeds: [new EmbedBuilder().setDescription("Please provide a song title").setColor(EmbedColor.Error)],
+                embeds: [new EmbedBuilder().setDescription("Please provide a song title").setColor(KoosColor.Error)],
                 ephemeral: true,
             });
         await interaction.deferReply();
 
         const song = await genius.songs.get(Number(query)).catch(() => undefined);
-        if (!song) return interaction.followUp({ embeds: [{ description: "No result was found", color: EmbedColor.Error }] });
+        if (!song) return interaction.followUp({ embeds: [{ description: "No result was found", color: KoosColor.Error }] });
 
         const lyrics = await this.getLyrics(song.url).catch(() => undefined);
-        if (!lyrics) return interaction.followUp({ embeds: [{ description: "Something went wrong!", color: EmbedColor.Error }] });
+        if (!lyrics) return interaction.followUp({ embeds: [{ description: "Something went wrong!", color: KoosColor.Error }] });
 
         const lyric = chunk(lyrics.split("\n"), 25);
 
@@ -69,7 +69,7 @@ export class LyricsCommand extends KoosCommand {
                     .setTitle(`${cutText(song.fullTitle, 128)}`)
                     .setThumbnail(song.thumbnail)
                     .setURL(song.url)
-                    .setColor(EmbedColor.Default)
+                    .setColor(KoosColor.Default)
             );
             return prev;
         }, []);
@@ -98,7 +98,7 @@ export class LyricsCommand extends KoosCommand {
             filter: (i) => {
                 if (i.user.id !== message.author.id) {
                     i.reply({
-                        embeds: [{ description: `This select menu can only be use by ${message.author}`, color: EmbedColor.Error }],
+                        embeds: [{ description: `This select menu can only be use by ${message.author}`, color: KoosColor.Error }],
                         ephemeral: true,
                     });
                     return false;
@@ -116,23 +116,23 @@ export class LyricsCommand extends KoosCommand {
             if (id !== "lyricsOptions") return;
             const input = Number(i.values[0]);
             if (isNaN(input) && i.values[0] === "cancel") {
-                await send(message, { embeds: [{ description: `Canceled the search`, color: EmbedColor.Default }] });
+                await send(message, { embeds: [{ description: `Canceled the search`, color: KoosColor.Default }] });
                 collector.stop("cancel");
                 return;
             }
 
-            await send(message, { embeds: [{ description: "Fetching lyrics...", color: EmbedColor.Default }] });
+            await send(message, { embeds: [{ description: "Fetching lyrics...", color: KoosColor.Default }] });
             const song = await this.container.genius.songs.get(input).catch(() => undefined);
             const lyrics = await this.getLyrics(song?.url).catch(() => undefined);
             if (!song) {
                 send(message, {
-                    embeds: [new EmbedBuilder().setDescription("Something went wrong!").setColor(EmbedColor.Error)],
+                    embeds: [new EmbedBuilder().setDescription("Something went wrong!").setColor(KoosColor.Error)],
                 });
                 return;
             }
             if (!lyrics) {
                 send(message, {
-                    embeds: [new EmbedBuilder().setDescription("No result was found").setColor(EmbedColor.Error)],
+                    embeds: [new EmbedBuilder().setDescription("No result was found").setColor(KoosColor.Error)],
                 });
                 return;
             }
@@ -146,7 +146,7 @@ export class LyricsCommand extends KoosCommand {
                         .setTitle(`${cutText(song.title, 128)}`)
                         .setThumbnail(song.thumbnail)
                         .setURL(song.url)
-                        .setColor(EmbedColor.Default)
+                        .setColor(KoosColor.Default)
                 );
                 return prev;
             }, []);
@@ -212,12 +212,12 @@ export class LyricsCommand extends KoosCommand {
     }
 
     private async lyrics(query?: string) {
-        if (!query) return { embed: new EmbedBuilder().setDescription("Please provide a song title.").setColor(EmbedColor.Error) };
+        if (!query) return { embed: new EmbedBuilder().setDescription("Please provide a song title.").setColor(KoosColor.Error) };
         let result = await this.container.genius.songs.search(query);
 
         result = result.slice(0, 10);
 
-        if (isNullishOrEmpty(result)) return { embed: new EmbedBuilder().setDescription("No result").setColor(EmbedColor.Error) };
+        if (isNullishOrEmpty(result)) return { embed: new EmbedBuilder().setDescription("No result").setColor(KoosColor.Error) };
 
         // const description = result.map(({ fullTitle, url }, i) => `**${i + 1}.** [${fullTitle}](${url})`);
         const options: SelectMenuComponentOptionData[] = result.map((song) => ({
@@ -235,7 +235,7 @@ export class LyricsCommand extends KoosCommand {
         return {
             embed: new EmbedBuilder()
                 .setDescription(`There are ${result.length} ${pluralize("result", result.length)}`)
-                .setColor(EmbedColor.Default),
+                .setColor(KoosColor.Default),
             selectMenu,
         };
     }

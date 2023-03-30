@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { Message, EmbedBuilder } from "discord.js";
@@ -27,7 +27,7 @@ export class StopCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (!player) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -41,7 +41,7 @@ export class StopCommand extends KoosCommand {
 
         if (!player) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
             });
         }
 
@@ -52,6 +52,6 @@ export class StopCommand extends KoosCommand {
         player.queue.clear();
         player.shoukaku.stopTrack();
 
-        return new EmbedBuilder().setDescription("Stopped playback and cleared the queue").setColor(EmbedColor.Default);
+        return new EmbedBuilder().setDescription("Stopped playback and cleared the queue").setColor(KoosColor.Default);
     }
 }

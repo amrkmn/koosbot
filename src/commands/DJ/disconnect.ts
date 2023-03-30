@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { Message, EmbedBuilder } from "discord.js";
@@ -28,7 +28,7 @@ export class DisconnectCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (!player) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -42,7 +42,7 @@ export class DisconnectCommand extends KoosCommand {
 
         if (!player) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
             });
         }
 
@@ -51,6 +51,6 @@ export class DisconnectCommand extends KoosCommand {
 
     private disconnect(player: KazagumoPlayer) {
         player.destroy();
-        return new EmbedBuilder().setDescription(`Destroyed the player and left the voice channel`).setColor(EmbedColor.Default);
+        return new EmbedBuilder().setDescription(`Destroyed the player and left the voice channel`).setColor(KoosColor.Default);
     }
 }

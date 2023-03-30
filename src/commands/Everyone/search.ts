@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { convertTime, cutText, mins, sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
@@ -48,7 +48,7 @@ export class SearchCommand extends KoosCommand {
 
         if (!query)
             return interaction.reply({
-                embeds: [{ description: "Please provide an URL or search query", color: EmbedColor.Error }],
+                embeds: [{ description: "Please provide an URL or search query", color: KoosColor.Error }],
                 ephemeral: true,
             });
 
@@ -60,7 +60,7 @@ export class SearchCommand extends KoosCommand {
         const { kazagumo } = this.container;
         const query = await args.rest("string").catch(() => undefined);
         if (!query)
-            return send(message, { embeds: [{ description: "Please provide an URL or search query", color: EmbedColor.Error }] });
+            return send(message, { embeds: [{ description: "Please provide an URL or search query", color: KoosColor.Error }] });
 
         await this.search(kazagumo, message, query);
     }
@@ -75,7 +75,7 @@ export class SearchCommand extends KoosCommand {
         tracks = type === "PLAYLIST" ? tracks : tracks.slice(0, 15);
 
         if (isNullishOrEmpty(tracks)) {
-            const embed = new EmbedBuilder().setDescription(`No result for that query.`).setColor(EmbedColor.Error);
+            const embed = new EmbedBuilder().setDescription(`No result for that query.`).setColor(KoosColor.Error);
             message instanceof CommandInteraction
                 ? await message.followUp({ embeds: [embed] })
                 : await send(message, { embeds: [embed] });
@@ -105,7 +105,7 @@ export class SearchCommand extends KoosCommand {
             .setDescription(
                 type === "PLAYLIST" ? `Here is the result` : `There are ${tracks.length} ${pluralize("result", tracks.length)}`
             )
-            .setColor(EmbedColor.Default);
+            .setColor(KoosColor.Default);
         const row = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(selectMenu);
         const msg =
             message instanceof CommandInteraction
@@ -126,7 +126,7 @@ export class SearchCommand extends KoosCommand {
             try {
                 const userOption = Number(interaction.values.at(0));
                 if (isNaN(userOption) && interaction.values.at(0) === "cancel") {
-                    interaction.followUp({ embeds: [{ description: `Canceled the search`, color: EmbedColor.Default }] });
+                    interaction.followUp({ embeds: [{ description: `Canceled the search`, color: KoosColor.Default }] });
                     collector.stop("cancel");
                     return;
                 }
@@ -146,7 +146,7 @@ export class SearchCommand extends KoosCommand {
                             embeds: [
                                 {
                                     description: `I cannot join your voice channel. It seem like I don't have the right permissions`,
-                                    color: EmbedColor.Error,
+                                    color: KoosColor.Error,
                                 },
                             ],
                         });
@@ -168,7 +168,7 @@ export class SearchCommand extends KoosCommand {
                                 type === "PLAYLIST"
                                     ? `Queued playlist ${title} with ${tracks.length} ${pluralize("track", tracks.length)}`
                                     : `Queued ${title} at position #${Number(player?.queue.totalSize ?? 0)}`,
-                            color: EmbedColor.Default,
+                            color: KoosColor.Default,
                         },
                     ],
                 });
@@ -200,7 +200,7 @@ export class SearchCommand extends KoosCommand {
                         selectMenu.setPlaceholder("Something went wrong").setDisabled(true)
                     );
                     msg.edit({
-                        embeds: [{ description: `Something went wrong when trying to add track to queue.`, color: EmbedColor.Error }],
+                        embeds: [{ description: `Something went wrong when trying to add track to queue.`, color: KoosColor.Error }],
                         components: [errorRow],
                     });
                     break;

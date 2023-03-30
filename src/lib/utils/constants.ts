@@ -7,7 +7,7 @@ export const regex = {
     spotify: /^(?:https:\/\/open\.spotify\.com\/(?:user\/[A-Za-z0-9]+\/)?|spotify:)(album|playlist|track)(?:[/:])([A-Za-z0-9]+).*$/g,
 };
 
-export const EmbedColor = {
+export const KoosColor = {
     Error: 0xf21100,
     Success: 0x3fb97c,
     Warn: 0xffb132,

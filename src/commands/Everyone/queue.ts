@@ -1,6 +1,6 @@
 import { KoosCommand } from "#lib/extensions";
 import { convertTime, pagination } from "#utils/functions";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply } from "@sapphire/plugin-editable-commands";
@@ -32,7 +32,7 @@ export class QueueCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -48,7 +48,7 @@ export class QueueCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
             });
         }
 
@@ -83,7 +83,7 @@ export class QueueCommand extends KoosCommand {
                     `
                 )
                 .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
-                .setColor(EmbedColor.Default);
+                .setColor(KoosColor.Default);
 
             return [embed];
         }
@@ -119,7 +119,7 @@ export class QueueCommand extends KoosCommand {
                         `
                     )
                     .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
-                    .setColor(EmbedColor.Default)
+                    .setColor(KoosColor.Default)
             );
         }
 

@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
@@ -42,12 +42,12 @@ export class VolumeCommand extends KoosCommand {
 
         if (!player) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
             });
         }
         if (input && (input > 200 || input < 1))
             return send(message, {
-                embeds: [{ description: `The volume may not be less than 0 or more than 200`, color: EmbedColor.Error }],
+                embeds: [{ description: `The volume may not be less than 0 or more than 200`, color: KoosColor.Error }],
             });
 
         send(message, { embeds: [await this.volume(player, input)] });
@@ -58,11 +58,11 @@ export class VolumeCommand extends KoosCommand {
 
         if (typeof input === "undefined") {
             let volume = player.volume * 100;
-            return new EmbedBuilder().setDescription(`Current volume is \`${volume}%\``).setColor(EmbedColor.Default);
+            return new EmbedBuilder().setDescription(`Current volume is \`${volume}%\``).setColor(KoosColor.Default);
         }
 
         player.setVolume(input);
         await db.guild.update({ where: { id: player.guildId }, data: { volume: input } });
-        return new EmbedBuilder().setDescription(`Changed the volume to \`${player.volume * 100}%\``).setColor(EmbedColor.Default);
+        return new EmbedBuilder().setDescription(`Changed the volume to \`${player.volume * 100}%\``).setColor(KoosColor.Default);
     }
 }

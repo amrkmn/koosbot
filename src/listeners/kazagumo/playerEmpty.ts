@@ -1,5 +1,5 @@
 import { envParseString } from "@skyra/env-utilities";
-import { EmbedColor } from "#utils/constants";
+import { KoosColor } from "#utils/constants";
 import { time } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
@@ -64,7 +64,7 @@ export class ClientListener extends Listener {
                                 .setDescription(
                                     `No tracks have been playing for the past ${ms(this.leaveAfter, { long: true })}, leaving.`
                                 )
-                                .setColor(EmbedColor.Error),
+                                .setColor(KoosColor.Error),
                         ],
                     });
             }
