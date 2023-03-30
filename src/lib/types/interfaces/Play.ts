@@ -4,7 +4,7 @@ import { Message, VoiceBasedChannel } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 
 export interface PlayOptions {
-    message: Message | KoosCommand.ChatInputInteraction;
+    message: Message | KoosCommand.ChatInputCommandInteraction;
     channel: VoiceBasedChannel;
     data: Guild | null;
     player?: KazagumoPlayer;

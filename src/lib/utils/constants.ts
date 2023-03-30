@@ -7,14 +7,14 @@ export const regex = {
     spotify: /^(?:https:\/\/open\.spotify\.com\/(?:user\/[A-Za-z0-9]+\/)?|spotify:)(album|playlist|track)(?:[/:])([A-Za-z0-9]+).*$/g,
 };
 
-export const embedColor = {
-    error: 0xf21100,
-    success: 0x3fb97c,
-    warn: 0xffb132,
-    default: 0xda6c56,
+export const EmbedColor = {
+    Error: 0xf21100,
+    Success: 0x3fb97c,
+    Warn: 0xffb132,
+    Default: 0xda6c56,
 };
 
-export const PermissionLevels = {
+export const PermissionLevel = {
     Everyone: 0,
     DJ: 3,
     Administrator: 6,
@@ -22,7 +22,7 @@ export const PermissionLevels = {
     BotOwner: 10,
 };
 
-export const Emojis = {
+export const Emoji = {
     Yes: "<:yes:896571151315255366>",
     No: "<:no:926367736794341428>",
     Blank: "<:blank:1020712225616445561> ",
@@ -34,7 +34,7 @@ export const Emojis = {
     Loading: "<a:loading:1027594528460386495>",
 };
 
-export const Buttons = {
+export const Button = {
     PauseOrResume: "buttonPauseOrResume",
     Skip: "buttonSkip",
     Stop: "buttonStop",

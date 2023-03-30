@@ -1,11 +1,22 @@
-import { Buttons } from "#lib/utils/constants";
+import { Button } from "#lib/utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
-import { Listener, Events } from "@sapphire/framework";
-import { Message, CommandInteraction, MessageButton, MessageActionRow, MessageEmbed, GuildMember, Guild } from "discord.js";
+import { Listener, Events, container } from "@sapphire/framework";
+import {
+    Message,
+    CommandInteraction,
+    ButtonBuilder,
+    ActionRowBuilder,
+    EmbedBuilder,
+    GuildMember,
+    Guild,
+    ButtonStyle,
+    Interaction,
+    ButtonInteraction,
+} from "discord.js";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { KazagumoPlayer } from "kazagumo";
 import { convertTime } from "#utils/functions";
-import { embedColor } from "#utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { stripIndents } from "common-tags";
 
 @ApplyOptions<Listener.Options>({
@@ -13,7 +24,7 @@ import { stripIndents } from "common-tags";
     event: Events.InteractionCreate,
 })
 export class ClientListener extends Listener {
-    public async run(interaction: CommandInteraction) {
+    public async run(interaction: Interaction) {
         if (!interaction.isButton()) return;
         const player = this.container.kazagumo.getPlayer(interaction.guildId!);
         const data = await this.container.db.guild.findUnique({ where: { id: interaction.guildId! } });
@@ -23,14 +34,14 @@ export class ClientListener extends Listener {
         const id = interaction.customId as "buttonPauseOrResume" | "buttonSkip" | "buttonStop" | "buttonShowQueue";
         const checkMember = this.checkMember(interaction.guild!, interaction.member as GuildMember);
 
-        if (Object.values(Buttons).includes(id)) await interaction.deferUpdate();
+        if (Object.values(Button).includes(id)) await interaction.deferUpdate();
         if (!isNullish(checkMember)) return interaction.followUp({ embeds: [checkMember], ephemeral: true });
         if (
             ["buttonPauseOrResume", "buttonSkip", "buttonStop"].includes(id) && //
             !this.checkDJ(interaction, player, data.dj)
         )
             return interaction.followUp({
-                embeds: [{ description: `This button can only be use by DJ.`, color: embedColor.error }],
+                embeds: [{ description: `This button can only be use by DJ.`, color: EmbedColor.Error }],
                 ephemeral: true,
             });
 
@@ -50,10 +61,10 @@ export class ClientListener extends Listener {
                 const queue = await this.queue(player);
                 const embed = queue[0];
 
-                if (embed.footer?.text) {
+                if (embed.data.footer?.text) {
                     embed.setFooter({
-                        text: `Page 1/${queue.length} | ${embed.footer.text}`,
-                        iconURL: embed.footer.iconURL,
+                        text: `Page 1/${queue.length} | ${embed.data.footer?.text}`,
+                        iconURL: embed.data.footer?.icon_url,
                     });
                 }
 
@@ -79,10 +90,10 @@ export class ClientListener extends Listener {
                 //     }, []);
                 //     return buttons;
                 // };
-                // const components = (state = false) => new MessageActionRow().addComponents(generateButtons(state));
+                // const components = (state = false) => new ActionRowBuilder().addComponents(generateButtons(state));
                 // const changeFooter = () => {
                 //     const embed = queue[currentPage - 1];
-                //     const newEmbed = new MessageEmbed(embed);
+                //     const newEmbed = new EmbedBuilder(embed);
                 //     if (embed?.footer?.text) {
                 //         return newEmbed.setFooter({
                 //             text: `Page ${currentPage}/${queue.length} | ${embed.footer.text}`,
@@ -130,24 +141,24 @@ export class ClientListener extends Listener {
     }
 
     private checkMember(guild: Guild | null, member: GuildMember) {
-        if (!guild) return new MessageEmbed({ description: "You cannot run this message command in DMs.", color: embedColor.error });
+        if (!guild) return new EmbedBuilder({ description: "You cannot run this message command in DMs.", color: EmbedColor.Error });
         if (
             !isNullish(guild.members.me) &&
             member.voice.channel !== null && //
             guild.members.me.voice.channel !== null &&
             member.voice.channelId !== guild.members.me!.voice.channelId
         )
-            return new MessageEmbed({
+            return new EmbedBuilder({
                 description: `You aren't connected to the same voice channel as I am. I'm currently connected to ${guild.members.me.voice.channel}`,
-                color: embedColor.error,
+                color: EmbedColor.Error,
             });
 
         return member.voice.channel !== null //
             ? undefined
-            : new MessageEmbed({ description: "You aren't connected to a voice channel.", color: embedColor.error });
+            : new EmbedBuilder({ description: "You aren't connected to a voice channel.", color: EmbedColor.Error });
     }
 
-    private checkDJ(message: Message | CommandInteraction, player: KazagumoPlayer, dj: string[]) {
+    private checkDJ(message: Message | ButtonInteraction, player: KazagumoPlayer, dj: string[]) {
         const member = message.member as GuildMember;
 
         // const current = player.queue.current!;
@@ -163,11 +174,11 @@ export class ClientListener extends Listener {
     }
 
     private buttons(paused = false) {
-        return new MessageActionRow().setComponents(
-            new MessageButton({ style: "SUCCESS", label: !paused ? "Pause" : "Resume", customId: Buttons.PauseOrResume }),
-            new MessageButton({ style: "PRIMARY", label: "Skip", customId: Buttons.Skip }),
-            new MessageButton({ style: "DANGER", label: "Stop", customId: Buttons.Stop }),
-            new MessageButton({ style: "SECONDARY", label: "Show Queue", customId: Buttons.ShowQueue })
+        return new ActionRowBuilder<ButtonBuilder>().setComponents(
+            new ButtonBuilder({ style: ButtonStyle.Success, label: !paused ? "Pause" : "Resume", customId: Button.PauseOrResume }),
+            new ButtonBuilder({ style: ButtonStyle.Primary, label: "Skip", customId: Button.Skip }),
+            new ButtonBuilder({ style: ButtonStyle.Danger, label: "Stop", customId: Button.Stop }),
+            new ButtonBuilder({ style: ButtonStyle.Secondary, label: "Show Queue", customId: Button.ShowQueue })
         );
     }
 
@@ -188,7 +199,7 @@ export class ClientListener extends Listener {
                 : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
 
         if (player.queue.isEmpty) {
-            const embed = new MessageEmbed()
+            const embed = new EmbedBuilder()
                 .setDescription(
                     stripIndents`
                         __Now playing:__
@@ -199,7 +210,7 @@ export class ClientListener extends Listener {
                     `
                 )
                 .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
-                .setColor(embedColor.default);
+                .setColor(EmbedColor.Default);
 
             return [embed];
         }
@@ -224,7 +235,7 @@ export class ClientListener extends Listener {
         for (let list of queueList) {
             let upNext = list.join("\n");
             embeds.push(
-                new MessageEmbed()
+                new EmbedBuilder()
                     .setDescription(
                         stripIndents`
                             __Now playing:__
@@ -235,7 +246,7 @@ export class ClientListener extends Listener {
                         `
                     )
                     .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
-                    .setColor(embedColor.default)
+                    .setColor(EmbedColor.Default)
             );
         }
 

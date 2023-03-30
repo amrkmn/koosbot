@@ -1,8 +1,8 @@
-import { embedColor } from "#utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
-import { Message, MessageEmbed } from "discord.js";
+import { Message, EmbedBuilder } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 import { isNullish } from "@sapphire/utilities";
 import { KoosCommand } from "#lib/extensions";
@@ -38,7 +38,7 @@ export class RemoveCommand extends KoosCommand {
         );
     }
 
-    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(interaction.guildId!)!;
         const position = interaction.options.getNumber("position");
@@ -47,12 +47,12 @@ export class RemoveCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (isNullish(position))
             return interaction.reply({
-                embeds: [{ description: "Please specify the song positions to remove.", color: embedColor.error }],
+                embeds: [{ description: "Please specify the song positions to remove.", color: EmbedColor.Error }],
                 ephemeral: true,
             });
         if (!player || (player && !player.queue.current))
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
                 ephemeral: true,
             });
 
@@ -67,12 +67,12 @@ export class RemoveCommand extends KoosCommand {
 
         if (isNullish(position)) {
             return reply(message, {
-                embeds: [{ description: "Please specify the song positions to remove.", color: embedColor.error }],
+                embeds: [{ description: "Please specify the song positions to remove.", color: EmbedColor.Error }],
             });
         }
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
             });
         }
 
@@ -84,18 +84,18 @@ export class RemoveCommand extends KoosCommand {
         if (to && to < position) to = undefined;
 
         if (position > player.queue.size || (to && to > player.queue.size))
-            return new MessageEmbed({
+            return new EmbedBuilder({
                 description: `The queue doesn't have that many tracks (Total tracks: ${player.queue.size})`,
-                color: embedColor.error,
+                color: EmbedColor.Error,
             });
         if (position < 1)
-            return new MessageEmbed({
+            return new EmbedBuilder({
                 description: `The position number must be from 1 to ${player.queue.size}`,
-                color: embedColor.error,
+                color: EmbedColor.Error,
             });
         if (to && to <= player.queue.size && to > position) {
             player.queue.splice(position - 1, to - position + 1);
-            return new MessageEmbed({ description: `Removed song from index ${position} to ${to}`, color: embedColor.default });
+            return new EmbedBuilder({ description: `Removed song from index ${position} to ${to}`, color: EmbedColor.Default });
         }
 
         const track = player.queue[position - 1];
@@ -105,6 +105,6 @@ export class RemoveCommand extends KoosCommand {
                 : `[${track.title} by ${track.author}](${track.uri})`;
         player.queue.remove(position - 1);
 
-        return new MessageEmbed({ description: `Removed ${title} from the queue`, color: embedColor.default });
+        return new EmbedBuilder({ description: `Removed ${title} from the queue`, color: EmbedColor.Default });
     }
 }

@@ -1,8 +1,8 @@
 import { KoosCommand } from "#lib/extensions";
-import { embedColor } from "#utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
-import { Message, MessageEmbed } from "discord.js";
+import { Message, EmbedBuilder } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
@@ -21,14 +21,14 @@ export class ClearCommand extends KoosCommand {
         );
     }
 
-    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${interaction.guildId}`);
 
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -42,7 +42,7 @@ export class ClearCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
             });
         }
 
@@ -51,10 +51,10 @@ export class ClearCommand extends KoosCommand {
 
     private clear(player: KazagumoPlayer) {
         if (player.queue.isEmpty)
-            return new MessageEmbed({ description: `There is currently no song in the queue.`, color: embedColor.error });
+            return new EmbedBuilder({ description: `There is currently no song in the queue.`, color: EmbedColor.Error });
 
         player.queue.clear();
 
-        return new MessageEmbed({ description: `The queue has been cleared.`, color: embedColor.default });
+        return new EmbedBuilder({ description: `The queue has been cleared.`, color: EmbedColor.Default });
     }
 }

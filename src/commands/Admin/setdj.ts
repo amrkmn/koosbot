@@ -1,18 +1,18 @@
 import { KoosCommand } from "#lib/extensions";
-import { embedColor, zws } from "#utils/constants";
+import { EmbedColor, zws } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
-import { MessageEmbed, Message, Role } from "discord.js";
+import { EmbedBuilder, Message, Role } from "discord.js";
 // import { isNullishOrEmpty } from "@sapphire/utilities";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { isNullishOrEmpty } from "@sapphire/utilities";
 import { removeItem, sendLoadingMessage } from "#utils/functions";
-import { PermissionLevels } from "#lib/utils/constants";
+import { PermissionLevel } from "#lib/utils/constants";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Add or remove a DJ role.",
     aliases: ["dj"],
-    permissionLevels: PermissionLevels.Administrator,
+    permissionLevels: PermissionLevel.Administrator,
     usage: {
         types: [{ type: "role" }],
     },
@@ -34,7 +34,7 @@ export class SetDJCommand extends KoosCommand {
         );
     }
 
-    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         const role = interaction.options.getRole("role") as Role | null;
         if (role) await interaction.deferReply();
         if (!role) return interaction.reply({ embeds: [await this.setdj(interaction.guildId!, undefined)] });
@@ -46,7 +46,7 @@ export class SetDJCommand extends KoosCommand {
         await sendLoadingMessage(message);
         const role = await args.pick("role").catch(() => undefined);
         if (!role && args.finished) return send(message, { embeds: [await this.setdj(message.guildId!, undefined)] });
-        if (!role) return send(message, { embeds: [{ description: `Role not found.`, color: embedColor.error }] });
+        if (!role) return send(message, { embeds: [{ description: `Role not found.`, color: EmbedColor.Error }] });
 
         send(message, { embeds: [await this.setdj(message.guildId!, role.id)] });
     }
@@ -54,13 +54,13 @@ export class SetDJCommand extends KoosCommand {
     private async setdj(guildId: string, roleId?: string) {
         const { db } = this.container;
         const data = await db.guild.findUnique({ where: { id: guildId } });
-        if (!data) return new MessageEmbed().setDescription(`There is no DJ role set.`).setColor(embedColor.warn);
+        if (!data) return new EmbedBuilder().setDescription(`There is no DJ role set.`).setColor(EmbedColor.Warn);
 
         const dj = data.dj.map((id) => `<@&${id}>`);
         if (!roleId && isNullishOrEmpty(dj))
-            return new MessageEmbed().setDescription(`There is no DJ role set.`).setColor(embedColor.warn);
+            return new EmbedBuilder().setDescription(`There is no DJ role set.`).setColor(EmbedColor.Warn);
         if (!roleId)
-            return new MessageEmbed().setDescription(`**__Configured DJ role:__**\n\n${dj.join("\n")}`).setColor(embedColor.default);
+            return new EmbedBuilder().setDescription(`**__Configured DJ role:__**\n\n${dj.join("\n")}`).setColor(EmbedColor.Default);
 
         const isNewRole = data.dj.includes(roleId) ? false : true;
         const roles = isNewRole //
@@ -73,8 +73,8 @@ export class SetDJCommand extends KoosCommand {
             create: { id: guildId, dj: { set: roles } },
         });
 
-        return new MessageEmbed()
+        return new EmbedBuilder()
             .setDescription(isNewRole ? `Added <@&${roleId}> to the DJ roles` : `Removed <@&${roleId}> from the DJ roles.`)
-            .setColor(embedColor.default);
+            .setColor(EmbedColor.Default);
     }
 }

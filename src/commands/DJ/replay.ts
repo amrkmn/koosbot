@@ -1,8 +1,8 @@
 import { KoosCommand } from "#lib/extensions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { KazagumoPlayer } from "kazagumo";
-import { MessageEmbed, Message } from "discord.js";
-import { embedColor } from "#utils/constants";
+import { EmbedBuilder, Message } from "discord.js";
+import { EmbedColor } from "#utils/constants";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 
 @ApplyOptions<KoosCommand.Options>({
@@ -21,14 +21,14 @@ export class ReplayCommand extends KoosCommand {
         );
     }
 
-    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${interaction.guildId}`);
 
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -42,7 +42,7 @@ export class ReplayCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
             });
         }
 
@@ -58,6 +58,6 @@ export class ReplayCommand extends KoosCommand {
 
         player.shoukaku.seekTo(0);
 
-        return new MessageEmbed().setDescription(`Starting over ${title}`).setColor(embedColor.default);
+        return new EmbedBuilder().setDescription(`Starting over ${title}`).setColor(EmbedColor.Default);
     }
 }

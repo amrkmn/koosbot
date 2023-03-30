@@ -1,5 +1,5 @@
 import { Command, PreconditionEntryResolvable, SapphireClient, UserPermissionsPrecondition } from "@sapphire/framework";
-import { PermissionLevels } from "#lib/utils/constants";
+import { PermissionLevel } from "#lib/utils/constants";
 import { isString } from "#utils/functions";
 import { isNullish } from "@sapphire/utilities";
 import { Time } from "@sapphire/timestamp";
@@ -41,7 +41,7 @@ export class KoosCommand extends Command {
         options.requiredUserPermissions = options.permissions;
 
         this.client = this.container.client;
-        this.permissionLevel = options.permissionLevels ?? PermissionLevels.Everyone;
+        this.permissionLevel = options.permissionLevels ?? PermissionLevel.Everyone;
         this.hidden = options.hidden ?? false;
         this.slashOnly = options.slashOnly ?? false;
         this.usage =
@@ -84,10 +84,10 @@ export class KoosCommand extends Command {
 
     protected static resolvePermissionLevelPreCondition(permissionLevel = 0): PreconditionEntryResolvable | null {
         if (permissionLevel === 0) return null;
-        if (permissionLevel <= PermissionLevels.Administrator) {
+        if (permissionLevel <= PermissionLevel.Administrator) {
             return ["OwnerOnly", "Administrator"];
         }
-        if (permissionLevel <= PermissionLevels.BotOwner) return "OwnerOnly";
+        if (permissionLevel <= PermissionLevel.BotOwner) return "OwnerOnly";
         return null;
     }
 }
@@ -103,9 +103,9 @@ export namespace KoosCommand {
         cooldown?: number;
         slashOnly?: boolean;
     };
-    export type ChatInputInteraction = Command.ChatInputInteraction;
+    export type ChatInputCommandInteraction = Command.ChatInputCommandInteraction;
     export type AutocompleteInteraction = Command.AutocompleteInteraction;
-    export type ContextMenuInteraction = Command.ContextMenuInteraction;
+    export type ContextMenuCommandInteraction = Command.ContextMenuCommandInteraction;
     export type Context = Command.Context;
     export type JSON = Command.JSON;
     export type Registry = Command.Registry;

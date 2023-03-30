@@ -1,8 +1,8 @@
 import { Args } from "@sapphire/framework";
 import { ApplyOptions } from "@sapphire/decorators";
-import { ApplicationCommandOptionChoiceData, GuildMember, Message, MessageEmbed, VoiceBasedChannel } from "discord.js";
+import { ApplicationCommandOptionChoiceData, GuildMember, Message, EmbedBuilder, VoiceBasedChannel } from "discord.js";
 import { send } from "@sapphire/plugin-editable-commands";
-import { embedColor } from "#utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
 import { filterNullishAndEmpty, isNullish } from "@sapphire/utilities";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
@@ -37,7 +37,7 @@ export class PlayCommand extends KoosCommand {
         );
     }
 
-    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         await interaction.deferReply();
 
         const { kazagumo, db } = this.container;
@@ -68,7 +68,7 @@ export class PlayCommand extends KoosCommand {
         const query = attachment ? attachment.proxyURL : await args.rest("string").catch(() => undefined);
         if (!query)
             return await send(message, {
-                embeds: [{ description: "Please provide an URL or search query", color: embedColor.error }],
+                embeds: [{ description: "Please provide an URL or search query", color: EmbedColor.Error }],
             });
 
         const channel = message.member?.voice.channel as VoiceBasedChannel;
@@ -116,13 +116,13 @@ export class PlayCommand extends KoosCommand {
         const { kazagumo } = this.container;
         const result = await kazagumo.search(query, { requester: message.member }).catch(() => undefined);
         if (!result || !result.tracks.length)
-            return new MessageEmbed({ description: `Something went wrong!`, color: embedColor.error });
+            return new EmbedBuilder({ description: `Something went wrong!`, color: EmbedColor.Error });
 
         if (!player) {
             if (!canJoinVoiceChannel(channel))
-                return new MessageEmbed()
+                return new EmbedBuilder()
                     .setDescription(`I cannot join your voice channel. It seem like I don't have the right permissions.`)
-                    .setColor(embedColor.error);
+                    .setColor(EmbedColor.Error);
             player ??= await kazagumo.createPlayer({
                 guildId: message.guildId!,
                 textId: message.channelId!,
@@ -159,6 +159,6 @@ export class PlayCommand extends KoosCommand {
 
         if (!player.playing && !player.paused) player.play();
 
-        return new MessageEmbed({ description: msg, color: embedColor.default });
+        return new EmbedBuilder({ description: msg, color: EmbedColor.Default });
     }
 }

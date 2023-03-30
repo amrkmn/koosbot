@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { embedColor } from "#utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { databasePing } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { isMessageInstance } from "@sapphire/discord.js-utilities";
@@ -20,10 +20,10 @@ export class PingCommand extends KoosCommand {
         );
     }
 
-    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         await interaction.deferReply();
         const [msg, database] = await Promise.all([
-            (await interaction.followUp({ embeds: [{ description: "Ping?", color: embedColor.default }] })) as Message,
+            (await interaction.followUp({ embeds: [{ description: "Ping?", color: EmbedColor.Default }] })) as Message,
             databasePing(),
         ]);
 
@@ -32,13 +32,13 @@ export class PingCommand extends KoosCommand {
             const ping = Math.round(this.container.client.ws.ping);
             const content = `Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms. Database: ${Math.round(database)}ms.)`;
 
-            interaction.editReply({ embeds: [{ description: content, color: embedColor.default }] });
+            interaction.editReply({ embeds: [{ description: content, color: EmbedColor.Default }] });
         }
     }
 
     public async messageRun(message: Message) {
         const [msg, database] = await Promise.all([
-            send(message, { embeds: [{ description: "Ping?", color: embedColor.default }] }),
+            send(message, { embeds: [{ description: "Ping?", color: EmbedColor.Default }] }),
             databasePing(),
         ]);
 
@@ -46,6 +46,6 @@ export class PingCommand extends KoosCommand {
         const ping = Math.round(this.container.client.ws.ping);
         const content = `Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms. Database: ${Math.round(database)}ms.)`;
 
-        return send(message, { embeds: [{ description: content, color: embedColor.default }] });
+        return send(message, { embeds: [{ description: content, color: EmbedColor.Default }] });
     }
 }

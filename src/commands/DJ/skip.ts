@@ -1,9 +1,9 @@
 import { KoosCommand } from "#lib/extensions";
-import { embedColor } from "#utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
-import { Message, MessageEmbed } from "discord.js";
+import { Message, EmbedBuilder } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 import pluralize from "pluralize";
 
@@ -33,7 +33,7 @@ export class SkipCommand extends KoosCommand {
         );
     }
 
-    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         const { kazagumo } = this.container;
         const to = interaction.options.getNumber("to") ?? undefined;
         const player = kazagumo.getPlayer(interaction.guildId!)!;
@@ -41,7 +41,7 @@ export class SkipCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -56,7 +56,7 @@ export class SkipCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
             });
         }
 
@@ -64,12 +64,12 @@ export class SkipCommand extends KoosCommand {
     }
 
     private async skip(player: KazagumoPlayer, amount?: number) {
-        let embed: MessageEmbed;
+        let embed: EmbedBuilder;
         if (typeof amount === "number" && amount > 1) {
             if (amount > player.queue.length)
-                return new MessageEmbed().setDescription("Cannot skip more than the queue length.").setColor(embedColor.error);
+                return new EmbedBuilder().setDescription("Cannot skip more than the queue length.").setColor(EmbedColor.Error);
             player.queue.splice(0, amount - 1);
-            embed = new MessageEmbed().setDescription(`Skipped ${amount} ${pluralize("song", amount)}`).setColor(embedColor.success);
+            embed = new EmbedBuilder().setDescription(`Skipped ${amount} ${pluralize("song", amount)}`).setColor(EmbedColor.Success);
         } else {
             const current = player.queue.current!;
             const title =
@@ -77,9 +77,9 @@ export class SkipCommand extends KoosCommand {
                     ? `[${current.title}](${current.uri})`
                     : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
 
-            embed = new MessageEmbed() //
+            embed = new EmbedBuilder() //
                 .setDescription(`${title} has been skipped`)
-                .setColor(embedColor.success);
+                .setColor(EmbedColor.Success);
         }
 
         player.skip();

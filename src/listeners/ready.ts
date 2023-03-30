@@ -1,8 +1,9 @@
-import { envParseString } from "@skyra/env-utilities";
 import type { KoosClient } from "#lib/extensions/KoosClient";
+import { envParseString } from "@skyra/env-utilities";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, Store } from "@sapphire/framework";
 import { blue, yellow } from "colorette";
+import { OAuth2Scopes, ActivityType } from "discord.js";
 
 const dev = envParseString("NODE_ENV") !== "production";
 
@@ -14,23 +15,23 @@ export class ClientListener extends Listener {
     public async run(client: KoosClient) {
         client.logger.info(
             client.generateInvite({
-                scopes: ["bot"],
+                scopes: [OAuth2Scopes.Bot],
                 permissions: [
-                    "CREATE_INSTANT_INVITE",
-                    "ATTACH_FILES",
-                    "CONNECT",
-                    "EMBED_LINKS",
-                    "MANAGE_MESSAGES",
-                    "SEND_MESSAGES",
-                    "READ_MESSAGE_HISTORY",
-                    "ADD_REACTIONS",
-                    "USE_EXTERNAL_EMOJIS",
-                    "SPEAK",
-                    "VIEW_AUDIT_LOG",
+                    "CreateInstantInvite",
+                    "AttachFiles",
+                    "Connect",
+                    "EmbedLinks",
+                    "ManageMessages",
+                    "SendMessages",
+                    "ReadMessageHistory",
+                    "AddReactions",
+                    "UseExternalEmojis",
+                    "Speak",
+                    "ViewAuditLog",
                 ],
             })
         );
-        client.user?.setActivity({ type: "LISTENING", name: `/play` });
+        client.user?.setActivity({ type: ActivityType.Listening, name: `/play` });
         client.logger.info(`Logged in as ${client.user?.tag}`);
         this.printStoreDebugInformation();
 

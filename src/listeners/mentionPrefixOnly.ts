@@ -1,4 +1,4 @@
-import { embedColor } from "#utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
@@ -12,7 +12,7 @@ export class UserListener extends Listener {
             embeds: [
                 {
                     description: prefix ? `My prefix in this guild is: \`${prefix}\`` : "You do not need a prefix in DMs.",
-                    color: embedColor.default,
+                    color: EmbedColor.Default,
                 },
             ],
         });

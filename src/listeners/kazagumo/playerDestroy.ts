@@ -3,7 +3,7 @@ import { Listener, container } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
 import { cyan } from "colorette";
 import { oneLine } from "common-tags";
-import { Message, MessageButton } from "discord.js";
+import { Message, ButtonBuilder, ButtonStyle, ComponentType } from "discord.js";
 import { Events, KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<Listener.Options>({
@@ -26,14 +26,16 @@ export class ClientListener extends Listener {
         const npMessage = player.data.get("nowPlayingMessage");
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
 
-        if (channel && channel.isText() && npMessage instanceof Message) {
+        if (channel && channel.isTextBased() && npMessage instanceof Message) {
             const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id).catch(() => null));
 
             if (!isNullish(msg) && msg.editable) {
                 const row = npMessage.components;
-                const disabled = row[0].components.map((button) => (button as MessageButton).setStyle("SECONDARY").setDisabled(true));
+                const disabled = row[0].components.map((button: unknown) =>
+                    (button as ButtonBuilder).setStyle(ButtonStyle.Secondary).setDisabled(true)
+                );
 
-                msg.edit({ components: [{ type: "ACTION_ROW", components: disabled }] });
+                msg.edit({ components: [{ type: ComponentType.ActionRow, components: disabled }] });
             }
         }
     }

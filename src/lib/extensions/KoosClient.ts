@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Awaitable, container, LogLevel, SapphireClient, SapphirePrefix } from "@sapphire/framework";
 import { GatewayIntentBits } from "discord-api-types/v9";
-import { Guild, Message } from "discord.js";
+import { Guild, Message, Partials } from "discord.js";
 import { resolve } from "path";
 import { Kazagumo, Plugins } from "kazagumo";
 import { Connectors, NodeOption, Shoukaku } from "shoukaku";
@@ -25,7 +25,7 @@ export class KoosClient extends SapphireClient {
         super({
             intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates],
             logger: { level: envParseString("NODE_ENV") === "production" ? LogLevel.Info : LogLevel.Debug },
-            partials: ["CHANNEL"],
+            partials: [Partials.Channel],
             caseInsensitiveCommands: true,
             caseInsensitivePrefixes: true,
             defaultPrefix: envParseString("CLIENT_PREFIX"),

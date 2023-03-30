@@ -1,11 +1,11 @@
 import { KoosCommand } from "#lib/extensions";
-import { embedColor } from "#utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { isNullish } from "@sapphire/utilities";
-import { Message, MessageEmbed } from "discord.js";
+import { Message, EmbedBuilder } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
@@ -42,12 +42,12 @@ export class VolumeCommand extends KoosCommand {
 
         if (!player) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
             });
         }
         if (input && (input > 200 || input < 1))
             return send(message, {
-                embeds: [{ description: `The volume may not be less than 0 or more than 200`, color: embedColor.error }],
+                embeds: [{ description: `The volume may not be less than 0 or more than 200`, color: EmbedColor.Error }],
             });
 
         send(message, { embeds: [await this.volume(player, input)] });
@@ -58,11 +58,11 @@ export class VolumeCommand extends KoosCommand {
 
         if (typeof input === "undefined") {
             let volume = player.volume * 100;
-            return new MessageEmbed().setDescription(`Current volume is \`${volume}%\``).setColor(embedColor.default);
+            return new EmbedBuilder().setDescription(`Current volume is \`${volume}%\``).setColor(EmbedColor.Default);
         }
 
         player.setVolume(input);
         await db.guild.update({ where: { id: player.guildId }, data: { volume: input } });
-        return new MessageEmbed().setDescription(`Changed the volume to \`${player.volume * 100}%\``).setColor(embedColor.default);
+        return new EmbedBuilder().setDescription(`Changed the volume to \`${player.volume * 100}%\``).setColor(EmbedColor.Default);
     }
 }

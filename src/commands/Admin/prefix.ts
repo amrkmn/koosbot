@@ -1,17 +1,17 @@
 import { envParseString } from "@skyra/env-utilities";
 import { KoosCommand } from "#lib/extensions";
-import { PermissionLevels } from "#lib/utils/constants";
-import { embedColor } from "#utils/constants";
+import { PermissionLevel } from "#lib/utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { isNullish } from "@sapphire/utilities";
-import { Message, MessageEmbed } from "discord.js";
+import { Message, EmbedBuilder } from "discord.js";
 import { Args, ResultError } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { sendLoadingMessage } from "#utils/functions";
 
 @ApplyOptions<KoosCommand.Options>({
     description: `Lets you set a new prefix.`,
-    permissionLevels: PermissionLevels.Administrator,
+    permissionLevels: PermissionLevel.Administrator,
     usage: {
         types: [{ type: "new prefix", required: false }],
     },
@@ -30,7 +30,7 @@ export class PrefixCommand extends KoosCommand {
                 });
             else if (error instanceof ResultError && error.value.identifier === "stringTooLong")
                 return send(message, {
-                    embeds: [{ description: "Prefix must be shorter than 5 characters.", color: embedColor.error }],
+                    embeds: [{ description: "Prefix must be shorter than 5 characters.", color: EmbedColor.Error }],
                 });
         }
     }
@@ -45,9 +45,9 @@ export class PrefixCommand extends KoosCommand {
             else if (data.prefix === "NONE") prefix = `${envParseString("CLIENT_PREFIX")}`;
             else prefix = `${data.prefix}`;
 
-            return new MessageEmbed()
+            return new EmbedBuilder()
                 .setDescription(`Prefix in **${guildName}** is set to: \`${prefix}\``)
-                .setColor(embedColor.default);
+                .setColor(EmbedColor.Default);
         }
 
         const output = await db.guild.upsert({
@@ -57,6 +57,6 @@ export class PrefixCommand extends KoosCommand {
             select: { prefix: true },
         });
 
-        return new MessageEmbed().setDescription(`The prefix has been changed to \`${output.prefix}\``).setColor(embedColor.success);
+        return new EmbedBuilder().setDescription(`The prefix has been changed to \`${output.prefix}\``).setColor(EmbedColor.Success);
     }
 }

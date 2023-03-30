@@ -1,10 +1,10 @@
 import { envParseString } from "@skyra/env-utilities";
-import { embedColor } from "#utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { time } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
-import { Guild, Message, MessageButton, MessageEmbed } from "discord.js";
+import { Guild, Message, ButtonBuilder, EmbedBuilder, ButtonStyle, ComponentType } from "discord.js";
 import { Events, KazagumoPlayer } from "kazagumo";
 import ms from "ms";
 
@@ -27,14 +27,16 @@ export class ClientListener extends Listener {
 
         const npMessage = player.data.get("nowPlayingMessage");
 
-        if (channel && channel.isText() && npMessage instanceof Message) {
+        if (channel && channel.isTextBased() && npMessage instanceof Message) {
             const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id).catch(() => null));
 
             if (!isNullish(msg) && msg.editable) {
                 const row = npMessage.components;
-                const disabled = row[0].components.map((button) => (button as MessageButton).setStyle("SECONDARY").setDisabled(true));
+                const disabled = row[0].components.map((button: unknown) =>
+                    (button as ButtonBuilder).setStyle(ButtonStyle.Secondary).setDisabled(true)
+                );
 
-                msg.edit({ components: [{ type: "ACTION_ROW", components: disabled }] });
+                msg.edit({ components: [{ type: ComponentType.ActionRow, components: disabled }] });
             }
         }
         // if (channel.isText()) channel.send({ embeds: [{ description: "There are no more tracks", color: embedColor.error }] });
@@ -55,14 +57,14 @@ export class ClientListener extends Listener {
             if (player.queue.current) return this.cancel();
             if (player.queue.isEmpty && !isNullish(guild.members.me?.voice.channelId)) {
                 player.destroy();
-                if (channel.isText())
+                if (channel.isTextBased())
                     channel.send({
                         embeds: [
-                            new MessageEmbed()
+                            new EmbedBuilder()
                                 .setDescription(
                                     `No tracks have been playing for the past ${ms(this.leaveAfter, { long: true })}, leaving.`
                                 )
-                                .setColor(embedColor.error),
+                                .setColor(EmbedColor.Error),
                         ],
                     });
             }

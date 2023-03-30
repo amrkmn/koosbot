@@ -16,12 +16,12 @@ export class UserPrecondition extends Precondition {
         if (!guild) return this.error({ message: "You cannot run this message command in DMs." });
         if (
             member.voice.channel !== null && //
-            guild.me!.voice.channel !== null &&
-            member.voice.channelId !== guild.me!.voice.channelId
+            guild.members.me!.voice.channel !== null &&
+            member.voice.channelId !== guild.members.me!.voice.channelId
         )
             return this.error({
                 message: `You aren't connected to the same voice channel as I am`,
-                context: { channel: guild.me!.voice.channel },
+                context: { channel: guild.members.me!.voice.channel },
             });
 
         return member.voice.channel !== null //

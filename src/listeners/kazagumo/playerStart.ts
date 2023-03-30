@@ -1,10 +1,10 @@
 import { Listener, container } from "@sapphire/framework";
 import { KazagumoPlayer, KazagumoTrack, Events } from "kazagumo";
-import { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
-import { embedColor } from "#utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { convertTime } from "#utils/functions";
-import { Buttons } from "#lib/utils/constants";
+import { Button } from "#lib/utils/constants";
 import { oneLine } from "common-tags";
 
 @ApplyOptions<Listener.Options>({
@@ -23,23 +23,23 @@ export class ClientListener extends Listener {
         let title =
             track.sourceName == "youtube" ? `[${track.title}](${track.uri})` : `[${track.title} by ${track.author}](${track.uri})`;
 
-        const embed = new MessageEmbed() //
+        const embed = new EmbedBuilder() //
             .setDescription(
                 oneLine`
                     ${title} [${track.isStream ? `Live` : convertTime(Number(track.length))}]
                     ${data?.requester ? ` ~ ${track.requester}` : ""}
                 `
             )
-            .setColor(embedColor.default);
+            .setColor(EmbedColor.Default);
         const playerButtons = [
-            new MessageButton().setLabel("Pause").setCustomId(Buttons.PauseOrResume).setStyle("SUCCESS"),
-            new MessageButton().setLabel("Skip").setCustomId(Buttons.Skip).setStyle("PRIMARY"),
-            new MessageButton().setLabel("Stop").setCustomId(Buttons.Stop).setStyle("DANGER"),
-            new MessageButton().setLabel("Show Queue").setCustomId(Buttons.ShowQueue).setStyle("SECONDARY"),
+            new ButtonBuilder().setLabel("Pause").setCustomId(Button.PauseOrResume).setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setLabel("Skip").setCustomId(Button.Skip).setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setLabel("Stop").setCustomId(Button.Stop).setStyle(ButtonStyle.Danger),
+            new ButtonBuilder().setLabel("Show Queue").setCustomId(Button.ShowQueue).setStyle(ButtonStyle.Secondary),
         ];
-        const row = new MessageActionRow().setComponents(playerButtons);
+        const row = new ActionRowBuilder<ButtonBuilder>().setComponents(playerButtons);
 
-        if (channel.isText()) {
+        if (channel.isTextBased()) {
             const msg = await channel.send({ embeds: [embed], components: [row] });
             player.data.set("nowPlayingMessage", msg);
         }

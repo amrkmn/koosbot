@@ -1,7 +1,7 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { KazagumoPlayer } from "kazagumo";
-import { MessageEmbed, Message } from "discord.js";
-import { embedColor } from "#utils/constants";
+import { EmbedBuilder, Message } from "discord.js";
+import { EmbedColor } from "#utils/constants";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { KoosCommand } from "#lib/extensions";
 
@@ -21,14 +21,14 @@ export class ShuffleCommand extends KoosCommand {
         );
     }
 
-    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${interaction.guildId}`);
 
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -42,7 +42,7 @@ export class ShuffleCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
             });
         }
 
@@ -52,6 +52,6 @@ export class ShuffleCommand extends KoosCommand {
     private shuffle(player: KazagumoPlayer) {
         player.queue.shuffle();
 
-        return new MessageEmbed({ description: `Shuffled the queue`, color: embedColor.default });
+        return new EmbedBuilder({ description: `Shuffled the queue`, color: EmbedColor.Default });
     }
 }

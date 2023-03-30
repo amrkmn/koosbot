@@ -1,6 +1,6 @@
 import { KoosCommand } from "#lib/extensions";
-import { PermissionLevels } from "#lib/utils/constants";
-import { embedColor } from "#utils/constants";
+import { PermissionLevel } from "#lib/utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { isString } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args, SapphirePrefix } from "@sapphire/framework";
@@ -8,10 +8,10 @@ import { send } from "@sapphire/plugin-editable-commands";
 import { Collection, Message } from "discord.js";
 
 const categoryLevel: { [key: string]: number } = {
-    Admin: PermissionLevels.Administrator,
-    DJ: PermissionLevels.DJ,
-    Everyone: PermissionLevels.Everyone,
-    General: PermissionLevels.Everyone,
+    Admin: PermissionLevel.Administrator,
+    DJ: PermissionLevel.DJ,
+    Everyone: PermissionLevel.Everyone,
+    General: PermissionLevel.Everyone,
 };
 
 @ApplyOptions<KoosCommand.Options>({
@@ -43,13 +43,13 @@ export class HelpCommand extends KoosCommand {
                             { name: `• Usage ${buildedCommand.slashOnly ? `(Slash only)` : ``}`, value: usage },
                             { name: `• Permission`, value: `\`${buildedCommand.category}\`` },
                         ],
-                        color: embedColor.default,
+                        color: EmbedColor.Default,
                     },
                 ],
             });
         } else if (command.isErr() && ["commandCannotResolve", "commandNotFound"].includes(command.err().unwrap().identifier))
             return send(message, {
-                embeds: [{ description: `${command.err().unwrap().message}`, color: embedColor.error }],
+                embeds: [{ description: `${command.err().unwrap().message}`, color: EmbedColor.Error }],
             });
 
         const help = await this.buildHelp(message);
@@ -58,9 +58,9 @@ export class HelpCommand extends KoosCommand {
             embeds: [
                 {
                     fields: help,
-                    color: embedColor.default,
+                    color: EmbedColor.Default,
                     footer: { text: `Use ${prefix}help [ command ] to get more information about a command` },
-                    author: { name: `${this.client.user?.username}'s Command List`, iconURL: this.client.user?.displayAvatarURL() },
+                    author: { name: `${this.client.user?.username}'s Command List`, icon_url: this.client.user?.displayAvatarURL() },
                 },
             ],
         });

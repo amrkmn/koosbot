@@ -1,17 +1,17 @@
 import { KoosCommand } from "#lib/extensions";
-import { PermissionLevels } from "#lib/utils/constants";
-import { embedColor } from "#utils/constants";
+import { PermissionLevel } from "#lib/utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { isNullish } from "@sapphire/utilities";
-import { Message, MessageEmbed } from "discord.js";
+import { Message, EmbedBuilder } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Lets you change the bots default output volume.",
     aliases: ["setvol", "svol"],
-    permissionLevels: PermissionLevels.Administrator,
+    permissionLevels: PermissionLevel.Administrator,
     usage: {
         types: [{ type: "1-200" }],
     },
@@ -30,7 +30,7 @@ export class SetVolumeCommand extends KoosCommand {
         );
     }
 
-    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         const input = interaction.options.getNumber("input") ?? undefined;
 
         await interaction.deferReply();
@@ -43,7 +43,7 @@ export class SetVolumeCommand extends KoosCommand {
 
         if (input && (input > 200 || input < 1))
             return send(message, {
-                embeds: [{ description: `The volume may not be less than 0 or more than 200`, color: embedColor.error }],
+                embeds: [{ description: `The volume may not be less than 0 or more than 200`, color: EmbedColor.Error }],
             });
 
         send(message, { embeds: [await this.setVolume(message.guildId!, input)] });
@@ -57,10 +57,10 @@ export class SetVolumeCommand extends KoosCommand {
             let volume = 0;
             if (isNullish(data)) volume = 100;
             else volume = data.volume;
-            return new MessageEmbed().setDescription(`Current default volume is \`${volume}%\``).setColor(embedColor.default);
+            return new EmbedBuilder().setDescription(`Current default volume is \`${volume}%\``).setColor(EmbedColor.Default);
         }
 
         await db.guild.update({ where: { id: guildId }, data: { volume: input } });
-        return new MessageEmbed().setDescription(`Changed the default volume to \`${input}%\``).setColor(embedColor.default);
+        return new EmbedBuilder().setDescription(`Changed the default volume to \`${input}%\``).setColor(EmbedColor.Default);
     }
 }

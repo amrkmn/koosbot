@@ -1,4 +1,4 @@
-import { embedColor } from "#utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener, MessageCommandDeniedPayload, UserError } from "@sapphire/framework";
 import { reply } from "@sapphire/plugin-editable-commands";
@@ -19,7 +19,7 @@ export class ClientListener extends Listener<typeof Events.MessageCommandDenied>
             }
         }
 
-        reply(message, { embeds: [{ description: content, color: embedColor.error }] });
+        reply(message, { embeds: [{ description: content, color: EmbedColor.Error }] });
     }
 
     private isVoiceOnlyError(error: UserError) {

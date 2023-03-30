@@ -8,7 +8,7 @@ import { request } from "@aytea/request";
 import { clean } from "#utils/functions";
 import type { Message } from "discord.js";
 import Type from "@sapphire/type";
-import { PermissionLevels } from "#utils/constants";
+import { PermissionLevel } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
 import { envParseString } from "@skyra/env-utilities";
 
@@ -25,7 +25,7 @@ type HasteBinResponse = {
     flags: ["async", "hidden", "showHidden", "silent", "s"],
     options: ["depth"],
     hidden: true,
-    permissionLevels: PermissionLevels.BotOwner,
+    permissionLevels: PermissionLevel.BotOwner,
     typing: false,
 })
 export class EvalCommand extends KoosCommand {

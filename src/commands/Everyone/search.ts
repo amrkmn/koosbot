@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { embedColor } from "#utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { convertTime, cutText, mins, sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
@@ -8,12 +8,13 @@ import { send } from "@sapphire/plugin-editable-commands";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import {
     Message,
-    MessageSelectOptionData,
-    MessageSelectMenu,
     CommandInteraction,
-    MessageEmbed,
-    MessageActionRow,
+    EmbedBuilder,
+    ActionRowBuilder,
     GuildMember,
+    StringSelectMenuBuilder,
+    SelectMenuComponentOptionData,
+    ComponentType,
 } from "discord.js";
 import { Kazagumo } from "kazagumo";
 import pluralize from "pluralize";
@@ -41,13 +42,13 @@ export class SearchCommand extends KoosCommand {
         );
     }
 
-    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         const { kazagumo } = this.container;
         const query = interaction.options.getString("query");
 
         if (!query)
             return interaction.reply({
-                embeds: [{ description: "Please provide an URL or search query", color: embedColor.error }],
+                embeds: [{ description: "Please provide an URL or search query", color: EmbedColor.Error }],
                 ephemeral: true,
             });
 
@@ -59,22 +60,22 @@ export class SearchCommand extends KoosCommand {
         const { kazagumo } = this.container;
         const query = await args.rest("string").catch(() => undefined);
         if (!query)
-            return send(message, { embeds: [{ description: "Please provide an URL or search query", color: embedColor.error }] });
+            return send(message, { embeds: [{ description: "Please provide an URL or search query", color: EmbedColor.Error }] });
 
         await this.search(kazagumo, message, query);
     }
 
-    private async search(kazagumo: Kazagumo, message: Message | KoosCommand.ChatInputInteraction, query: string) {
+    private async search(kazagumo: Kazagumo, message: Message | KoosCommand.ChatInputCommandInteraction, query: string) {
         if (message instanceof CommandInteraction && !message.deferred) await message.deferReply();
         const member = message.member as GuildMember;
         const data = await this.container.db.guild.findUnique({ where: { id: `${message.guildId}` } });
-        const options: MessageSelectOptionData[] = [];
+        const options: SelectMenuComponentOptionData[] = [];
 
         let { tracks, type, playlistName } = await kazagumo.search(query, { requester: message.member });
         tracks = type === "PLAYLIST" ? tracks : tracks.slice(0, 15);
 
         if (isNullishOrEmpty(tracks)) {
-            const embed = new MessageEmbed().setDescription(`No result for that query.`).setColor(embedColor.error);
+            const embed = new EmbedBuilder().setDescription(`No result for that query.`).setColor(EmbedColor.Error);
             message instanceof CommandInteraction
                 ? await message.followUp({ embeds: [embed] })
                 : await send(message, { embeds: [embed] });
@@ -98,14 +99,14 @@ export class SearchCommand extends KoosCommand {
         }
         options.push({ label: "Cancel", description: "Cancel this search", value: `cancel` });
 
-        const selectMenu = new MessageSelectMenu().setCustomId("searchSongs").setOptions(options).setPlaceholder("Pick a track");
+        const selectMenu = new StringSelectMenuBuilder().setCustomId("searchSongs").setOptions(options).setPlaceholder("Pick a track");
 
-        const embed = new MessageEmbed()
+        const embed = new EmbedBuilder()
             .setDescription(
                 type === "PLAYLIST" ? `Here is the result` : `There are ${tracks.length} ${pluralize("result", tracks.length)}`
             )
-            .setColor(embedColor.default);
-        const row = new MessageActionRow().setComponents(selectMenu);
+            .setColor(EmbedColor.Default);
+        const row = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(selectMenu);
         const msg =
             message instanceof CommandInteraction
                 ? ((await message.followUp({ embeds: [embed], components: [row] })) as Message)
@@ -113,19 +114,19 @@ export class SearchCommand extends KoosCommand {
 
         const collector = msg.createMessageComponentCollector({
             time: mins(1),
-            componentType: "SELECT_MENU",
+            componentType: ComponentType.StringSelect,
             filter: (i) => i.user.id === message.member?.user.id,
         });
 
         collector.on("collect", async (interaction) => {
-            if (!interaction.isSelectMenu() || interaction.customId !== "searchSongs") return;
+            if (!interaction.isStringSelectMenu() || interaction.customId !== "searchSongs") return;
             await interaction.deferUpdate();
 
             let player = kazagumo.getPlayer(`${message.guildId}`);
             try {
                 const userOption = Number(interaction.values.at(0));
                 if (isNaN(userOption) && interaction.values.at(0) === "cancel") {
-                    interaction.followUp({ embeds: [{ description: `Canceled the search`, color: embedColor.default }] });
+                    interaction.followUp({ embeds: [{ description: `Canceled the search`, color: EmbedColor.Default }] });
                     collector.stop("cancel");
                     return;
                 }
@@ -145,7 +146,7 @@ export class SearchCommand extends KoosCommand {
                             embeds: [
                                 {
                                     description: `I cannot join your voice channel. It seem like I don't have the right permissions`,
-                                    color: embedColor.error,
+                                    color: EmbedColor.Error,
                                 },
                             ],
                         });
@@ -167,7 +168,7 @@ export class SearchCommand extends KoosCommand {
                                 type === "PLAYLIST"
                                     ? `Queued playlist ${title} with ${tracks.length} ${pluralize("track", tracks.length)}`
                                     : `Queued ${title} at position #${Number(player?.queue.totalSize ?? 0)}`,
-                            color: embedColor.default,
+                            color: EmbedColor.Default,
                         },
                     ],
                 });
@@ -183,21 +184,23 @@ export class SearchCommand extends KoosCommand {
             switch (reason) {
                 case "cancel":
                 case "picked":
-                    let pickedRow = new MessageActionRow().setComponents(
+                    let pickedRow = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(
                         selectMenu.setPlaceholder("You already picked a choice").setDisabled(true)
                     );
                     msg.edit({ embeds: [embed], components: [pickedRow] });
                     break;
                 case "time":
-                    let timedOutRow = new MessageActionRow().setComponents(selectMenu.setPlaceholder("Timed out").setDisabled(true));
+                    let timedOutRow = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(
+                        selectMenu.setPlaceholder("Timed out").setDisabled(true)
+                    );
                     msg.edit({ embeds: [embed], components: [timedOutRow] });
                     break;
                 case "error":
-                    let errorRow = new MessageActionRow().setComponents(
+                    let errorRow = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(
                         selectMenu.setPlaceholder("Something went wrong").setDisabled(true)
                     );
                     msg.edit({
-                        embeds: [{ description: `Something went wrong when trying to add track to queue.`, color: embedColor.error }],
+                        embeds: [{ description: `Something went wrong when trying to add track to queue.`, color: EmbedColor.Error }],
                         components: [errorRow],
                     });
                     break;

@@ -1,16 +1,16 @@
 import { KoosCommand } from "#lib/extensions";
 import { ApplyOptions } from "@sapphire/decorators";
-import { MessageEmbed, Message } from "discord.js";
-import { embedColor } from "#utils/constants";
+import { EmbedBuilder, Message } from "discord.js";
+import { EmbedColor } from "#utils/constants";
 import { send } from "@sapphire/plugin-editable-commands";
-import { Emojis, PermissionLevels } from "#lib/utils/constants";
+import { Emoji, PermissionLevel } from "#lib/utils/constants";
 import { Args } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
 import { sendLoadingMessage } from "#utils/functions";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Enables/disables if the requester is shown on each track.",
-    permissionLevels: PermissionLevels.Administrator,
+    permissionLevels: PermissionLevel.Administrator,
     aliases: ["req"],
     usage: {
         type: ["enable", "disable"],
@@ -34,7 +34,7 @@ export class RequesterCommand extends KoosCommand {
         );
     }
 
-    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         const enable = interaction.options.getBoolean("enable")!;
 
         await interaction.deferReply();
@@ -50,11 +50,11 @@ export class RequesterCommand extends KoosCommand {
         });
         if (isNullish(input))
             return send(message, {
-                embeds: [{ description: "Please enter an input.", color: embedColor.error }],
+                embeds: [{ description: "Please enter an input.", color: EmbedColor.Error }],
             });
         if (input === "enumError")
             return send(message, {
-                embeds: [{ description: `Please enter a correct input. (${options.join(", ")})`, color: embedColor.error }],
+                embeds: [{ description: `Please enter a correct input. (${options.join(", ")})`, color: EmbedColor.Error }],
             });
 
         let enable: boolean;
@@ -74,12 +74,12 @@ export class RequesterCommand extends KoosCommand {
             select: { requester: true },
         });
 
-        return new MessageEmbed()
+        return new EmbedBuilder()
             .setDescription(
                 requester
-                    ? `${Emojis.Yes} Requester will be shown permanently on each track.`
-                    : `${Emojis.No} Requester is no longer shown permanently on each track.`
+                    ? `${Emoji.Yes} Requester will be shown permanently on each track.`
+                    : `${Emoji.No} Requester is no longer shown permanently on each track.`
             )
-            .setColor(requester ? embedColor.success : embedColor.error);
+            .setColor(requester ? EmbedColor.Success : EmbedColor.Error);
     }
 }

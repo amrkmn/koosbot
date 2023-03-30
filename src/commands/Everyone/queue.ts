@@ -1,10 +1,10 @@
 import { KoosCommand } from "#lib/extensions";
 import { convertTime, pagination } from "#utils/functions";
-import { embedColor } from "#utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply } from "@sapphire/plugin-editable-commands";
-import { Message, MessageEmbed, TextChannel, User } from "discord.js";
+import { Message, EmbedBuilder, TextChannel, User } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 import { stripIndents } from "common-tags";
 
@@ -24,7 +24,7 @@ export class QueueCommand extends KoosCommand {
         );
     }
 
-    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${interaction.guildId}`);
         const target = interaction.member!.user as User;
@@ -32,7 +32,7 @@ export class QueueCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -48,7 +48,7 @@ export class QueueCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
             });
         }
 
@@ -72,7 +72,7 @@ export class QueueCommand extends KoosCommand {
                 : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
 
         if (player.queue.isEmpty) {
-            const embed = new MessageEmbed()
+            const embed = new EmbedBuilder()
                 .setDescription(
                     stripIndents`
                         __Now playing:__
@@ -83,7 +83,7 @@ export class QueueCommand extends KoosCommand {
                     `
                 )
                 .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
-                .setColor(embedColor.default);
+                .setColor(EmbedColor.Default);
 
             return [embed];
         }
@@ -108,7 +108,7 @@ export class QueueCommand extends KoosCommand {
         for (let list of queueList) {
             let upNext = list.join("\n");
             embeds.push(
-                new MessageEmbed()
+                new EmbedBuilder()
                     .setDescription(
                         stripIndents`
                             __Now playing:__
@@ -119,7 +119,7 @@ export class QueueCommand extends KoosCommand {
                         `
                     )
                     .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
-                    .setColor(embedColor.default)
+                    .setColor(EmbedColor.Default)
             );
         }
 

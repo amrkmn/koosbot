@@ -1,9 +1,9 @@
 import { KoosCommand } from "#lib/extensions";
-import { embedColor } from "#utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
-import { Message, MessageEmbed } from "discord.js";
+import { Message, EmbedBuilder } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
@@ -27,7 +27,7 @@ export class LoopCommand extends KoosCommand {
         );
     }
 
-    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(interaction.guildId!)!;
         const mode = interaction.options.getSubcommand(true) as "off" | "queue" | "song";
@@ -35,7 +35,7 @@ export class LoopCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -50,7 +50,7 @@ export class LoopCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
             });
         }
 
@@ -62,36 +62,36 @@ export class LoopCommand extends KoosCommand {
             switch (player.loop) {
                 case "none":
                     player.setLoop("queue");
-                    return new MessageEmbed({ description: "Looping the queue activated.", color: embedColor.default });
+                    return new EmbedBuilder({ description: "Looping the queue activated.", color: EmbedColor.Default });
                 case "queue":
                     player.setLoop("track");
-                    return new MessageEmbed({ description: "Looping the current song enabled.", color: embedColor.default });
+                    return new EmbedBuilder({ description: "Looping the current song enabled.", color: EmbedColor.Default });
                 case "track":
                     player.setLoop("none");
-                    return new MessageEmbed({ description: "Looping disabled.", color: embedColor.default });
+                    return new EmbedBuilder({ description: "Looping disabled.", color: EmbedColor.Default });
             }
         } else {
             switch (type) {
                 case "song":
                     if (player.loop === "track") {
                         player.setLoop("none");
-                        return new MessageEmbed({ description: "Looping disabled.", color: embedColor.default });
+                        return new EmbedBuilder({ description: "Looping disabled.", color: EmbedColor.Default });
                     }
                     player.setLoop("track");
-                    return new MessageEmbed({ description: "Looping the current song enabled.", color: embedColor.default });
+                    return new EmbedBuilder({ description: "Looping the current song enabled.", color: EmbedColor.Default });
                 case "queue":
                     if (player.loop === "queue") {
                         player.setLoop("none");
-                        return new MessageEmbed({ description: "Looping disabled.", color: embedColor.default });
+                        return new EmbedBuilder({ description: "Looping disabled.", color: EmbedColor.Default });
                     }
                     player.setLoop("queue");
-                    return new MessageEmbed({ description: "Looping the queue activated.", color: embedColor.default });
+                    return new EmbedBuilder({ description: "Looping the queue activated.", color: EmbedColor.Default });
                 case "off":
                     if (player.loop === "none") {
-                        return new MessageEmbed({ description: "Looping is already set to off.", color: embedColor.default });
+                        return new EmbedBuilder({ description: "Looping is already set to off.", color: EmbedColor.Default });
                     }
                     player.setLoop("none");
-                    return new MessageEmbed({ description: "Looping disabled.", color: embedColor.default });
+                    return new EmbedBuilder({ description: "Looping disabled.", color: EmbedColor.Default });
             }
         }
     }

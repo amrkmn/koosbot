@@ -2,8 +2,8 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
 import { isNullish, Nullish } from "@sapphire/utilities";
 import { envParseString } from "@skyra/env-utilities";
-import { Guild, Message, MessageActionRow, MessageButton, MessageEmbed, VoiceBasedChannel, VoiceState } from "discord.js";
-import { Buttons, embedColor } from "#utils/constants";
+import { Guild, Message, ActionRowBuilder, ButtonBuilder, EmbedBuilder, VoiceBasedChannel, VoiceState, ButtonStyle } from "discord.js";
+import { Button, EmbedColor } from "#utils/constants";
 import { KazagumoPlayer } from "kazagumo";
 import { time } from "#utils/functions";
 import ms from "ms";
@@ -48,15 +48,15 @@ export class ClientListener extends Listener {
 
     createButtons(paused: boolean) {
         const playerButtons = [
-            new MessageButton()
+            new ButtonBuilder()
                 .setLabel(paused ? "Resume" : "Pause")
-                .setCustomId(Buttons.PauseOrResume)
-                .setStyle("SUCCESS"),
-            new MessageButton().setLabel("Skip").setCustomId(Buttons.Skip).setStyle("PRIMARY"),
-            new MessageButton().setLabel("Stop").setCustomId(Buttons.Stop).setStyle("DANGER"),
-            new MessageButton().setLabel("Show Queue").setCustomId(Buttons.ShowQueue).setStyle("SECONDARY"),
+                .setCustomId(Button.PauseOrResume)
+                .setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setLabel("Skip").setCustomId(Button.Skip).setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setLabel("Stop").setCustomId(Button.Stop).setStyle(ButtonStyle.Danger),
+            new ButtonBuilder().setLabel("Show Queue").setCustomId(Button.ShowQueue).setStyle(ButtonStyle.Secondary),
         ];
-        return new MessageActionRow().setComponents(playerButtons);
+        return new ActionRowBuilder<ButtonBuilder>().setComponents(playerButtons);
     }
 
     checkState(oldState: VoiceState, newState: VoiceState) {
@@ -77,12 +77,12 @@ export class ClientListener extends Listener {
         this.timeoutId = setTimeout(() => {
             if (!isNullish(guild.members.me?.voice.channelId)) {
                 player.destroy();
-                if (channel.isText())
+                if (channel.isTextBased())
                     channel.send({
                         embeds: [
-                            new MessageEmbed()
+                            new EmbedBuilder()
                                 .setDescription(`No one was listening for ${ms(this.leaveAfter, { long: true })}, leaving.`)
-                                .setColor(embedColor.error),
+                                .setColor(EmbedColor.Error),
                         ],
                     });
             }

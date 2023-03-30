@@ -2,9 +2,9 @@ import {
     User,
     TextChannel,
     CommandInteraction,
-    MessageEmbed,
-    MessageButton,
-    MessageActionRow,
+    EmbedBuilder,
+    ButtonBuilder,
+    ActionRowBuilder,
     ButtonInteraction,
     Message,
 } from "discord.js";
@@ -12,7 +12,7 @@ import {
 interface PaginationOptions {
     target: User;
     channel: TextChannel | CommandInteraction;
-    embeds: MessageEmbed[];
+    embeds: EmbedBuilder[];
     page?: number;
     time?: number;
     max?: number;
@@ -47,9 +47,9 @@ export const pagination = async (options: PaginationOptions) => {
         let names = ["previous", "next"];
         if (fastSkip) names = ["first", ...names, "last"];
         names.push("stop");
-        const buttons = names.reduce((accumulator: MessageButton[], name) => {
+        const buttons = names.reduce((accumulator: ButtonBuilder[], name) => {
             accumulator.push(
-                new MessageButton()
+                new ButtonBuilder()
                     .setCustomId(name)
                     .setDisabled(state || checkState(name))
                     .setLabel(defaultLabels[name])
@@ -59,14 +59,14 @@ export const pagination = async (options: PaginationOptions) => {
         }, []);
         return buttons;
     };
-    const components = (state = false) => [new MessageActionRow().addComponents(generateButtons(state))];
+    const components = (state = false) => [new ActionRowBuilder<ButtonBuilder>().addComponents(generateButtons(state))];
     const changeFooter = () => {
         const embed = embeds[currentPage - 1];
-        const newEmbed = new MessageEmbed(embed);
-        if (embed?.footer?.text) {
+        const newEmbed = new EmbedBuilder(embed.data);
+        if (embed?.data.footer?.text) {
             return newEmbed.setFooter({
-                text: `Page ${currentPage}/${embeds.length} | ${embed.footer.text}`,
-                iconURL: embed.footer.iconURL,
+                text: `Page ${currentPage}/${embeds.length} | ${embed.data.footer?.text}`,
+                iconURL: embed.data.footer?.icon_url,
             });
         }
         return newEmbed.setFooter({ text: `Page ${currentPage}/${embeds.length}` });

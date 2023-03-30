@@ -1,7 +1,7 @@
 import { envParseArray } from "@skyra/env-utilities";
 import { Precondition } from "@sapphire/framework";
 import { isNullishOrEmpty } from "@sapphire/utilities";
-import type { CommandInteraction, Message, ContextMenuInteraction } from "discord.js";
+import type { CommandInteraction, Message, ContextMenuCommandInteraction } from "discord.js";
 
 export class OwnerOnlyPrecondition extends Precondition {
     public override async messageRun(message: Message) {
@@ -10,7 +10,7 @@ export class OwnerOnlyPrecondition extends Precondition {
     public override async chatInputRun(interaction: CommandInteraction) {
         return this.checkOwner(interaction.user.id);
     }
-    public override async contextMenuRun(interaction: ContextMenuInteraction) {
+    public override async contextMenuRun(interaction: ContextMenuCommandInteraction) {
         return this.checkOwner(interaction.user.id);
     }
 

@@ -1,5 +1,5 @@
 import { Precondition, PreconditionResult } from "@sapphire/framework";
-import type { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 
 export class AdministratorPrecondition extends Precondition {
     public messageRun(message: Message): PreconditionResult {
@@ -7,7 +7,7 @@ export class AdministratorPrecondition extends Precondition {
             return this.error({ message: "This cannot be run in dms" });
         }
         const member = message.member!;
-        return member.permissions.has("ADMINISTRATOR") || member.permissions.has("MANAGE_GUILD")
+        return member.permissions.has(PermissionFlagsBits.Administrator) || member.permissions.has(PermissionFlagsBits.ManageGuild)
             ? this.ok()
             : this.error({ message: "This command can only run by Administrators!" });
     }
@@ -17,7 +17,7 @@ export class AdministratorPrecondition extends Precondition {
             return this.error({ message: "This cannot be run in dms" });
         }
         const memberPermissions = interaction.memberPermissions!;
-        return memberPermissions.has("ADMINISTRATOR") || memberPermissions.has("MANAGE_GUILD")
+        return memberPermissions.has(PermissionFlagsBits.Administrator) || memberPermissions.has(PermissionFlagsBits.ManageGuild)
             ? this.ok()
             : this.error({ message: "This command can only run by Administrators!" });
     }

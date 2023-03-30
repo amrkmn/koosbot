@@ -2,8 +2,8 @@ import { KoosCommand } from "#lib/extensions";
 import { Guild } from "@prisma/client";
 import { ApplyOptions } from "@sapphire/decorators";
 import { KazagumoPlayer } from "kazagumo";
-import { Message, GuildMember, MessageEmbed } from "discord.js";
-import { embedColor } from "#utils/constants";
+import { Message, GuildMember, EmbedBuilder } from "discord.js";
+import { EmbedColor } from "#utils/constants";
 import { isNullishOrEmpty } from "@sapphire/utilities";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import pluralize from "pluralize";
@@ -26,7 +26,7 @@ export class VoteSkipCommand extends KoosCommand {
         );
     }
 
-    public async chatInputRun(interaction: KoosCommand.ChatInputInteraction) {
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         const { db, kazagumo } = this.container;
         const player = kazagumo.getPlayer(interaction.guildId!)!;
         const data = await db.guild.findUnique({ where: { id: interaction.guildId! } });
@@ -34,7 +34,7 @@ export class VoteSkipCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
                 ephemeral: true,
             });
         }
@@ -50,7 +50,7 @@ export class VoteSkipCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: embedColor.warn }],
+                embeds: [{ description: "There's nothing playing in this server", color: EmbedColor.Warn }],
             });
         }
 
@@ -59,7 +59,7 @@ export class VoteSkipCommand extends KoosCommand {
 
     private async voteSkip(
         data: Guild | null,
-        messageOrInteraction: Message | KoosCommand.ChatInputInteraction,
+        messageOrInteraction: Message | KoosCommand.ChatInputCommandInteraction,
         player: KazagumoPlayer
     ) {
         const member = messageOrInteraction.member as GuildMember;
@@ -71,9 +71,9 @@ export class VoteSkipCommand extends KoosCommand {
             current.sourceName === "youtube"
                 ? `[${current.title}](${current.uri})`
                 : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
-        const embed = new MessageEmbed() //
+        const embed = new EmbedBuilder() //
             .setDescription(`${title} has been skip`)
-            .setColor(embedColor.success);
+            .setColor(EmbedColor.Success);
         const roles = [...member.roles.cache.keys()].filter((id) => data?.dj.includes(id) ?? false);
 
         if (data && !isNullishOrEmpty(roles)) {
@@ -87,11 +87,11 @@ export class VoteSkipCommand extends KoosCommand {
 
             if (votes.has(member.id)) {
                 msg = `You have already voted`;
-                color = embedColor.error;
+                color = EmbedColor.Error;
                 voted = true;
             } else {
                 msg = `Skipping`;
-                color = embedColor.success;
+                color = EmbedColor.Success;
                 voted = false;
                 votes.add(member.id);
             }
@@ -106,12 +106,12 @@ export class VoteSkipCommand extends KoosCommand {
                     votes.delete(voterId);
                 }
                 msg = `${title} has been skipped`;
-                color = embedColor.success;
+                color = EmbedColor.Success;
                 player.skip();
-                return new MessageEmbed({ description: msg, color });
+                return new EmbedBuilder({ description: msg, color });
             }
 
-            return new MessageEmbed({ description: msg, color });
+            return new EmbedBuilder({ description: msg, color });
         } else {
             player.skip();
             return embed;

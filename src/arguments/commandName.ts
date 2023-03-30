@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { PermissionLevels } from "#lib/utils/constants";
+import { PermissionLevel } from "#lib/utils/constants";
 import { KoosArgument } from "#lib/interfaces";
 import { Argument } from "@sapphire/framework";
 import { envParseArray } from "@skyra/env-utilities";
@@ -28,7 +28,7 @@ export class CommandNameArgument extends Argument<KoosCommand> {
     }
 
     private isAllowed(command: KoosCommand, context: KoosArgument.Context): boolean {
-        if (command.permissionLevel !== PermissionLevels.BotOwner) return true;
+        if (command.permissionLevel !== PermissionLevel.BotOwner) return true;
         return context.owners ?? Array.from(envParseArray("CLIENT_OWNERS")).includes(context.message.author.id);
     }
 }

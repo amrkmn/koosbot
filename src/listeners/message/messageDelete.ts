@@ -1,11 +1,11 @@
-import { embedColor } from "#utils/constants";
+import { EmbedColor } from "#utils/constants";
 import { convertTime } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, Events } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { oneLine } from "common-tags";
-import { Message, MessageEmbed } from "discord.js";
+import { Message, EmbedBuilder } from "discord.js";
 
 @ApplyOptions<Listener.Options>({
     event: Events.MessageDelete,
@@ -22,6 +22,7 @@ export class ClientListener extends Listener {
 
         if (npMessage instanceof Message && message.id === npMessage.id) {
             let { embeds, components } = npMessage;
+            let newEmbeds: EmbedBuilder[] = [];
 
             if (isNullishOrEmpty(embeds)) {
                 const track = player.queue.current!;
@@ -30,19 +31,19 @@ export class ClientListener extends Listener {
                         ? `[${track.title}](${track.uri})`
                         : `[${track.title} by ${track.author}](${track.uri})`;
 
-                embeds = [
-                    new MessageEmbed()
+                newEmbeds.push(
+                    new EmbedBuilder()
                         .setDescription(
                             oneLine`
                                 ${title} [${track.isStream ? `Live` : convertTime(Number(track.length))}]
                                 ${data?.requester ? ` ~ ${track.requester}` : ""}
                             `
                         )
-                        .setColor(embedColor.default),
-                ];
+                        .setColor(EmbedColor.Default)
+                );
             }
 
-            const newNpMessage = await send(npMessage, { embeds, components });
+            const newNpMessage = await send(npMessage, { components, embeds: isNullishOrEmpty(newEmbeds) ? embeds : newEmbeds });
             player.data.set("nowPlayingMessage", newNpMessage);
         }
 
