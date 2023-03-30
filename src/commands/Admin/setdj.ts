@@ -1,7 +1,7 @@
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor, zws } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
-import { EmbedBuilder, Message, Role } from "discord.js";
+import { EmbedBuilder, Message, PermissionFlagsBits, Role } from "discord.js";
 // import { isNullishOrEmpty } from "@sapphire/utilities";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
@@ -29,7 +29,8 @@ export class SetDJCommand extends KoosCommand {
                             .setName("role")
                             .setDescription("The role that you want Add/Remove")
                             .setRequired(false)
-                    ),
+                    )
+                    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
             { idHints: ["1050092662486749296", "1050094587592581140"] }
         );
     }

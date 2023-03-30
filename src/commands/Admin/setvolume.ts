@@ -6,7 +6,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { isNullish } from "@sapphire/utilities";
-import { Message, EmbedBuilder } from "discord.js";
+import { Message, EmbedBuilder, PermissionFlagsBits } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Lets you change the bots default output volume.",
@@ -25,7 +25,8 @@ export class SetVolumeCommand extends KoosCommand {
                     .setDescription(this.description)
                     .addNumberOption((option) =>
                         option.setName("input").setDescription("The new volume.").setMinValue(0).setMaxValue(200)
-                    ),
+                    )
+                    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
             { idHints: ["1050765774828077151", "1050766022451417118"] }
         );
     }

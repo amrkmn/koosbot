@@ -1,6 +1,6 @@
 import { KoosCommand } from "#lib/extensions";
 import { ApplyOptions } from "@sapphire/decorators";
-import { EmbedBuilder, Message } from "discord.js";
+import { EmbedBuilder, Message, PermissionFlagsBits, PermissionsBitField } from "discord.js";
 import { KoosColor } from "#utils/constants";
 import { send } from "@sapphire/plugin-editable-commands";
 import { Emoji, PermissionLevel } from "#lib/utils/constants";
@@ -29,7 +29,8 @@ export class RequesterCommand extends KoosCommand {
                             .setName("enable")
                             .setDescription(this.description)
                             .setRequired(true)
-                    ),
+                    )
+                    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
             { idHints: ["1053707175316426863", "1053707710861955163"] }
         );
     }
