@@ -44,7 +44,6 @@ export class RemoveCommand extends KoosCommand {
         const position = interaction.options.getNumber("position");
         const to = interaction.options.getNumber("to") ?? undefined;
 
-        if (player) await interaction.deferReply();
         if (isNullish(position))
             return interaction.reply({
                 embeds: [{ description: "Please specify the song positions to remove.", color: KoosColor.Error }],
@@ -55,6 +54,8 @@ export class RemoveCommand extends KoosCommand {
                 embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
                 ephemeral: true,
             });
+
+        await interaction.deferReply();
 
         return interaction.followUp({ embeds: [await this.remove(player, position, to)] });
     }

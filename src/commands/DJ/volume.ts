@@ -34,13 +34,34 @@ export class VolumeCommand extends KoosCommand {
         );
     }
 
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
+        const { kazagumo } = this.container;
+        const player = kazagumo.getPlayer(`${interaction.guildId}`);
+        const input = interaction.options.getNumber("input");
+
+        if (!player || (player && !player.queue.current))
+            return interaction.reply({
+                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                ephemeral: true,
+            });
+        if (input && (input > 200 || input < 1))
+            return interaction.reply({
+                embeds: [{ description: `The volume may not be less than 0 or more than 200`, color: KoosColor.Error }],
+                ephemeral: true,
+            });
+
+        await interaction.deferReply();
+
+        interaction.followUp({ embeds: [await this.volume(player, input)] });
+    }
+
     public async messageRun(message: Message, args: Args) {
         await sendLoadingMessage(message);
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${message.guildId}`);
         const input = await args.pick("number").catch(() => undefined);
 
-        if (!player) {
+        if (!player || (player && !player.queue.current)) {
             return reply(message, {
                 embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
             });
@@ -53,10 +74,10 @@ export class VolumeCommand extends KoosCommand {
         send(message, { embeds: [await this.volume(player, input)] });
     }
 
-    private async volume(player: KazagumoPlayer, input?: number) {
+    private async volume(player: KazagumoPlayer, input?: number | null) {
         const { db } = this.container;
 
-        if (typeof input === "undefined") {
+        if (isNullish(input) || typeof input === "undefined") {
             let volume = player.volume * 100;
             return new EmbedBuilder().setDescription(`Current volume is \`${volume}%\``).setColor(KoosColor.Default);
         }

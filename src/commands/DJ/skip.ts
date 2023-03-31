@@ -38,13 +38,13 @@ export class SkipCommand extends KoosCommand {
         const to = interaction.options.getNumber("to") ?? undefined;
         const player = kazagumo.getPlayer(interaction.guildId!)!;
 
-        if (player) await interaction.deferReply();
-        if (!player || (player && !player.queue.current)) {
+        if (!player || (player && !player.queue.current))
             return interaction.reply({
                 embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
                 ephemeral: true,
             });
-        }
+
+        await interaction.deferReply();
 
         interaction.followUp({ embeds: [await this.skip(player, to)] });
     }

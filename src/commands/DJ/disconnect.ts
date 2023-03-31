@@ -25,15 +25,15 @@ export class DisconnectCommand extends KoosCommand {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${interaction.guildId}`);
 
-        if (player) await interaction.deferReply();
-        if (!player) {
+        if (!player || (player && !player.queue.current))
             return interaction.reply({
                 embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
                 ephemeral: true,
             });
-        }
 
-        interaction.followUp({ embeds: [await this.disconnect(player)] });
+        await interaction.deferReply();
+
+        interaction.followUp({ embeds: [this.disconnect(player)] });
     }
 
     public async messageRun(message: Message) {

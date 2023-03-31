@@ -25,13 +25,13 @@ export class ShuffleCommand extends KoosCommand {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${interaction.guildId}`);
 
-        if (player) await interaction.deferReply();
-        if (!player || (player && !player.queue.current)) {
+        if (!player || (player && !player.queue.current))
             return interaction.reply({
                 embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
                 ephemeral: true,
             });
-        }
+
+        await interaction.deferReply();
 
         return interaction.followUp({ embeds: [this.shuffle(player)] });
     }

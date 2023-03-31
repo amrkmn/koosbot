@@ -31,11 +31,12 @@ export class ClientListener extends Listener {
 
             if (!isNullish(msg) && msg.editable) {
                 const row = npMessage.components;
-                const disabled = row[0].components.map((button: unknown) =>
-                    (button as ButtonBuilder).setStyle(ButtonStyle.Secondary).setDisabled(true)
+                const disabled = row[0].components.map((button) =>
+                    new ButtonBuilder(button.data).setStyle(ButtonStyle.Secondary).setDisabled(true)
                 );
 
                 msg.edit({ components: [{ type: ComponentType.ActionRow, components: disabled }] });
+                player.data.delete("nowPlayingMessage");
             }
         }
     }
