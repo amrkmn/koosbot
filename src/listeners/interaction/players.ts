@@ -1,9 +1,8 @@
 import { Button } from "#lib/utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
-import { Listener, Events, container } from "@sapphire/framework";
+import { Listener, Events } from "@sapphire/framework";
 import {
     Message,
-    CommandInteraction,
     ButtonBuilder,
     ActionRowBuilder,
     EmbedBuilder,
@@ -61,81 +60,13 @@ export class ClientListener extends Listener {
                 const queue = await this.queue(player);
                 const embed = queue[0];
 
-                if (embed.data.footer?.text) {
+                if (embed.data.footer?.text)
                     embed.setFooter({
                         text: `Page 1/${queue.length} | ${embed.data.footer?.text}`,
                         iconURL: embed.data.footer?.icon_url,
                     });
-                }
 
                 await interaction.followUp({ embeds: [embed], ephemeral: true });
-                // const generateButtons = (state: boolean) => {
-                //     const checkState = (name: string) => {
-                //         if (queue.length === 1) return true;
-                //         if (["first", "previous"].includes(name) && currentPage === 1) return true;
-                //         if (["next", "last"].includes(name) && currentPage === queue.length) return true;
-                //         return false;
-                //     };
-                //     let names = ["first", "previous", "next", "last"];
-                //     names.push("stop");
-                //     const buttons = names.reduce((accumulator: MessageButton[], name) => {
-                //         accumulator.push(
-                //             new MessageButton()
-                //                 .setCustomId(name)
-                //                 .setDisabled(state || checkState(name))
-                //                 .setLabel(this.defaultLabels[name])
-                //                 .setStyle(this.defaultStyles[name])
-                //         );
-                //         return accumulator;
-                //     }, []);
-                //     return buttons;
-                // };
-                // const components = (state = false) => new ActionRowBuilder().addComponents(generateButtons(state));
-                // const changeFooter = () => {
-                //     const embed = queue[currentPage - 1];
-                //     const newEmbed = new EmbedBuilder(embed);
-                //     if (embed?.footer?.text) {
-                //         return newEmbed.setFooter({
-                //             text: `Page ${currentPage}/${queue.length} | ${embed.footer.text}`,
-                //             iconURL: embed.footer.iconURL,
-                //         });
-                //     }
-                //     return newEmbed.setFooter({ text: `Page ${currentPage}/${queue.length}` });
-                // };
-
-                // await interaction.reply({ embeds: [changeFooter()], components: [components()], ephemeral: true });
-
-                // const collector = interaction.channel?.createMessageComponentCollector({
-                //     filter: (i) => i.user.id === interaction.user.id && !interaction.user.bot,
-                //     componentType: "BUTTON",
-                //     time: ms("30s"),
-                // });
-                // if (isNullish(collector)) return;
-
-                // collector.on("collect", async (i) => {
-                //     try {
-                //         const id = i.customId;
-                //         if (id === "first") currentPage = 1;
-                //         if (id === "previous") currentPage--;
-                //         if (id === "next") currentPage++;
-                //         if (id === "last") currentPage = queue.length;
-                //         if (id === "stop") {
-                //             collector.stop("user");
-                //             await i.update({ embeds: [changeFooter()], components: [components(true)] });
-                //             return;
-                //         }
-
-                //         collector.resetTimer();
-                //         await i.update({ embeds: [changeFooter()], components: [components()] });
-                //     } catch (error) {}
-                // });
-                // collector.on("end", (_, reason) => {
-                //     try {
-                //         if (reason == "user" || reason == "time") interaction.editReply({ components: [components(true)] });
-                //         else return;
-                //     } catch (error) {}
-                // });
-
                 break;
         }
     }
