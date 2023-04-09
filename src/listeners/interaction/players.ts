@@ -30,13 +30,13 @@ export class ClientListener extends Listener {
         if (isNullish(player) || isNullish(data)) return;
 
         const msg = player.data.get("nowPlayingMessage") as Message;
-        const id = interaction.customId as "buttonPauseOrResume" | "buttonSkip" | "buttonStop" | "buttonShowQueue";
+        const id = interaction.customId as Button;
         const checkMember = this.checkMember(interaction.guild!, interaction.member as GuildMember);
 
         if (Object.values(Button).includes(id)) await interaction.deferUpdate();
         if (!isNullish(checkMember)) return interaction.followUp({ embeds: [checkMember], ephemeral: true });
         if (
-            ["buttonPauseOrResume", "buttonSkip", "buttonStop"].includes(id) && //
+            [Button.PauseOrResume, Button.Skip, Button.Stop].includes(id) && //
             !this.checkDJ(interaction, player, data.dj)
         )
             return interaction.followUp({
@@ -45,18 +45,18 @@ export class ClientListener extends Listener {
             });
 
         switch (id) {
-            case "buttonPauseOrResume":
+            case Button.PauseOrResume:
                 player.pause(!player.paused);
                 msg.edit({ components: [this.buttons(player.paused)] });
                 break;
-            case "buttonSkip":
+            case Button.Skip:
                 player.skip();
                 break;
-            case "buttonStop":
+            case Button.Stop:
                 player.queue.clear();
                 player.skip();
                 break;
-            case "buttonShowQueue":
+            case Button.ShowQueue:
                 const queue = await this.queue(player);
                 const embed = queue[0];
 
