@@ -10,6 +10,7 @@ import { cutText, sendLoadingMessage } from "#utils/functions";
 import { PlayOptions } from "#lib/interfaces";
 import { oneLine } from "common-tags";
 import pluralize from "pluralize";
+import { KazagumoTrack, RawTrack } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Add a track to queue.",
@@ -133,10 +134,11 @@ export class PlayCommand extends KoosCommand {
         }
 
         let msg: string = "";
+        let queue: RawTrack[] = [];
 
         switch (result.type) {
             case "PLAYLIST":
-                for (let track of result.tracks) player.queue.add(track);
+                for (let track of result.tracks) queue.push(track.getRaw());
                 const playlistLength = result.tracks.length;
                 msg = oneLine`
                     Queued playlist [${result.playlistName}](${query}) with
@@ -151,12 +153,18 @@ export class PlayCommand extends KoosCommand {
                         ? `[${track.title}](${track.uri})`
                         : `[${track.title} by ${track.author}](${track.uri})`;
 
-                player.queue.add(track);
+                queue.push(track.getRaw());
                 const position = player.queue.findIndex((x) => x.identifier === track.identifier);
                 msg = `Queued ${title} at position #${position + 1}`;
                 break;
         }
+        const savedQueue = player.data.get("queue") as RawTrack[];
 
+        if (isNullish(savedQueue)) player.data.set("queue", queue);
+        else player.data.set("queue", [...savedQueue, ...queue]);
+
+        const resolvedQueue = queue.map((rawTrack) => new KazagumoTrack(rawTrack, message.member));
+        player.queue.add(resolvedQueue);
         if (!player.playing && !player.paused) player.play();
 
         return new EmbedBuilder({ description: msg, color: KoosColor.Default });

@@ -37,6 +37,8 @@ export class ClientListener extends Listener {
 
                 msg.edit({ components: [{ type: ComponentType.ActionRow, components: disabled }] });
                 player.data.delete("nowPlayingMessage");
+                player.data.delete("queue");
+                player.data.delete("currentTrack");
             }
         }
     }

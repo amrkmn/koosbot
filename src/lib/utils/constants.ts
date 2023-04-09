@@ -36,6 +36,7 @@ export const Emoji = {
 
 export enum Button {
     PauseOrResume = "buttonPauseOrResume",
+    Previous = "buttonPrevious",
     Skip = "buttonSkip",
     Stop = "buttonStop",
     ShowQueue = "buttonShowQueue",

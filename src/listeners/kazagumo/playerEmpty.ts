@@ -48,6 +48,8 @@ export class ClientListener extends Listener {
 
                 msg.edit({ components: [{ type: ComponentType.ActionRow, components: disabled }] });
                 player.data.delete("nowPlayingMessage");
+                player.data.delete("queue");
+                player.data.delete("currentTrack");
             }
         }
         // if (channel.isText()) channel.send({ embeds: [{ description: "There are no more tracks", color: embedColor.error }] });

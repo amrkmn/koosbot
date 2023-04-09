@@ -13,7 +13,7 @@ import {
     ButtonInteraction,
 } from "discord.js";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
-import { KazagumoPlayer } from "kazagumo";
+import { KazagumoPlayer, KazagumoTrack, RawTrack } from "kazagumo";
 import { convertTime } from "#utils/functions";
 import { KoosColor } from "#utils/constants";
 import { stripIndents } from "common-tags";
@@ -36,7 +36,7 @@ export class ClientListener extends Listener {
         if (Object.values(Button).includes(id)) await interaction.deferUpdate();
         if (!isNullish(checkMember)) return interaction.followUp({ embeds: [checkMember], ephemeral: true });
         if (
-            [Button.PauseOrResume, Button.Skip, Button.Stop].includes(id) && //
+            [Button.PauseOrResume, Button.Previous, Button.Skip, Button.Stop].includes(id) && //
             !this.checkDJ(interaction, player, data.dj)
         )
             return interaction.followUp({
@@ -44,10 +44,22 @@ export class ClientListener extends Listener {
                 ephemeral: true,
             });
 
+        const currentTrack = player.data.get("currentTrack") as RawTrack;
+        const queueData = player.data.get("queue") as RawTrack[];
+
+        const currentIndex = queueData.findIndex((rawTrack) => rawTrack.track === currentTrack.track);
+        const previousTrack = queueData[currentIndex - 1];
+
         switch (id) {
             case Button.PauseOrResume:
                 player.pause(!player.paused);
-                msg.edit({ components: [this.buttons(player.paused)] });
+                msg.edit({ components: [this.buttons(player.paused, isNullish(previousTrack))] });
+                break;
+            case Button.Previous:
+                if (isNullish(previousTrack)) return;
+                const resolvedTrack = new KazagumoTrack(previousTrack, interaction.member);
+                player.queue.unshift(resolvedTrack);
+                player.skip();
                 break;
             case Button.Skip:
                 player.skip();
@@ -104,12 +116,20 @@ export class ClientListener extends Listener {
         return !isNullishOrEmpty(roles);
     }
 
-    private buttons(paused = false) {
+    private buttons(paused = false, firstTrack: boolean) {
         return new ActionRowBuilder<ButtonBuilder>().setComponents(
-            new ButtonBuilder({ style: ButtonStyle.Success, label: !paused ? "Pause" : "Resume", customId: Button.PauseOrResume }),
-            new ButtonBuilder({ style: ButtonStyle.Primary, label: "Skip", customId: Button.Skip }),
-            new ButtonBuilder({ style: ButtonStyle.Danger, label: "Stop", customId: Button.Stop }),
-            new ButtonBuilder({ style: ButtonStyle.Secondary, label: "Show Queue", customId: Button.ShowQueue })
+            new ButtonBuilder()
+                .setCustomId(Button.PauseOrResume)
+                .setStyle(ButtonStyle.Success)
+                .setLabel(!paused ? "Pause" : "Resume"),
+            new ButtonBuilder()
+                .setCustomId(Button.Previous)
+                .setStyle(ButtonStyle.Primary)
+                .setLabel("Previous")
+                .setDisabled(firstTrack),
+            new ButtonBuilder().setCustomId(Button.Skip).setStyle(ButtonStyle.Primary).setLabel("Skip"),
+            new ButtonBuilder().setCustomId(Button.Stop).setStyle(ButtonStyle.Danger).setLabel("Stop"),
+            new ButtonBuilder().setCustomId(Button.ShowQueue).setStyle(ButtonStyle.Secondary).setLabel("Show Queue")
         );
     }
 
