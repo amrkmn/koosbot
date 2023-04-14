@@ -151,6 +151,7 @@ export class HelpCommand extends KoosCommand {
 
         commands.sort((_, __, a, b) => categoryLevel[a] - categoryLevel[b]);
         for (const [category, list] of commands) {
+            list.sort((a, b) => a.name.localeCompare(b.name));
             helpMessage.push({
                 name: `${category} commands`,
                 value: list.map((cmd) => `\`${cmd.name}\``).join(", "),
