@@ -58,8 +58,7 @@ export class ClientListener extends Listener {
             case Button.Previous:
                 if (isNullish(previousTrack)) return;
                 const resolvedTrack = new KazagumoTrack(previousTrack, interaction.member);
-                player.queue.unshift(resolvedTrack);
-                player.skip();
+                player.play(resolvedTrack);
                 break;
             case Button.Skip:
                 player.skip();
