@@ -1,11 +1,11 @@
 import { KoosCommand } from "#lib/extensions";
 import { ApplyOptions } from "@sapphire/decorators";
-import { EmbedBuilder, Message, PermissionFlagsBits, PermissionsBitField } from "discord.js";
+import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
 import { KoosColor } from "#utils/constants";
 import { send } from "@sapphire/plugin-editable-commands";
 import { Emoji, PermissionLevel } from "#lib/utils/constants";
-import { Args } from "@sapphire/framework";
-import { isNullish } from "@sapphire/utilities";
+import { Args, UserError } from "@sapphire/framework";
+import { isNullish, isObject } from "@sapphire/utilities";
 import { sendLoadingMessage } from "#utils/functions";
 
 @ApplyOptions<KoosCommand.Options>({
@@ -41,23 +41,23 @@ export class RequesterCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message, args: Args) {
-        await sendLoadingMessage(message);
         const options = ["enable", "disable", "true", "false"];
-        const input = await args.pick("enum", { enum: options, caseInsensitive: true }).catch((e) => {
-            let identifier = `${Reflect.get(e.value, "identifier")}`;
-            return identifier === "argsMissing" ? undefined : identifier;
-        });
-        if (isNullish(input))
+        const input = await args.pickResult("enum", { enum: options, caseInsensitive: true });
+
+        let error = input.isErr() ? input.unwrapErr().identifier : undefined;
+
+        if (error === "argsMissing")
             return send(message, {
                 embeds: [{ description: "Please enter an input.", color: KoosColor.Error }],
             });
-        if (input === "enumError")
+        if (error === "enumError")
             return send(message, {
                 embeds: [{ description: `Please enter a correct input. (${options.join(", ")})`, color: KoosColor.Error }],
             });
+        await sendLoadingMessage(message);
 
         let enable: boolean;
-        if (["enable", "true"].includes(input.toLowerCase())) enable = true;
+        if (input.isOk() && ["enable", "true"].includes(input.unwrap().toLowerCase())) enable = true;
         else enable = false;
 
         send(message, { embeds: [await this.requester(message.guildId!, enable)] });
