@@ -42,8 +42,6 @@ export class PreviousCommand extends KoosCommand {
                 ephemeral: true,
             });
 
-        await interaction.deferReply();
-
         this.previous(player, previousTrack, interaction.member as GuildMember);
     }
 
