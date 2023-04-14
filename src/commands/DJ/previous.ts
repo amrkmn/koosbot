@@ -43,6 +43,11 @@ export class PreviousCommand extends KoosCommand {
             });
 
         this.previous(player, previousTrack, interaction.member as GuildMember);
+
+        interaction.reply({
+            embeds: [new EmbedBuilder().setDescription(`Playing the previous track`).setColor(KoosColor.Default)],
+            ephemeral: true,
+        });
     }
 
     public async messageRun(message: Message) {
