@@ -20,9 +20,7 @@ WORKDIR /app
 
 ENV NODE_ENV production
 
-COPY ./dist .
-COPY ./prisma .
-COPY package.json .
+COPY . .
 
 RUN yarn install && yarn generate
 FROM debian:bullseye
@@ -36,4 +34,4 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV PATH /root/.volta/bin:$PATH
 
-CMD [ "node", "--preserve-symlinks", "--enable-source-maps", "--no-warnings", "index.js" ]
+CMD [ "yarn", "run", "start" ]
