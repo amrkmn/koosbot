@@ -17,24 +17,22 @@ import { KoosCommand } from "#lib/extensions";
 })
 export class RemoveCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
-        registery.registerChatInputCommand(
-            (builder) =>
-                builder //
-                    .setName(this.name)
-                    .setDescription(this.description)
-                    .addNumberOption((option) =>
-                        option //
-                            .setName("position")
-                            .setDescription("Position of song to remove.")
-                            .setRequired(true)
-                    )
-                    .addNumberOption((option) =>
-                        option //
-                            .setName("to")
-                            .setDescription("Remove a range of tracks from the queue")
-                            .setRequired(false)
-                    ),
-            { idHints: ["1050092669860319292", "1050094595914076201"] }
+        registery.registerChatInputCommand((builder) =>
+            builder //
+                .setName(this.name)
+                .setDescription(this.description)
+                .addNumberOption((option) =>
+                    option //
+                        .setName("position")
+                        .setDescription("Position of song to remove.")
+                        .setRequired(true)
+                )
+                .addNumberOption((option) =>
+                    option //
+                        .setName("to")
+                        .setDescription("Remove a range of tracks from the queue")
+                        .setRequired(false)
+                )
         );
     }
 

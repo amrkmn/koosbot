@@ -12,12 +12,10 @@ import { KazagumoPlayer } from "kazagumo";
 })
 export class DisconnectCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
-        registery.registerChatInputCommand(
-            (builder) =>
-                builder //
-                    .setName(this.name)
-                    .setDescription(this.description),
-            { idHints: ["1053318753800175707", "1053318960638087218"] }
+        registery.registerChatInputCommand((builder) =>
+            builder //
+                .setName(this.name)
+                .setDescription(this.description)
         );
     }
 

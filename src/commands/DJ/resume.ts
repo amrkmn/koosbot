@@ -12,12 +12,10 @@ import { KazagumoPlayer } from "kazagumo";
 })
 export class ResumeCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
-        registery.registerChatInputCommand(
-            (builder) =>
-                builder //
-                    .setName(this.name)
-                    .setDescription(this.description),
-            { idHints: ["1050092752181940354", "1050094676948029440"] }
+        registery.registerChatInputCommand((builder) =>
+            builder //
+                .setName(this.name)
+                .setDescription(this.description)
         );
     }
 

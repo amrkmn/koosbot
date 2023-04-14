@@ -14,12 +14,10 @@ import prettyMs from "pretty-ms";
 })
 export class NowPlayingCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
-        registery.registerChatInputCommand(
-            (builder) =>
-                builder //
-                    .setName(this.name)
-                    .setDescription(this.description),
-            { idHints: ["1050092838257442877", "1050094763212275792"] }
+        registery.registerChatInputCommand((builder) =>
+            builder //
+                .setName(this.name)
+                .setDescription(this.description)
         );
     }
 

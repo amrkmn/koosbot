@@ -27,19 +27,17 @@ import pluralize from "pluralize";
 })
 export class LyricsCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
-        registery.registerChatInputCommand(
-            (builder) =>
-                builder //
-                    .setName(this.name)
-                    .setDescription(this.description)
-                    .addStringOption((option) =>
-                        option //
-                            .setName("query")
-                            .setDescription("The song name to search")
-                            .setAutocomplete(true)
-                            .setRequired(true)
-                    ),
-            { idHints: ["1054747570422947931", "1054764188817432597"] }
+        registery.registerChatInputCommand((builder) =>
+            builder //
+                .setName(this.name)
+                .setDescription(this.description)
+                .addStringOption((option) =>
+                    option //
+                        .setName("query")
+                        .setDescription("The song name to search")
+                        .setAutocomplete(true)
+                        .setRequired(true)
+                )
         );
     }
 

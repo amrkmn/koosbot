@@ -22,19 +22,17 @@ export class PlayCommand extends KoosCommand {
     private tracks: Map<string, string[]> = new Map<string, string[]>();
 
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
-        registery.registerChatInputCommand(
-            (builder) =>
-                builder //
-                    .setName(this.name)
-                    .setDescription(this.description)
-                    .addStringOption((option) =>
-                        option //
-                            .setName("query")
-                            .setDescription("Could be a link of the track, or a search term")
-                            .setRequired(true)
-                            .setAutocomplete(true)
-                    ),
-            { idHints: ["1050092839700287521", "1050094765485609030"] }
+        registery.registerChatInputCommand((builder) =>
+            builder //
+                .setName(this.name)
+                .setDescription(this.description)
+                .addStringOption((option) =>
+                    option //
+                        .setName("query")
+                        .setDescription("Could be a link of the track, or a search term")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
         );
     }
 

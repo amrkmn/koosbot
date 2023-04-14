@@ -16,20 +16,16 @@ import pluralize from "pluralize";
     },
 })
 export class SkipCommand extends KoosCommand {
-    public votes = new Set<string>();
-
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
-        registery.registerChatInputCommand(
-            (builder) =>
-                builder //
-                    .setName(this.name)
-                    .setDescription(this.description)
-                    .addNumberOption((option) =>
-                        option //
-                            .setName("to")
-                            .setDescription("Skips to a specific track in the queue.")
-                    ),
-            { idHints: ["1050092756636274778", "1050094681654055064"] }
+        registery.registerChatInputCommand((builder) =>
+            builder //
+                .setName(this.name)
+                .setDescription(this.description)
+                .addNumberOption((option) =>
+                    option //
+                        .setName("to")
+                        .setDescription("Skips to a specific track in the queue.")
+                )
         );
     }
 

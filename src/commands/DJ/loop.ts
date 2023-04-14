@@ -15,15 +15,13 @@ import { KazagumoPlayer } from "kazagumo";
 })
 export class LoopCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
-        registery.registerChatInputCommand(
-            (builder) =>
-                builder //
-                    .setName(this.name)
-                    .setDescription(this.description)
-                    .addSubcommand((subcommand) => subcommand.setName("queue").setDescription("Loop the queue."))
-                    .addSubcommand((subcommand) => subcommand.setName("song").setDescription("Loop the current playing song."))
-                    .addSubcommand((subcommand) => subcommand.setName("off").setDescription("Turn looping off")),
-            { idHints: ["1050624814580252753", "1050766024347230298"] }
+        registery.registerChatInputCommand((builder) =>
+            builder //
+                .setName(this.name)
+                .setDescription(this.description)
+                .addSubcommand((subcommand) => subcommand.setName("queue").setDescription("Loop the queue."))
+                .addSubcommand((subcommand) => subcommand.setName("song").setDescription("Loop the current playing song."))
+                .addSubcommand((subcommand) => subcommand.setName("off").setDescription("Turn looping off"))
         );
     }
 

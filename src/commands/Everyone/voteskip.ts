@@ -17,12 +17,10 @@ export class VoteSkipCommand extends KoosCommand {
     public votes = new Set<string>();
 
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
-        registery.registerChatInputCommand(
-            (builder) =>
-                builder //
-                    .setName(this.name)
-                    .setDescription(this.description),
-            { idHints: ["1050092846113370155", "1050094770854318140"] }
+        registery.registerChatInputCommand((builder) =>
+            builder //
+                .setName(this.name)
+                .setDescription(this.description)
         );
     }
 

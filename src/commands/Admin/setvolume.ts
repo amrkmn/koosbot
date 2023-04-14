@@ -18,16 +18,12 @@ import { Message, EmbedBuilder, PermissionFlagsBits } from "discord.js";
 })
 export class SetVolumeCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
-        registery.registerChatInputCommand(
-            (builder) =>
-                builder //
-                    .setName(this.name)
-                    .setDescription(this.description)
-                    .addNumberOption((option) =>
-                        option.setName("input").setDescription("The new volume.").setMinValue(0).setMaxValue(200)
-                    )
-                    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
-            { idHints: ["1050765774828077151", "1050766022451417118"] }
+        registery.registerChatInputCommand((builder) =>
+            builder //
+                .setName(this.name)
+                .setDescription(this.description)
+                .addNumberOption((option) => option.setName("input").setDescription("The new volume.").setMinValue(0).setMaxValue(200))
+                .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         );
     }
 

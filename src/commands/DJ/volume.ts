@@ -18,19 +18,13 @@ import { KazagumoPlayer } from "kazagumo";
 })
 export class VolumeCommand extends KoosCommand {
     public override async registerApplicationCommands(registery: KoosCommand.Registry) {
-        registery.registerChatInputCommand(
-            (builder) =>
-                builder //
-                    .setName(this.name)
-                    .setDescription(this.description)
-                    .addNumberOption((option) =>
-                        option
-                            .setName("input")
-                            .setDescription("Lets you change the bots output volume.")
-                            .setMinValue(0)
-                            .setMaxValue(200)
-                    ),
-            { idHints: ["1050662611722706945", "1050766029862752356"] }
+        registery.registerChatInputCommand((builder) =>
+            builder //
+                .setName(this.name)
+                .setDescription(this.description)
+                .addNumberOption((option) =>
+                    option.setName("input").setDescription("Lets you change the bots output volume.").setMinValue(0).setMaxValue(200)
+                )
         );
     }
 

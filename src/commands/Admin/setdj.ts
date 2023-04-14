@@ -19,19 +19,17 @@ import { PermissionLevel } from "#lib/utils/constants";
 })
 export class SetDJCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
-        registery.registerChatInputCommand(
-            (builder) =>
-                builder //
-                    .setName(this.name)
-                    .setDescription(this.description)
-                    .addRoleOption((option) =>
-                        option //
-                            .setName("role")
-                            .setDescription("The role that you want Add/Remove")
-                            .setRequired(false)
-                    )
-                    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
-            { idHints: ["1050092662486749296", "1050094587592581140"] }
+        registery.registerChatInputCommand((builder) =>
+            builder //
+                .setName(this.name)
+                .setDescription(this.description)
+                .addRoleOption((option) =>
+                    option //
+                        .setName("role")
+                        .setDescription("The role that you want Add/Remove")
+                        .setRequired(false)
+                )
+                .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         );
     }
 

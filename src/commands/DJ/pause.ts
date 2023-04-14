@@ -12,12 +12,10 @@ import { KazagumoPlayer } from "kazagumo";
 })
 export class PauseCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
-        registery.registerChatInputCommand(
-            (builder) =>
-                builder //
-                    .setName(this.name)
-                    .setDescription(this.description),
-            { idHints: ["1050092667880615978", "1050094593695293550"] }
+        registery.registerChatInputCommand((builder) =>
+            builder //
+                .setName(this.name)
+                .setDescription(this.description)
         );
     }
 

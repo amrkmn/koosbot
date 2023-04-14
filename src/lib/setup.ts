@@ -13,4 +13,4 @@ setup(resolve(process.cwd(), ".env"));
 inspect.defaultOptions.depth = 1;
 colorette.createColors({ useColor: true });
 
-ApplicationCommandRegistries.setDefaultBehaviorWhenNotIdentical(RegisterBehavior.Overwrite);
+ApplicationCommandRegistries.setDefaultBehaviorWhenNotIdentical(RegisterBehavior.BulkOverwrite);

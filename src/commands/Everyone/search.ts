@@ -27,18 +27,16 @@ import pluralize from "pluralize";
 })
 export class SearchCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
-        registery.registerChatInputCommand(
-            (builder) =>
-                builder //
-                    .setName(this.name)
-                    .setDescription(this.description)
-                    .addStringOption((option) =>
-                        option //
-                            .setName("query")
-                            .setDescription("The url or search term of track you want to play")
-                            .setRequired(true)
-                    ),
-            { idHints: ["1050092844116877416", "1050094769092690020"] }
+        registery.registerChatInputCommand((builder) =>
+            builder //
+                .setName(this.name)
+                .setDescription(this.description)
+                .addStringOption((option) =>
+                    option //
+                        .setName("query")
+                        .setDescription("The url or search term of track you want to play")
+                        .setRequired(true)
+                )
         );
     }
 

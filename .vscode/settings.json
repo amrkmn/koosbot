@@ -1,5 +1,4 @@
 {
     "typescript.tsdk": "node_modules\\typescript\\lib",
-    "editor.fontFamily": "Consolas, 'Courier New', monospace, FiraCode NFM",
-    "terminal.integrated.fontFamily": ""
+    "editor.fontFamily": "Consolas, 'Courier New', monospace, FiraCode NFM"
 }

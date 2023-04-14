@@ -19,19 +19,17 @@ import { sendLoadingMessage } from "#utils/functions";
 })
 export class RequesterCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
-        registery.registerChatInputCommand(
-            (builder) =>
-                builder //
-                    .setName(this.name)
-                    .setDescription(this.description)
-                    .addBooleanOption((option) =>
-                        option //
-                            .setName("enable")
-                            .setDescription(this.description)
-                            .setRequired(true)
-                    )
-                    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
-            { idHints: ["1053707175316426863", "1053707710861955163"] }
+        registery.registerChatInputCommand((builder) =>
+            builder //
+                .setName(this.name)
+                .setDescription(this.description)
+                .addBooleanOption((option) =>
+                    option //
+                        .setName("enable")
+                        .setDescription(this.description)
+                        .setRequired(true)
+                )
+                .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         );
     }
 
