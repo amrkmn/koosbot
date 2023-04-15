@@ -1,3 +1,4 @@
+import type { Message } from "discord.js";
 import { type Args } from "@sapphire/framework";
 import { ApplyOptions } from "@sapphire/decorators";
 import { codeBlock, isThenable } from "@sapphire/utilities";
@@ -6,11 +7,11 @@ import { inspect } from "util";
 import { Stopwatch } from "@sapphire/stopwatch";
 import { request } from "@aytea/request";
 import { clean } from "#utils/functions";
-import type { Message } from "discord.js";
-import Type from "@sapphire/type";
 import { PermissionLevel } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
 import { envParseString } from "@skyra/env-utilities";
+import Type from "@sapphire/type";
+import * as functions from "#utils/functions";
 
 type HasteBinResponse = {
     key?: string;
@@ -74,6 +75,7 @@ export class EvalCommand extends KoosCommand {
         const { container } = this;
         const { client, db, genius, kazagumo, shoukaku, stores } = container;
         const msg = message;
+        const utils = functions;
 
         const stopwatch = new Stopwatch();
         let success, syncTime, asyncTime, result;
