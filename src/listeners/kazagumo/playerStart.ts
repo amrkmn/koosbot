@@ -22,7 +22,7 @@ export class ClientListener extends Listener {
         if (isNullish(channel)) return;
 
         const queue = player.data.get("queue") as RawTrack[];
-        const currentIndex = queue.findIndex((rawTrack) => rawTrack.track === track.track);
+        const currentIndex = queue.findIndex((rawTrack) => rawTrack.info.identifier === track.identifier);
 
         const previousTrack = queue[currentIndex - 1];
 

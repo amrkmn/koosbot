@@ -33,7 +33,7 @@ export class PreviousCommand extends KoosCommand {
         const queue = player.data.get("queue") as RawTrack[];
         const currentTrack = player.data.get("currentTrack") as RawTrack;
 
-        const currentIndex = queue.findIndex((rawTrack) => rawTrack.track === currentTrack.track);
+        const currentIndex = queue.findIndex((rawTrack) => rawTrack.info.identifier === currentTrack.info.identifier);
         const previousTrack = queue[currentIndex - 1];
 
         if (isNullish(previousTrack))

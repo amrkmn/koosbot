@@ -47,7 +47,7 @@ export class ClientListener extends Listener {
         const currentTrack = player.data.get("currentTrack") as RawTrack;
         const queueData = player.data.get("queue") as RawTrack[];
 
-        const currentIndex = queueData.findIndex((rawTrack) => rawTrack.track === currentTrack.track);
+        const currentIndex = queueData.findIndex((rawTrack) => rawTrack.info.identifier === currentTrack.info.identifier);
         const previousTrack = queueData[currentIndex - 1];
 
         switch (id) {

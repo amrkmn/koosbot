@@ -95,11 +95,11 @@ export class RemoveCommand extends KoosCommand {
                 color: KoosColor.Error,
             });
         if (to && to <= player.queue.size && to > position) {
-            const firstTrack = player.queue[position - 1];
-            const lastTrack = player.queue[to - 1];
+            const firstTrack = player.queue[position - 1].getRaw();
+            const lastTrack = player.queue[to - 1].getRaw();
 
-            const firstTrackIndex = queue.findIndex((rawTrack) => rawTrack.track === firstTrack.track);
-            const lastTrackIndex = queue.findIndex((rawTrack) => rawTrack.track === lastTrack.track);
+            const firstTrackIndex = queue.findIndex((rawTrack) => rawTrack.info.identifier === firstTrack.info.identifier);
+            const lastTrackIndex = queue.findIndex((rawTrack) => rawTrack.info.identifier === lastTrack.info.identifier);
 
             queue.splice(firstTrackIndex, lastTrackIndex - firstTrackIndex + 1);
             player.queue.splice(position - 1, to - position + 1);
