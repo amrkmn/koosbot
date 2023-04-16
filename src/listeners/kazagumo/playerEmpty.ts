@@ -1,22 +1,12 @@
 import { envParseString } from "@skyra/env-utilities";
 import { KoosColor } from "#utils/constants";
-import { time } from "#utils/functions";
+import { deletePrevious, time } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
-import {
-    Guild,
-    Message,
-    ButtonBuilder,
-    EmbedBuilder,
-    ButtonStyle,
-    ComponentType,
-    ActionRowBuilder,
-    ButtonComponentData,
-} from "discord.js";
+import { Guild, Message, ButtonBuilder, EmbedBuilder, ButtonStyle, ComponentType } from "discord.js";
 import { Events, KazagumoPlayer } from "kazagumo";
 import ms from "ms";
-import { ButtonComponent } from "discord.js";
 
 @ApplyOptions<Listener.Options>({
     emitter: container.kazagumo,
@@ -48,8 +38,7 @@ export class ClientListener extends Listener {
 
                 msg.edit({ components: [{ type: ComponentType.ActionRow, components: disabled }] });
                 player.data.delete("nowPlayingMessage");
-                player.data.delete("queue");
-                player.data.delete("currentTrack");
+                deletePrevious(player.guildId);
             }
         }
         // if (channel.isText()) channel.send({ embeds: [{ description: "There are no more tracks", color: embedColor.error }] });

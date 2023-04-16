@@ -14,7 +14,7 @@ import {
 } from "discord.js";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { KazagumoPlayer, KazagumoTrack, RawTrack } from "kazagumo";
-import { convertTime } from "#utils/functions";
+import { convertTime, getPreviousTrack } from "#utils/functions";
 import { KoosColor } from "#utils/constants";
 import { stripIndents } from "common-tags";
 
@@ -44,21 +44,16 @@ export class ClientListener extends Listener {
                 ephemeral: true,
             });
 
-        const currentTrack = player.data.get("currentTrack") as RawTrack;
-        const queueData = player.data.get("queue") as RawTrack[];
-
-        const currentIndex = queueData.findIndex((rawTrack) => rawTrack.info.identifier === currentTrack.info.identifier);
-        const previousTrack = queueData[currentIndex - 1];
-
         switch (id) {
             case Button.PauseOrResume:
+                const previousTrack = getPreviousTrack(interaction.guildId!);
                 player.pause(!player.paused);
-                msg.edit({ components: [this.buttons(player.paused, isNullish(previousTrack))] });
+                msg.edit({ components: [this.buttons(player.paused, isNullishOrEmpty(previousTrack))] });
                 break;
             case Button.Previous:
-                if (isNullish(previousTrack)) return;
-                const resolvedTrack = new KazagumoTrack(previousTrack, interaction.member);
-                player.play(resolvedTrack);
+                const prevTrack = getPreviousTrack(interaction.guildId!);
+                if (isNullish(prevTrack)) return;
+                player.play(prevTrack);
                 break;
             case Button.Skip:
                 player.skip();
@@ -67,18 +62,18 @@ export class ClientListener extends Listener {
                 player.queue.clear();
                 player.skip();
                 break;
-            case Button.ShowQueue:
-                const queue = await this.queue(player);
-                const embed = queue[0];
+            // case Button.ShowQueue:
+            //     const queue = await this.queue(player);
+            //     const embed = queue[0];
 
-                if (embed.data.footer?.text)
-                    embed.setFooter({
-                        text: `Page 1/${queue.length} | ${embed.data.footer?.text}`,
-                        iconURL: embed.data.footer?.icon_url,
-                    });
+            //     if (embed.data.footer?.text)
+            //         embed.setFooter({
+            //             text: `Page 1/${queue.length} | ${embed.data.footer?.text}`,
+            //             iconURL: embed.data.footer?.icon_url,
+            //         });
 
-                await interaction.followUp({ embeds: [embed], ephemeral: true });
-                break;
+            //     await interaction.followUp({ embeds: [embed], ephemeral: true });
+            //     break;
         }
     }
 
@@ -127,8 +122,8 @@ export class ClientListener extends Listener {
                 .setLabel("Previous")
                 .setDisabled(firstTrack),
             new ButtonBuilder().setCustomId(Button.Skip).setStyle(ButtonStyle.Primary).setLabel("Skip"),
-            new ButtonBuilder().setCustomId(Button.Stop).setStyle(ButtonStyle.Danger).setLabel("Stop"),
-            new ButtonBuilder().setCustomId(Button.ShowQueue).setStyle(ButtonStyle.Secondary).setLabel("Show Queue")
+            new ButtonBuilder().setCustomId(Button.Stop).setStyle(ButtonStyle.Danger).setLabel("Stop")
+            // new ButtonBuilder().setCustomId(Button.ShowQueue).setStyle(ButtonStyle.Secondary).setLabel("Show Queue")
         );
     }
 

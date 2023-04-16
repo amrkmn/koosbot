@@ -2,6 +2,7 @@ import { KoosColor, Emoji } from "#utils/constants";
 import { container } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { Message, EmbedBuilder } from "discord.js";
+import { isObject, isNullish } from "@sapphire/utilities";
 
 export async function databasePing() {
     const startTime = process.hrtime.bigint();
@@ -106,4 +107,42 @@ export function sendLoadingMessage(message: Message) {
     return send(message, {
         embeds: [new EmbedBuilder().setDescription(`${Emoji.Loading} This might take a few seconds`).setColor(KoosColor.Default)],
     });
+}
+
+export function deepCompare<T extends Record<string, any>>(obj1: T, obj2: T): boolean {
+    // If objects are the same reference, return true
+    if (obj1 === obj2) {
+        return true;
+    }
+
+    // If either object is null or not an object, return false
+    if (!isObject(obj1) || isNullish(obj1) || !isObject(obj2) || isNullish(obj2)) {
+        return false;
+    }
+
+    // Get the keys of both objects
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    // If the number of keys is different, return false
+    if (keys1.length !== keys2.length) {
+        return false;
+    }
+
+    // Compare the values of each key in both objects recursively
+    for (const key of keys1) {
+        if (!obj2.hasOwnProperty(key)) {
+            return false;
+        }
+        if (typeof obj1[key] === "object" && typeof obj2[key] === "object") {
+            if (!deepCompare(obj1[key], obj2[key])) {
+                return false;
+            }
+        } else if (obj1[key] !== obj2[key]) {
+            return false;
+        }
+    }
+
+    // If all keys and values are equal, return true
+    return true;
 }

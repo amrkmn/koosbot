@@ -1,10 +1,11 @@
 import { KoosCommand } from "#lib/extensions";
 import { ApplyOptions } from "@sapphire/decorators";
-import { KazagumoPlayer, KazagumoTrack, RawTrack } from "kazagumo";
-import { Message, EmbedBuilder, GuildMember } from "discord.js";
+import { KazagumoPlayer, KazagumoTrack } from "kazagumo";
+import { Message, EmbedBuilder } from "discord.js";
 import { KoosColor } from "#utils/constants";
-import { reply } from "@sapphire/plugin-editable-commands";
+import { reply, send } from "@sapphire/plugin-editable-commands";
 import { isNullish } from "@sapphire/utilities";
+import { getPreviousTrack } from "#utils/functions";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Goes back to the first track in listening history",
@@ -30,23 +31,8 @@ export class PreviousCommand extends KoosCommand {
             });
         }
 
-        const queue = player.data.get("queue") as RawTrack[];
-        const currentTrack = player.data.get("currentTrack") as RawTrack;
-
-        const currentIndex = queue.findIndex((rawTrack) => rawTrack.info.identifier === currentTrack.info.identifier);
-        const previousTrack = queue[currentIndex - 1];
-
-        if (isNullish(previousTrack))
-            return interaction.reply({
-                embeds: [new EmbedBuilder().setDescription(`There are no previous tracks`).setColor(KoosColor.Error)],
-                ephemeral: true,
-            });
-
-        this.previous(player, previousTrack, interaction.member as GuildMember);
-
         interaction.reply({
-            embeds: [new EmbedBuilder().setDescription(`Playing the previous track`).setColor(KoosColor.Default)],
-            ephemeral: true,
+            embeds: [this.previous(player)],
         });
     }
 
@@ -56,25 +42,22 @@ export class PreviousCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                embeds: [new EmbedBuilder().setDescription("There's nothing playing in this server").setColor(KoosColor.Warn)],
             });
         }
 
-        const queue = player.data.get("queue") as RawTrack[];
-        const currentTrack = player.data.get("currentTrack") as RawTrack;
-
-        const currentIndex = queue.findIndex((rawTrack) => rawTrack.track === currentTrack.track);
-        const previousTrack = queue[currentIndex - 1];
-
-        if (isNullish(previousTrack))
-            return reply(message, {
-                embeds: [new EmbedBuilder().setDescription(`There are no previous tracks`).setColor(KoosColor.Error)],
-            });
-
-        this.previous(player, previousTrack, message.member!);
+        send(message, {
+            embeds: [this.previous(player)],
+        });
     }
 
-    private previous(player: KazagumoPlayer, previousTrack: RawTrack, member: GuildMember) {
-        player.play(new KazagumoTrack(previousTrack, member));
+    private previous(player: KazagumoPlayer) {
+        const previousTrack = getPreviousTrack(player.guildId!);
+
+        if (isNullish(previousTrack))
+            return new EmbedBuilder().setDescription(`There are no previous tracks`).setColor(KoosColor.Error);
+
+        player.play(previousTrack);
+        return new EmbedBuilder().setDescription(`Playing the previous track`).setColor(KoosColor.Success);
     }
 }

@@ -1,3 +1,4 @@
+import { deletePrevious } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, container } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
@@ -37,8 +38,7 @@ export class ClientListener extends Listener {
 
                 msg.edit({ components: [{ type: ComponentType.ActionRow, components: disabled }] });
                 player.data.delete("nowPlayingMessage");
-                player.data.delete("queue");
-                player.data.delete("currentTrack");
+                deletePrevious(player.guildId);
             }
         }
     }

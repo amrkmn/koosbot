@@ -3,7 +3,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { Message, EmbedBuilder } from "discord.js";
-import { KazagumoPlayer, RawTrack } from "kazagumo";
+import { KazagumoPlayer } from "kazagumo";
 import { isNullish } from "@sapphire/utilities";
 import { KoosCommand } from "#lib/extensions";
 
@@ -82,8 +82,6 @@ export class RemoveCommand extends KoosCommand {
         if (position === to) to = undefined;
         if (to && to < position) to = undefined;
 
-        const queue = player.data.get("queue") as RawTrack[];
-
         if (position > player.queue.size || (to && to > player.queue.size))
             return new EmbedBuilder({
                 description: `The queue doesn't have that many tracks (Total tracks: ${player.queue.size})`,
@@ -95,13 +93,9 @@ export class RemoveCommand extends KoosCommand {
                 color: KoosColor.Error,
             });
         if (to && to <= player.queue.size && to > position) {
-            const firstTrack = player.queue[position - 1].getRaw();
-            const lastTrack = player.queue[to - 1].getRaw();
+            const firstTrack = player.queue[position - 1];
+            const lastTrack = player.queue[to - 1];
 
-            const firstTrackIndex = queue.findIndex((rawTrack) => rawTrack.info.identifier === firstTrack.info.identifier);
-            const lastTrackIndex = queue.findIndex((rawTrack) => rawTrack.info.identifier === lastTrack.info.identifier);
-
-            queue.splice(firstTrackIndex, lastTrackIndex - firstTrackIndex + 1);
             player.queue.splice(position - 1, to - position + 1);
 
             return new EmbedBuilder({ description: `Removed song from index ${position} to ${to}`, color: KoosColor.Default });

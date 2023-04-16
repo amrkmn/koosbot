@@ -132,11 +132,11 @@ export class PlayCommand extends KoosCommand {
         }
 
         let msg: string = "";
-        let queue: RawTrack[] = [];
+        let queue: KazagumoTrack[] = [];
 
         switch (result.type) {
             case "PLAYLIST":
-                for (let track of result.tracks) queue.push(track.getRaw());
+                for (let track of result.tracks) queue.push(track);
                 const playlistLength = result.tracks.length;
                 msg = oneLine`
                     Queued playlist [${result.playlistName}](${query}) with
@@ -151,18 +151,13 @@ export class PlayCommand extends KoosCommand {
                         ? `[${track.title}](${track.uri})`
                         : `[${track.title} by ${track.author}](${track.uri})`;
 
-                queue.push(track.getRaw());
+                queue.push(track);
                 const position = player.queue.findIndex((x) => x.identifier === track.identifier);
                 msg = `Queued ${title} at position #${position + 1}`;
                 break;
         }
-        const savedQueue = player.data.get("queue") as RawTrack[];
 
-        if (isNullish(savedQueue)) player.data.set("queue", queue);
-        else player.data.set("queue", [...savedQueue, ...queue]);
-
-        const resolvedQueue = queue.map((rawTrack) => new KazagumoTrack(rawTrack, message.member));
-        player.queue.add(resolvedQueue);
+        player.queue.add(queue);
         if (!player.playing && !player.paused) player.play();
 
         return new EmbedBuilder({ description: msg, color: KoosColor.Default });

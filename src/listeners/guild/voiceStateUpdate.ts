@@ -54,7 +54,7 @@ export class ClientListener extends Listener {
                 .setStyle(ButtonStyle.Success),
             new ButtonBuilder().setLabel("Skip").setCustomId(Button.Skip).setStyle(ButtonStyle.Primary),
             new ButtonBuilder().setLabel("Stop").setCustomId(Button.Stop).setStyle(ButtonStyle.Danger),
-            new ButtonBuilder().setLabel("Show Queue").setCustomId(Button.ShowQueue).setStyle(ButtonStyle.Secondary),
+            // new ButtonBuilder().setLabel("Show Queue").setCustomId(Button.ShowQueue).setStyle(ButtonStyle.Secondary),
         ];
         return new ActionRowBuilder<ButtonBuilder>().setComponents(playerButtons);
     }

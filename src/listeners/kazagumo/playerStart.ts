@@ -3,10 +3,10 @@ import { KazagumoPlayer, KazagumoTrack, Events, RawTrack } from "kazagumo";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
 import { KoosColor } from "#utils/constants";
-import { convertTime } from "#utils/functions";
+import { convertTime, getPrevious } from "#utils/functions";
 import { Button } from "#lib/utils/constants";
 import { oneLine } from "common-tags";
-import { isNullish } from "@sapphire/utilities";
+import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 
 @ApplyOptions<Listener.Options>({
     emitter: container.kazagumo,
@@ -21,10 +21,7 @@ export class ClientListener extends Listener {
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
         if (isNullish(channel)) return;
 
-        const queue = player.data.get("queue") as RawTrack[];
-        const currentIndex = queue.findIndex((rawTrack) => rawTrack.info.identifier === track.identifier);
-
-        const previousTrack = queue[currentIndex - 1];
+        const previousTrack = getPrevious(player.guildId);
 
         let title =
             track.sourceName == "youtube" ? `[${track.title}](${track.uri})` : `[${track.title} by ${track.author}](${track.uri})`;
@@ -43,17 +40,16 @@ export class ClientListener extends Listener {
                 .setLabel("Previous")
                 .setCustomId(Button.Previous)
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(isNullish(previousTrack)),
+                .setDisabled(isNullishOrEmpty(previousTrack)),
             new ButtonBuilder().setLabel("Skip").setCustomId(Button.Skip).setStyle(ButtonStyle.Primary),
             new ButtonBuilder().setLabel("Stop").setCustomId(Button.Stop).setStyle(ButtonStyle.Danger),
-            new ButtonBuilder().setLabel("Show Queue").setCustomId(Button.ShowQueue).setStyle(ButtonStyle.Secondary),
+            // new ButtonBuilder().setLabel("Show Queue").setCustomId(Button.ShowQueue).setStyle(ButtonStyle.Secondary),
         ];
         const row = new ActionRowBuilder<ButtonBuilder>().setComponents(playerButtons);
 
         if (channel.isTextBased()) {
             const msg = await channel.send({ embeds: [embed], components: [row] });
             player.data.set("nowPlayingMessage", msg);
-            player.data.set("currentTrack", track.getRaw());
         }
     }
 }
