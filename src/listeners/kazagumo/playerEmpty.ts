@@ -50,26 +50,26 @@ export class ClientListener extends Listener {
     async setup(guild: Guild | null, player: KazagumoPlayer) {
         if (typeof this.timeoutId !== "undefined") this.cancel();
 
-        const { client } = this.container;
+        const { client, kazagumo } = this.container;
         const channel =
             container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
         if (isNullish(guild) || isNullish(player) || isNullish(channel)) return this.cancel();
 
         this.timeoutId = setTimeout(() => {
+            const player = kazagumo.getPlayer(guild.id);
+            if (isNullish(player)) return this.cancel();
             if (player.queue.current) return this.cancel();
-            if (player.queue.isEmpty && !isNullish(guild.members.me?.voice.channelId)) {
-                player.destroy();
-                if (channel.isTextBased())
-                    channel.send({
-                        embeds: [
-                            new EmbedBuilder()
-                                .setDescription(
-                                    `No tracks have been playing for the past ${ms(this.leaveAfter, { long: true })}, leaving.`
-                                )
-                                .setColor(KoosColor.Error),
-                        ],
-                    });
-            }
+            if (!player.queue.isEmpty && isNullish(guild.members.me?.voice.channelId)) return this.cancel();
+            if (!channel.isTextBased()) return this.cancel();
+
+            player.destroy();
+            channel.send({
+                embeds: [
+                    new EmbedBuilder()
+                        .setDescription(`No tracks have been playing for the past ${ms(this.leaveAfter, { long: true })}, leaving.`)
+                        .setColor(KoosColor.Error),
+                ],
+            });
         }, this.leaveAfter);
     }
     reset() {
