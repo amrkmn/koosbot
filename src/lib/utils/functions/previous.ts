@@ -20,8 +20,8 @@ export function getPreviousTrack(guildId: Snowflake) {
     const savedPrevious = getPrevious(guildId);
     if (isNullish(savedPrevious)) return undefined;
 
-    const [lastTrack] = savedPrevious.splice(-1);
-    savedPrevious.forEach((track) => setPrevious(guildId, track));
+    const lastTrack = savedPrevious.pop();
+    previous.set(guildId, savedPrevious);
 
     return lastTrack;
 }
