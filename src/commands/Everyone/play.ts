@@ -4,7 +4,7 @@ import { ApplicationCommandOptionChoiceData, GuildMember, Message, EmbedBuilder,
 import { send } from "@sapphire/plugin-editable-commands";
 import { KoosColor } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
-import { filterNullishAndEmpty, isNullish } from "@sapphire/utilities";
+import { filterNullishAndEmpty, isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
 import { createTitle, cutText, sendLoadingMessage } from "#utils/functions";
 import { PlayOptions } from "#lib/interfaces";
@@ -115,8 +115,9 @@ export class PlayCommand extends KoosCommand {
     private async play(query: string, { message, player, channel, data }: PlayOptions) {
         const { kazagumo } = this.container;
         const result = await kazagumo.search(query, { requester: message.member }).catch(() => undefined);
-        if (!result || !result.tracks.length)
-            return new EmbedBuilder({ description: `Something went wrong!`, color: KoosColor.Error });
+        if (!result) return new EmbedBuilder().setDescription(`Something went wrong`).setColor(KoosColor.Error);
+        if (isNullishOrEmpty(!result.tracks.length))
+            return new EmbedBuilder().setDescription(`I couldn't find anything in the query you gave me`).setColor(KoosColor.Default);
 
         if (!player) {
             if (!canJoinVoiceChannel(channel))
