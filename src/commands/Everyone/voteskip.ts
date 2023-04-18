@@ -70,12 +70,9 @@ export class VoteSkipCommand extends KoosCommand {
         const embed = new EmbedBuilder() //
             .setDescription(`${title} has been skip`)
             .setColor(KoosColor.Success);
-        const roles = [...member.roles.cache.keys()].filter((id) => data?.dj.includes(id) ?? false);
+        // const roles = [...member.roles.cache.keys()].filter((id) => data?.dj.includes(id) ?? false);
 
-        if (data && !isNullishOrEmpty(roles)) {
-            player.skip();
-            return embed;
-        } else if (data && listeners.size > 1) {
+        if (data && listeners.size > 1) {
             let votes = this.getVotes(player);
             let msg = "",
                 color = 0,
