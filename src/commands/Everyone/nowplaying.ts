@@ -3,6 +3,7 @@ import { KoosColor } from "#utils/constants";
 import { createTitle, progressBar } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
+import { oneLine } from "common-tags";
 import { Message, EmbedBuilder } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 import prettyMs from "pretty-ms";
@@ -56,10 +57,11 @@ export class NowPlayingCommand extends KoosCommand {
 
         const description = `${title}${data?.requester ? ` ~ ${current.requester}` : ``}`;
         const duration = Number(current.length);
-        const progress =
-            `${progressBar(player.shoukaku.position, duration, 20, current.isStream)} ` +
-            `${prettyMs(player.shoukaku.position, { secondsDecimalDigits: 0 }).replace("ms", "s")} / ` +
-            `${!current.isStream ? prettyMs(duration, { secondsDecimalDigits: 0 }) : "∞"}`;
+        const progress = oneLine`
+                ${progressBar(player.shoukaku.position, duration, 20, current.isStream)}
+                ${prettyMs(player.shoukaku.position, { secondsDecimalDigits: 0 }).replace("ms", "s")} /
+                ${!current.isStream ? prettyMs(duration, { secondsDecimalDigits: 0 }) : "∞"}
+            `;
 
         return new EmbedBuilder({ description, footer: { text: progress }, color: KoosColor.Default });
     }
