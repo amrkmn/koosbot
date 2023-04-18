@@ -191,7 +191,7 @@ export class KazagumoPlugin extends Plugin implements Plugin {
                     sourceName: "spotify",
                     identifier: spotifyTrack.id,
                     isSeekable: true,
-                    author: spotifyTrack.artists[0] ? spotifyTrack.artists[0].name : "Unknown",
+                    author: spotifyTrack.artists[0] ? spotifyTrack.artists[0].name : "Unknown artist",
                     length: spotifyTrack.duration_ms,
                     isStream: false,
                     position: 0,
