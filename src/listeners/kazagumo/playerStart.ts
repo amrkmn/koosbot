@@ -3,7 +3,7 @@ import { KazagumoPlayer, KazagumoTrack, Events, RawTrack } from "kazagumo";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
 import { KoosColor } from "#utils/constants";
-import { convertTime, getPrevious } from "#utils/functions";
+import { convertTime, createTitle, getPrevious, setNp } from "#utils/functions";
 import { Button } from "#lib/utils/constants";
 import { oneLine } from "common-tags";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
@@ -21,10 +21,9 @@ export class ClientListener extends Listener {
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
         if (isNullish(channel)) return;
 
-        const previousTrack = getPrevious(player.guildId);
+        const previousTrack = getPrevious(player);
 
-        let title =
-            track.sourceName == "youtube" ? `[${track.title}](${track.uri})` : `[${track.title} by ${track.author}](${track.uri})`;
+        const title = createTitle(track);
 
         const embed = new EmbedBuilder() //
             .setDescription(
@@ -49,7 +48,7 @@ export class ClientListener extends Listener {
 
         if (channel.isTextBased()) {
             const msg = await channel.send({ embeds: [embed], components: [row] });
-            player.data.set("nowPlayingMessage", msg);
+            setNp(player, msg);
         }
     }
 }

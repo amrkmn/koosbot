@@ -1,6 +1,6 @@
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
-import { progressBar } from "#utils/functions";
+import { createTitle, progressBar } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { Message, EmbedBuilder } from "discord.js";
@@ -52,10 +52,7 @@ export class NowPlayingCommand extends KoosCommand {
     private async nowPlaying(player: KazagumoPlayer) {
         const data = await this.container.db.guild.findUnique({ where: { id: player.guildId } });
         const current = player.queue.current!;
-        const title =
-            current.sourceName === "youtube"
-                ? `[${current.title}](${current.uri})`
-                : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
+        const title = createTitle(current);
 
         const description = `${title}${data?.requester ? ` ~ ${current.requester}` : ``}`;
         const duration = Number(current.length);

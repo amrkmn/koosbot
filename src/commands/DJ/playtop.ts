@@ -7,7 +7,7 @@ import { KoosColor } from "#utils/constants";
 import { Args } from "@sapphire/framework";
 import { filterNullishAndEmpty, isNullish } from "@sapphire/utilities";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
-import { cutText } from "#utils/functions";
+import { createTitle, cutText } from "#utils/functions";
 import { send } from "@sapphire/plugin-editable-commands";
 import { oneLine } from "common-tags";
 import pluralize from "pluralize";
@@ -101,7 +101,7 @@ export class PlayTopCommand extends KoosCommand {
                 tracks.map((track) => track.uri)
             );
             const options: ApplicationCommandOptionChoiceData[] = tracks.map((track, i) => {
-                const title = `${track.title} by ${track.author}`;
+                const title = createTitle(track, false);
                 return {
                     name: `${cutText(title, 100)}`,
                     value: `a:${i}`,
@@ -145,10 +145,7 @@ export class PlayTopCommand extends KoosCommand {
             case "SEARCH":
             case "TRACK":
                 let [track] = result.tracks;
-                let title =
-                    track.sourceName === "youtube"
-                        ? `[${track.title}](${track.uri})`
-                        : `[${track.title} by ${track.author}](${track.uri})`;
+                let title = createTitle(track);
 
                 player.queue.unshift(track);
                 const position = player.queue.findIndex((x) => x.identifier === track.identifier);

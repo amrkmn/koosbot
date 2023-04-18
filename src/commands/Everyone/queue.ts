@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { convertTime, pagination } from "#utils/functions";
+import { convertTime, createTitle, pagination } from "#utils/functions";
 import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
@@ -67,7 +67,7 @@ export class QueueCommand extends KoosCommand {
         let nowPlaying =
             current.sourceName === "youtube"
                 ? `[${current.title}](${current.uri})`
-                : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
+                : `[${current.title} ${current.author ? `by ${current.author}` : ``}](${current.uri})`;
 
         if (player.queue.isEmpty) {
             const embed = new EmbedBuilder()
@@ -91,10 +91,7 @@ export class QueueCommand extends KoosCommand {
             let queue = player.queue.slice(i, i + 10);
             queueList.push(
                 queue.map((track, index) => {
-                    let title =
-                        track.sourceName === "youtube"
-                            ? `[${track.title}](${track.uri})`
-                            : `[${track.title} by ${track.author ?? "Unknown artist"}](${track.uri})`;
+                    let title = createTitle(track);
                     return `**${i + ++index}.** ${title} [${track.isStream ? "Live" : convertTime(track.length!)}]${
                         data?.requester ? ` ~ ${track.requester}` : ``
                     }`;

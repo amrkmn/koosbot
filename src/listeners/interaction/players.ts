@@ -14,7 +14,7 @@ import {
 } from "discord.js";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { KazagumoPlayer, KazagumoTrack, RawTrack } from "kazagumo";
-import { convertTime, getPreviousTrack } from "#utils/functions";
+import { convertTime, createTitle, getNp, getPreviousTrack } from "#utils/functions";
 import { KoosColor } from "#utils/constants";
 import { stripIndents } from "common-tags";
 
@@ -29,7 +29,7 @@ export class ClientListener extends Listener {
         const data = await this.container.db.guild.findUnique({ where: { id: interaction.guildId! } });
         if (isNullish(player) || isNullish(data)) return;
 
-        const msg = player.data.get("nowPlayingMessage") as Message;
+        const msg = getNp(player);
         const id = interaction.customId as Button;
         const checkMember = this.checkMember(interaction.guild!, interaction.member as GuildMember);
 
@@ -46,12 +46,12 @@ export class ClientListener extends Listener {
 
         switch (id) {
             case Button.PauseOrResume:
-                const previousTrack = getPreviousTrack(interaction.guildId!);
+                const previousTrack = getPreviousTrack(player);
                 player.pause(!player.paused);
                 msg.edit({ components: [this.buttons(player.paused, isNullishOrEmpty(previousTrack))] });
                 break;
             case Button.Previous:
-                const prevTrack = getPreviousTrack(interaction.guildId!);
+                const prevTrack = getPreviousTrack(player);
                 if (isNullish(prevTrack)) return;
                 player.play(prevTrack);
                 break;
@@ -141,7 +141,7 @@ export class ClientListener extends Listener {
         let nowPlaying =
             current.sourceName === "youtube"
                 ? `[${current.title}](${current.uri})`
-                : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
+                : `[${current.title} ${current.author ? `by ${current.author}` : ``}](${current.uri})`;
 
         if (player.queue.isEmpty) {
             const embed = new EmbedBuilder()
@@ -165,10 +165,7 @@ export class ClientListener extends Listener {
             let queue = player.queue.slice(i, i + 10);
             queueList.push(
                 queue.map((track, index) => {
-                    let title =
-                        track.sourceName === "youtube"
-                            ? `[${track.title}](${track.uri})`
-                            : `[${track.title} by ${track.author ?? "Unknown artist"}](${track.uri})`;
+                    const title = createTitle(track);
                     return `**${i + ++index}.** ${title} [${track.isStream ? "Live" : convertTime(track.length!)}]${
                         data?.requester ? ` ~ ${track.requester}` : ``
                     }`;

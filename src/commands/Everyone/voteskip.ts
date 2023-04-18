@@ -7,7 +7,7 @@ import { KoosColor } from "#utils/constants";
 import { isNullishOrEmpty } from "@sapphire/utilities";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import pluralize from "pluralize";
-import { sendLoadingMessage } from "#utils/functions";
+import { createTitle, sendLoadingMessage } from "#utils/functions";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Lets you vote for skipping the current track.",
@@ -65,10 +65,8 @@ export class VoteSkipCommand extends KoosCommand {
 
         const listeners = channel.members.filter((member) => !member.user.bot);
         const current = player.queue.current!;
-        const title =
-            current.sourceName === "youtube"
-                ? `[${current.title}](${current.uri})`
-                : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
+        const title = createTitle(current);
+
         const embed = new EmbedBuilder() //
             .setDescription(`${title} has been skip`)
             .setColor(KoosColor.Success);

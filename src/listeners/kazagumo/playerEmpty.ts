@@ -1,6 +1,6 @@
 import { envParseString } from "@skyra/env-utilities";
 import { KoosColor } from "#utils/constants";
-import { deletePrevious, time } from "#utils/functions";
+import { deleteNp, deletePrevious, getNp, time } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
@@ -25,20 +25,21 @@ export class ClientListener extends Listener {
 
         if (player.queue.current) return;
 
-        const npMessage = player.data.get("nowPlayingMessage");
+        const npMessage = getNp(player);
+        console.log("ran");
 
         if (channel && channel.isTextBased() && npMessage instanceof Message) {
             const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id).catch(() => null));
 
             if (!isNullish(msg) && msg.editable) {
-                const row = npMessage.components;
-                const disabled = row[0].components.map((component) =>
-                    new ButtonBuilder(component.data).setStyle(ButtonStyle.Secondary).setDisabled(true)
-                );
+                // const row = npMessage.components;
+                // const disabled = row[0].components.map((component) =>
+                //     new ButtonBuilder(component.data).setStyle(ButtonStyle.Secondary).setDisabled(true)
+                // );
 
-                msg.edit({ components: [{ type: ComponentType.ActionRow, components: disabled }] });
-                player.data.delete("nowPlayingMessage");
-                deletePrevious(player.guildId);
+                msg.edit({ components: [] });
+                deleteNp(player);
+                deletePrevious(player);
             }
         }
         // if (channel.isText()) channel.send({ embeds: [{ description: "There are no more tracks", color: embedColor.error }] });

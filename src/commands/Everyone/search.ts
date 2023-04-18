@@ -1,6 +1,6 @@
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
-import { convertTime, cutText, mins, sendLoadingMessage } from "#utils/functions";
+import { convertTime, createTitle, cutText, mins, sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
 import { Args } from "@sapphire/framework";
@@ -90,7 +90,7 @@ export class SearchCommand extends KoosCommand {
             for (let track of tracks) {
                 options.push({
                     label: cutText(`${track.title}`, 100),
-                    description: `Duration: ${convertTime(track.length!)} | Author: ${track.author}`,
+                    description: `Duration: ${convertTime(track.length!)} | Author: ${track.author ?? "Unknown artist"}`,
                     value: `${i++}`,
                 });
             }
@@ -132,11 +132,7 @@ export class SearchCommand extends KoosCommand {
                 collector.stop("picked");
                 const selected = type === "PLAYLIST" && isNaN(userOption) ? tracks : tracks[userOption];
 
-                const title = !Array.isArray(selected)
-                    ? selected.sourceName === "youtube"
-                        ? `[${selected.title}](${selected.uri})`
-                        : `[${selected.title} by ${selected.author}](${selected.uri})`
-                    : `[${playlistName}](${query})`;
+                const title = !Array.isArray(selected) ? createTitle(selected) : `[${playlistName}](${query})`;
 
                 if (!player) {
                     if (!canJoinVoiceChannel(member.voice.channel)) {

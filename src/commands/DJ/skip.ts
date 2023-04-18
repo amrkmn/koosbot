@@ -1,5 +1,6 @@
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
+import { createTitle } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
@@ -68,10 +69,7 @@ export class SkipCommand extends KoosCommand {
             embed = new EmbedBuilder().setDescription(`Skipped ${amount} ${pluralize("song", amount)}`).setColor(KoosColor.Success);
         } else {
             const current = player.queue.current!;
-            const title =
-                current.sourceName === "youtube"
-                    ? `[${current.title}](${current.uri})`
-                    : `[${current.title} by ${current.author ?? "Unknown artist"}](${current.uri})`;
+            const title = createTitle(current);
 
             embed = new EmbedBuilder() //
                 .setDescription(`${title} has been skipped`)

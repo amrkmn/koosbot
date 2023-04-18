@@ -52,7 +52,7 @@ export class PreviousCommand extends KoosCommand {
     }
 
     private previous(player: KazagumoPlayer) {
-        const previousTrack = getPreviousTrack(player.guildId!);
+        const previousTrack = getPreviousTrack(player);
 
         if (isNullish(previousTrack))
             return new EmbedBuilder().setDescription(`There are no previous tracks`).setColor(KoosColor.Error);

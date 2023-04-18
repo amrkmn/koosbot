@@ -1,4 +1,4 @@
-import { deletePrevious } from "#utils/functions";
+import { deleteNp, deletePrevious, getNp } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, container } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
@@ -24,21 +24,21 @@ export class ClientListener extends Listener {
                 - Player has been destroyed in ${guild.name}[${cyan(guild.id)}] on ${cyan(player.shoukaku.node.name)} node`
         );
 
-        const npMessage = player.data.get("nowPlayingMessage");
+        const npMessage = getNp(player);
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
 
         if (channel && channel.isTextBased() && npMessage instanceof Message) {
             const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id).catch(() => null));
 
             if (!isNullish(msg) && msg.editable) {
-                const row = npMessage.components;
-                const disabled = row[0].components.map((component) =>
-                    new ButtonBuilder(component.data).setStyle(ButtonStyle.Secondary).setDisabled(true)
-                );
+                // const row = npMessage.components;
+                // const disabled = row[0].components.map((component) =>
+                //     new ButtonBuilder(component.data).setStyle(ButtonStyle.Secondary).setDisabled(true)
+                // );
 
-                msg.edit({ components: [{ type: ComponentType.ActionRow, components: disabled }] });
-                player.data.delete("nowPlayingMessage");
-                deletePrevious(player.guildId);
+                msg.edit({ components: [] });
+                deleteNp(player);
+                deletePrevious(player);
             }
         }
     }

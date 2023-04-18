@@ -6,6 +6,7 @@ import { Message, EmbedBuilder } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 import { isNullish } from "@sapphire/utilities";
 import { KoosCommand } from "#lib/extensions";
+import { createTitle } from "#utils/functions";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Remove a track from the queue.",
@@ -102,10 +103,7 @@ export class RemoveCommand extends KoosCommand {
         }
 
         const track = player.queue[position - 1];
-        const title =
-            track.sourceName === "youtube" //
-                ? `[${track.title}](${track.uri})`
-                : `[${track.title} by ${track.author}](${track.uri})`;
+        const title = createTitle(track);
         player.queue.remove(position - 1);
 
         return new EmbedBuilder({ description: `Removed ${title} from the queue`, color: KoosColor.Default });

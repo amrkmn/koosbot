@@ -3,6 +3,7 @@ import { container } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { Message, EmbedBuilder } from "discord.js";
 import { isObject, isNullish } from "@sapphire/utilities";
+import { KazagumoTrack } from "kazagumo";
 
 export async function databasePing() {
     const startTime = process.hrtime.bigint();
@@ -107,6 +108,16 @@ export function sendLoadingMessage(message: Message) {
     return send(message, {
         embeds: [new EmbedBuilder().setDescription(`${Emoji.Loading} This might take a few seconds`).setColor(KoosColor.Default)],
     });
+}
+
+export function createTitle(track: KazagumoTrack, withUrl = true) {
+    const author = track.author;
+    const title =
+        track.sourceName === "youtube"
+            ? `${track.title}`
+            : `${track.title} ${author && author.toLowerCase() !== "unknown artist" ? `by ${author}` : ``}`;
+
+    return withUrl ? `[${title}](${track.uri})` : title;
 }
 
 export function deepCompare<T extends Record<string, any>>(obj1: T, obj2: T): boolean {

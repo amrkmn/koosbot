@@ -4,6 +4,7 @@ import { KazagumoPlayer } from "kazagumo";
 import { EmbedBuilder, Message } from "discord.js";
 import { KoosColor } from "#utils/constants";
 import { reply, send } from "@sapphire/plugin-editable-commands";
+import { createTitle } from "#utils/functions";
 
 @ApplyOptions<KoosCommand.Options>({
     description: `Replay the current song.`,
@@ -49,10 +50,7 @@ export class ReplayCommand extends KoosCommand {
 
     private replay(player: KazagumoPlayer) {
         const current = player.queue.current!;
-        const title =
-            current.sourceName === "youtube"
-                ? `[${current.title}](${current.uri})`
-                : `[${current.title} by ${current.author}](${current.uri})`;
+        const title = createTitle(current);
 
         player.shoukaku.seekTo(0);
 
