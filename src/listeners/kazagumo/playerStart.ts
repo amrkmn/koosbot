@@ -1,9 +1,9 @@
 import { Listener, container } from "@sapphire/framework";
-import { KazagumoPlayer, KazagumoTrack, Events, RawTrack } from "kazagumo";
+import { KazagumoPlayer, KazagumoTrack, Events } from "kazagumo";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
 import { KoosColor } from "#utils/constants";
-import { convertTime, createTitle, getPrevious, setNp } from "#utils/functions";
+import { convertTime, createTitle } from "#utils/functions";
 import { Button } from "#lib/utils/constants";
 import { oneLine } from "common-tags";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
@@ -21,7 +21,7 @@ export class ClientListener extends Listener {
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
         if (isNullish(channel)) return;
 
-        const previousTrack = getPrevious(player);
+        const previousTracks = player.previous();
 
         const title = createTitle(track);
 
@@ -39,16 +39,15 @@ export class ClientListener extends Listener {
                 .setLabel("Previous")
                 .setCustomId(Button.Previous)
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(isNullishOrEmpty(previousTrack)),
+                .setDisabled(isNullishOrEmpty(previousTracks)),
             new ButtonBuilder().setLabel("Skip").setCustomId(Button.Skip).setStyle(ButtonStyle.Primary),
             new ButtonBuilder().setLabel("Stop").setCustomId(Button.Stop).setStyle(ButtonStyle.Danger),
-            // new ButtonBuilder().setLabel("Show Queue").setCustomId(Button.ShowQueue).setStyle(ButtonStyle.Secondary),
         ];
         const row = new ActionRowBuilder<ButtonBuilder>().setComponents(playerButtons);
 
         if (channel.isTextBased()) {
             const msg = await channel.send({ embeds: [embed], components: [row] });
-            setNp(player, msg);
+            player.nowPlaying(msg);
         }
     }
 }

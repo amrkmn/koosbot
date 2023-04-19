@@ -2,10 +2,10 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
 import { isNullish, Nullish } from "@sapphire/utilities";
 import { envParseString } from "@skyra/env-utilities";
-import { Guild, Message, ActionRowBuilder, ButtonBuilder, EmbedBuilder, VoiceBasedChannel, VoiceState, ButtonStyle } from "discord.js";
+import { Guild, ActionRowBuilder, ButtonBuilder, EmbedBuilder, VoiceBasedChannel, VoiceState, ButtonStyle } from "discord.js";
 import { Button, KoosColor } from "#utils/constants";
 import { KazagumoPlayer } from "kazagumo";
-import { getNp, time } from "#utils/functions";
+import { time } from "#utils/functions";
 import ms from "ms";
 
 @ApplyOptions<Listener.Options>({
@@ -31,7 +31,7 @@ export class ClientListener extends Listener {
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
         if (isNullish(channel)) return;
 
-        const npMessage = getNp(player);
+        const npMessage = player.nowPlaying();
 
         const state = this.checkState(oldState, newState);
         const vcSize = clientVc.members.filter((x) => client.user?.id === x.id || !x.user.bot).size;

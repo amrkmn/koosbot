@@ -13,8 +13,8 @@ import {
     ButtonInteraction,
 } from "discord.js";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
-import { KazagumoPlayer, KazagumoTrack, RawTrack } from "kazagumo";
-import { convertTime, createTitle, getNp, getPreviousTrack } from "#utils/functions";
+import { KazagumoPlayer } from "kazagumo";
+import { convertTime, createTitle } from "#utils/functions";
 import { KoosColor } from "#utils/constants";
 import { stripIndents } from "common-tags";
 
@@ -29,7 +29,8 @@ export class ClientListener extends Listener {
         const data = await this.container.db.guild.findUnique({ where: { id: interaction.guildId! } });
         if (isNullish(player) || isNullish(data)) return;
 
-        const msg = getNp(player);
+        let msg = player.nowPlaying();
+
         const id = interaction.customId as Button;
         const checkMember = this.checkMember(interaction.guild!, interaction.member as GuildMember);
 
@@ -46,12 +47,12 @@ export class ClientListener extends Listener {
 
         switch (id) {
             case Button.PauseOrResume:
-                const previousTrack = getPreviousTrack(player);
+                const previousTrack = player.previous();
                 player.pause(!player.paused);
                 msg.edit({ components: [this.buttons(player.paused, isNullishOrEmpty(previousTrack))] });
                 break;
             case Button.Previous:
-                const prevTrack = getPreviousTrack(player);
+                const prevTrack = player.previousTrack();
                 if (isNullish(prevTrack)) return;
                 player.play(prevTrack);
                 break;

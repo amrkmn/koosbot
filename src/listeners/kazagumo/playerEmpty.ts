@@ -1,10 +1,10 @@
 import { envParseString } from "@skyra/env-utilities";
 import { KoosColor } from "#utils/constants";
-import { deleteNp, deletePrevious, getNp, time } from "#utils/functions";
+import { deleteNp, time } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
-import { Guild, Message, ButtonBuilder, EmbedBuilder, ButtonStyle, ComponentType } from "discord.js";
+import { Guild, Message, EmbedBuilder } from "discord.js";
 import { Events, KazagumoPlayer } from "kazagumo";
 import ms from "ms";
 
@@ -25,8 +25,7 @@ export class ClientListener extends Listener {
 
         if (player.queue.current) return;
 
-        const npMessage = getNp(player);
-        console.log("ran");
+        const npMessage = player.nowPlaying();
 
         if (channel && channel.isTextBased() && npMessage instanceof Message) {
             const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id).catch(() => null));
@@ -38,8 +37,8 @@ export class ClientListener extends Listener {
                 // );
 
                 msg.edit({ components: [] });
-                deleteNp(player);
-                deletePrevious(player);
+                player.resetNowPlaying();
+                player.resetPrevious();
             }
         }
         // if (channel.isText()) channel.send({ embeds: [{ description: "There are no more tracks", color: embedColor.error }] });

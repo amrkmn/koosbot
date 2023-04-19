@@ -1,11 +1,10 @@
 import { KoosCommand } from "#lib/extensions";
 import { ApplyOptions } from "@sapphire/decorators";
-import { KazagumoPlayer, KazagumoTrack } from "kazagumo";
+import { KazagumoPlayer } from "kazagumo";
 import { Message, EmbedBuilder } from "discord.js";
 import { KoosColor } from "#utils/constants";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { isNullish } from "@sapphire/utilities";
-import { getPreviousTrack } from "#utils/functions";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Goes back to the first track in listening history",
@@ -52,7 +51,7 @@ export class PreviousCommand extends KoosCommand {
     }
 
     private previous(player: KazagumoPlayer) {
-        const previousTrack = getPreviousTrack(player);
+        const previousTrack = player.previousTrack();
 
         if (isNullish(previousTrack))
             return new EmbedBuilder().setDescription(`There are no previous tracks`).setColor(KoosColor.Error);

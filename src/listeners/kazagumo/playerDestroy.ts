@@ -1,10 +1,10 @@
-import { deleteNp, deletePrevious, getNp } from "#utils/functions";
+import { deleteNp } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, container } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
 import { cyan } from "colorette";
 import { oneLine } from "common-tags";
-import { Message, ButtonBuilder, ButtonStyle, ComponentType } from "discord.js";
+import { Message } from "discord.js";
 import { Events, KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<Listener.Options>({
@@ -24,7 +24,7 @@ export class ClientListener extends Listener {
                 - Player has been destroyed in ${guild.name}[${cyan(guild.id)}] on ${cyan(player.shoukaku.node.name)} node`
         );
 
-        const npMessage = getNp(player);
+        const npMessage = player.nowPlaying();
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
 
         if (channel && channel.isTextBased() && npMessage instanceof Message) {
@@ -37,8 +37,8 @@ export class ClientListener extends Listener {
                 // );
 
                 msg.edit({ components: [] });
-                deleteNp(player);
-                deletePrevious(player);
+                player.resetNowPlaying();
+                player.resetPrevious();
             }
         }
     }
