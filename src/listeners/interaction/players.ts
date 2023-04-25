@@ -1,4 +1,4 @@
-import { Button } from "#lib/utils/constants";
+import { ButtonId } from "#lib/utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, Events } from "@sapphire/framework";
 import {
@@ -31,13 +31,13 @@ export class ClientListener extends Listener {
 
         let msg = player.nowPlaying();
 
-        const id = interaction.customId as Button;
+        const id = interaction.customId as ButtonId;
         const checkMember = this.checkMember(interaction.guild!, interaction.member as GuildMember);
 
-        if (Object.values(Button).includes(id)) await interaction.deferUpdate();
+        if (Object.values(ButtonId).includes(id)) await interaction.deferUpdate();
         if (!isNullish(checkMember)) return interaction.followUp({ embeds: [checkMember], ephemeral: true });
         if (
-            [Button.PauseOrResume, Button.Previous, Button.Skip, Button.Stop].includes(id) && //
+            [ButtonId.PauseOrResume, ButtonId.Previous, ButtonId.Skip, ButtonId.Stop].includes(id) && //
             !this.checkDJ(interaction, player, data.dj)
         )
             return interaction.followUp({
@@ -46,20 +46,20 @@ export class ClientListener extends Listener {
             });
 
         switch (id) {
-            case Button.PauseOrResume:
+            case ButtonId.PauseOrResume:
                 const previousTrack = player.previous();
                 player.pause(!player.paused);
                 msg.edit({ components: [this.buttons(player.paused, isNullishOrEmpty(previousTrack))] });
                 break;
-            case Button.Previous:
+            case ButtonId.Previous:
                 const prevTrack = player.previousTrack();
                 if (isNullish(prevTrack)) return;
                 player.play(prevTrack);
                 break;
-            case Button.Skip:
+            case ButtonId.Skip:
                 player.skip();
                 break;
-            case Button.Stop:
+            case ButtonId.Stop:
                 player.queue.clear();
                 player.skip();
                 break;
@@ -114,16 +114,16 @@ export class ClientListener extends Listener {
     private buttons(paused = false, firstTrack: boolean) {
         return new ActionRowBuilder<ButtonBuilder>().setComponents(
             new ButtonBuilder()
-                .setCustomId(Button.PauseOrResume)
+                .setCustomId(ButtonId.PauseOrResume)
                 .setStyle(ButtonStyle.Success)
                 .setLabel(!paused ? "Pause" : "Resume"),
             new ButtonBuilder()
-                .setCustomId(Button.Previous)
+                .setCustomId(ButtonId.Previous)
                 .setStyle(ButtonStyle.Primary)
                 .setLabel("Previous")
                 .setDisabled(firstTrack),
-            new ButtonBuilder().setCustomId(Button.Skip).setStyle(ButtonStyle.Primary).setLabel("Skip"),
-            new ButtonBuilder().setCustomId(Button.Stop).setStyle(ButtonStyle.Danger).setLabel("Stop")
+            new ButtonBuilder().setCustomId(ButtonId.Skip).setStyle(ButtonStyle.Primary).setLabel("Skip"),
+            new ButtonBuilder().setCustomId(ButtonId.Stop).setStyle(ButtonStyle.Danger).setLabel("Stop")
             // new ButtonBuilder().setCustomId(Button.ShowQueue).setStyle(ButtonStyle.Secondary).setLabel("Show Queue")
         );
     }

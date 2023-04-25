@@ -4,7 +4,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "disc
 import { ApplyOptions } from "@sapphire/decorators";
 import { KoosColor } from "#utils/constants";
 import { convertTime, createTitle } from "#utils/functions";
-import { Button } from "#lib/utils/constants";
+import { ButtonId } from "#lib/utils/constants";
 import { oneLine } from "common-tags";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 
@@ -34,14 +34,14 @@ export class ClientListener extends Listener {
             )
             .setColor(KoosColor.Default);
         const playerButtons = [
-            new ButtonBuilder().setLabel("Pause").setCustomId(Button.PauseOrResume).setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setLabel("Pause").setCustomId(ButtonId.PauseOrResume).setStyle(ButtonStyle.Success),
             new ButtonBuilder()
                 .setLabel("Previous")
-                .setCustomId(Button.Previous)
+                .setCustomId(ButtonId.Previous)
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(isNullishOrEmpty(previousTracks)),
-            new ButtonBuilder().setLabel("Skip").setCustomId(Button.Skip).setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setLabel("Stop").setCustomId(Button.Stop).setStyle(ButtonStyle.Danger),
+            new ButtonBuilder().setLabel("Skip").setCustomId(ButtonId.Skip).setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setLabel("Stop").setCustomId(ButtonId.Stop).setStyle(ButtonStyle.Danger),
         ];
         const row = new ActionRowBuilder<ButtonBuilder>().setComponents(playerButtons);
 

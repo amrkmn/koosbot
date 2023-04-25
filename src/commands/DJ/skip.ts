@@ -65,8 +65,15 @@ export class SkipCommand extends KoosCommand {
         if (typeof amount === "number" && amount > 1) {
             if (amount > player.queue.length)
                 return new EmbedBuilder().setDescription("Cannot skip more than the queue length.").setColor(KoosColor.Error);
-            player.queue.splice(0, amount - 1);
+            const skipped = player.queue.splice(0, amount);
+            const lastTrack = skipped.pop();
+
+            player.previous(player.queue.current!);
+            skipped.forEach((track) => player.previous(track));
+
             embed = new EmbedBuilder().setDescription(`Skipped ${amount} ${pluralize("song", amount)}`).setColor(KoosColor.Success);
+
+            player.play(lastTrack, { replaceCurrent: true });
         } else {
             const current = player.queue.current!;
             const title = createTitle(current);
@@ -74,9 +81,9 @@ export class SkipCommand extends KoosCommand {
             embed = new EmbedBuilder() //
                 .setDescription(`${title} has been skipped`)
                 .setColor(KoosColor.Success);
+            player.skip();
         }
 
-        player.skip();
         return embed;
     }
 }

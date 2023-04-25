@@ -34,7 +34,7 @@ export const Emoji = {
     Loading: "<a:loading:1027594528460386495>",
 };
 
-export enum Button {
+export enum ButtonId {
     PauseOrResume = "buttonPauseOrResume",
     Previous = "buttonPrevious",
     Skip = "buttonSkip",

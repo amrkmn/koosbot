@@ -5,7 +5,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message } f
 import { Kazagumo, KazagumoPlayer, KazagumoPlayerOptions, KazagumoTrack } from "kazagumo";
 import { container } from "@sapphire/framework";
 import { Player } from "shoukaku";
-import { Button, KoosColor } from "#utils/constants";
+import { ButtonId, KoosColor } from "#utils/constants";
 import { Signal } from "#lib/structures";
 
 export class KoosPlayer extends KazagumoPlayer {
@@ -53,14 +53,14 @@ export class KoosPlayer extends KazagumoPlayer {
             )
             .setColor(KoosColor.Default);
         const playerButtons = [
-            new ButtonBuilder().setLabel("Pause").setCustomId(Button.PauseOrResume).setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setLabel("Pause").setCustomId(ButtonId.PauseOrResume).setStyle(ButtonStyle.Success),
             new ButtonBuilder()
                 .setLabel("Previous")
-                .setCustomId(Button.Previous)
+                .setCustomId(ButtonId.Previous)
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(isNullishOrEmpty(previousTracks)),
-            new ButtonBuilder().setLabel("Skip").setCustomId(Button.Skip).setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setLabel("Stop").setCustomId(Button.Stop).setStyle(ButtonStyle.Danger),
+            new ButtonBuilder().setLabel("Skip").setCustomId(ButtonId.Skip).setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setLabel("Stop").setCustomId(ButtonId.Stop).setStyle(ButtonStyle.Danger),
         ];
         const row = new ActionRowBuilder<ButtonBuilder>().setComponents(playerButtons);
 

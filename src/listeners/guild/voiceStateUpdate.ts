@@ -3,7 +3,7 @@ import { Events, Listener } from "@sapphire/framework";
 import { isNullish, Nullish } from "@sapphire/utilities";
 import { envParseString } from "@skyra/env-utilities";
 import { Guild, ActionRowBuilder, ButtonBuilder, EmbedBuilder, VoiceBasedChannel, VoiceState, ButtonStyle } from "discord.js";
-import { Button, KoosColor } from "#utils/constants";
+import { ButtonId, KoosColor } from "#utils/constants";
 import { KazagumoPlayer } from "kazagumo";
 import { time } from "#utils/functions";
 import ms from "ms";
@@ -50,10 +50,10 @@ export class ClientListener extends Listener {
         const playerButtons = [
             new ButtonBuilder()
                 .setLabel(paused ? "Resume" : "Pause")
-                .setCustomId(Button.PauseOrResume)
+                .setCustomId(ButtonId.PauseOrResume)
                 .setStyle(ButtonStyle.Success),
-            new ButtonBuilder().setLabel("Skip").setCustomId(Button.Skip).setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setLabel("Stop").setCustomId(Button.Stop).setStyle(ButtonStyle.Danger),
+            new ButtonBuilder().setLabel("Skip").setCustomId(ButtonId.Skip).setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setLabel("Stop").setCustomId(ButtonId.Stop).setStyle(ButtonStyle.Danger),
             // new ButtonBuilder().setLabel("Show Queue").setCustomId(Button.ShowQueue).setStyle(ButtonStyle.Secondary),
         ];
         return new ActionRowBuilder<ButtonBuilder>().setComponents(playerButtons);
