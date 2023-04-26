@@ -15,6 +15,8 @@ import {
     StringSelectMenuBuilder,
     SelectMenuComponentOptionData,
     ComponentType,
+    ButtonBuilder,
+    ButtonStyle,
 } from "discord.js";
 import { Kazagumo } from "kazagumo";
 import pluralize from "pluralize";
@@ -46,7 +48,7 @@ export class SearchCommand extends KoosCommand {
 
         if (!query)
             return interaction.reply({
-                embeds: [{ description: "Please provide an URL or search query", color: KoosColor.Error }],
+                embeds: [new EmbedBuilder().setDescription("Please provide an URL or search query").setColor(KoosColor.Error)],
                 ephemeral: true,
             });
 
@@ -58,7 +60,9 @@ export class SearchCommand extends KoosCommand {
         const { kazagumo } = this.container;
         const query = await args.rest("string").catch(() => undefined);
         if (!query)
-            return send(message, { embeds: [{ description: "Please provide an URL or search query", color: KoosColor.Error }] });
+            return send(message, {
+                embeds: [new EmbedBuilder().setDescription("Please provide an URL or search query").setColor(KoosColor.Error)],
+            });
 
         await this.search(kazagumo, message, query);
     }
@@ -95,9 +99,10 @@ export class SearchCommand extends KoosCommand {
                 });
             }
         }
-        options.push({ label: "Cancel", description: "Cancel this search", value: `cancel` });
+        // options.push({ label: "Cancel", description: "Cancel this search", value: `cancel` });
 
         const selectMenu = new StringSelectMenuBuilder().setCustomId("searchSongs").setOptions(options).setPlaceholder("Pick a track");
+        const cancelButton = new ButtonBuilder().setCustomId("cancel").setLabel("Cancel").setStyle(ButtonStyle.Danger);
 
         const embed = new EmbedBuilder()
             .setDescription(
@@ -105,96 +110,101 @@ export class SearchCommand extends KoosCommand {
             )
             .setColor(KoosColor.Default);
         const row = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(selectMenu);
+        const buttonRow = new ActionRowBuilder<ButtonBuilder>().setComponents(cancelButton);
         const msg =
             message instanceof CommandInteraction
-                ? ((await message.followUp({ embeds: [embed], components: [row] })) as Message)
-                : await send(message, { embeds: [embed], components: [row] });
+                ? ((await message.followUp({ embeds: [embed], components: [row, buttonRow] })) as Message)
+                : await send(message, { embeds: [embed], components: [row, buttonRow] });
 
         const collector = msg.createMessageComponentCollector({
             time: mins(1),
-            componentType: ComponentType.StringSelect,
             filter: (i) => i.user.id === message.member?.user.id,
         });
 
         collector.on("collect", async (interaction) => {
-            if (!interaction.isStringSelectMenu() || interaction.customId !== "searchSongs") return;
-            await interaction.deferUpdate();
-
-            let player = kazagumo.getPlayer(`${message.guildId}`);
-            try {
-                const userOption = Number(interaction.values.at(0));
-                if (isNaN(userOption) && interaction.values.at(0) === "cancel") {
-                    interaction.followUp({ embeds: [{ description: `Canceled the search`, color: KoosColor.Default }] });
-                    collector.stop("cancel");
-                    return;
-                }
-
-                collector.stop("picked");
-                const selected = type === "PLAYLIST" && isNaN(userOption) ? tracks : tracks[userOption];
-
-                const title = !Array.isArray(selected) ? createTitle(selected) : `[${playlistName}](${query})`;
-
-                if (!player) {
-                    if (!canJoinVoiceChannel(member.voice.channel)) {
-                        interaction.followUp({
-                            embeds: [
-                                {
-                                    description: `I cannot join your voice channel. It seem like I don't have the right permissions`,
-                                    color: KoosColor.Error,
-                                },
-                            ],
-                        });
-                        return;
-                    }
-                    player ??= await kazagumo.createPlayer({
-                        guildId: `${message.guildId}`,
-                        textId: `${message.channelId}`,
-                        voiceId: `${member.voice.channelId}`,
-                        deaf: true,
-                        volume: isNullish(data) ? 100 : data.volume,
-                    });
-                }
-
+            if (interaction.isButton() && interaction.customId === "cancel") {
+                await interaction.deferUpdate();
                 interaction.followUp({
-                    embeds: [
-                        {
-                            description:
-                                type === "PLAYLIST"
-                                    ? `Queued playlist ${title} with ${tracks.length} ${pluralize("track", tracks.length)}`
-                                    : `Queued ${title} at position #${Number(player?.queue.totalSize ?? 0)}`,
-                            color: KoosColor.Default,
-                        },
-                    ],
+                    embeds: [new EmbedBuilder().setDescription(`Canceled the search`).setColor(KoosColor.Default)],
                 });
+                collector.stop("cancel");
+                return;
+            } else if (interaction.isStringSelectMenu() && interaction.customId === "searchSongs") {
+                await interaction.deferUpdate();
 
-                player.queue.add(selected);
-                if (!player.playing && !player.paused) player.play();
-            } catch (error) {
-                collector.stop("error");
+                let player = kazagumo.getPlayer(`${message.guildId}`);
+                try {
+                    const userOption = Number(interaction.values.at(0));
+
+                    collector.stop("picked");
+                    const selected = type === "PLAYLIST" && isNaN(userOption) ? tracks : tracks[userOption];
+
+                    const title = !Array.isArray(selected) ? createTitle(selected) : `[${playlistName}](${query})`;
+
+                    if (!player) {
+                        if (!canJoinVoiceChannel(member.voice.channel)) {
+                            interaction.followUp({
+                                embeds: [
+                                    new EmbedBuilder()
+                                        .setDescription(
+                                            `I cannot join your voice channel. It seem like I don't have the right permissions`
+                                        )
+                                        .setColor(KoosColor.Error),
+                                ],
+                            });
+                            return;
+                        }
+                        player ??= await kazagumo.createPlayer({
+                            guildId: `${message.guildId}`,
+                            textId: `${message.channelId}`,
+                            voiceId: `${member.voice.channelId}`,
+                            deaf: true,
+                            volume: isNullish(data) ? 100 : data.volume,
+                        });
+                    }
+
+                    interaction.followUp({
+                        embeds: [
+                            {
+                                description:
+                                    type === "PLAYLIST"
+                                        ? `Queued playlist ${title} with ${tracks.length} ${pluralize("track", tracks.length)}`
+                                        : `Queued ${title} at position #${Number(player?.queue.totalSize ?? 0)}`,
+                                color: KoosColor.Default,
+                            },
+                        ],
+                    });
+
+                    player.queue.add(selected);
+                    if (!player.playing && !player.paused) player.play();
+                } catch (error) {
+                    collector.stop("error");
+                }
             }
+            collector.stop("error");
         });
 
         collector.on("end", (_, reason) => {
+            const row = new ActionRowBuilder<StringSelectMenuBuilder>();
+
             switch (reason) {
                 case "cancel":
                 case "picked":
-                    let pickedRow = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(
-                        selectMenu.setPlaceholder("You already picked a choice").setDisabled(true)
-                    );
+                    let pickedRow = row.setComponents(selectMenu.setPlaceholder("You already picked a choice").setDisabled(true));
                     msg.edit({ embeds: [embed], components: [pickedRow] });
                     break;
                 case "time":
-                    let timedOutRow = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(
-                        selectMenu.setPlaceholder("Timed out").setDisabled(true)
-                    );
+                    let timedOutRow = row.setComponents(selectMenu.setPlaceholder("Timed out").setDisabled(true));
                     msg.edit({ embeds: [embed], components: [timedOutRow] });
                     break;
                 case "error":
-                    let errorRow = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(
-                        selectMenu.setPlaceholder("Something went wrong").setDisabled(true)
-                    );
+                    let errorRow = row.setComponents(selectMenu.setPlaceholder("Something went wrong").setDisabled(true));
                     msg.edit({
-                        embeds: [{ description: `Something went wrong when trying to add track to queue.`, color: KoosColor.Error }],
+                        embeds: [
+                            new EmbedBuilder()
+                                .setDescription(`Something went wrong when trying to add track to queue.`)
+                                .setColor(KoosColor.Error),
+                        ],
                         components: [errorRow],
                     });
                     break;
