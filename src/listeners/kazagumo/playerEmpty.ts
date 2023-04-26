@@ -1,6 +1,6 @@
 import { envParseString } from "@skyra/env-utilities";
 import { KoosColor } from "#utils/constants";
-import { deleteNp, time } from "#utils/functions";
+import { time } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";

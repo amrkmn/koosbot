@@ -1,7 +1,6 @@
-import { deleteNp } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, container } from "@sapphire/framework";
-import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
+import { isNullish } from "@sapphire/utilities";
 import { Message } from "discord.js";
 import { Events, KazagumoPlayer, KazagumoTrack } from "kazagumo";
 

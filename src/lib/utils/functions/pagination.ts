@@ -8,7 +8,6 @@ import {
     ButtonInteraction,
     Message,
     ButtonStyle,
-    MessageCollectorOptionsParams,
     ComponentType,
 } from "discord.js";
 

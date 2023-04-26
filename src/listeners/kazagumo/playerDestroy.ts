@@ -1,4 +1,3 @@
-import { deleteNp } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, container } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
