@@ -165,13 +165,13 @@ export class SearchCommand extends KoosCommand {
 
                     interaction.followUp({
                         embeds: [
-                            {
-                                description:
+                            new EmbedBuilder()
+                                .setDescription(
                                     type === "PLAYLIST"
                                         ? `Queued playlist ${title} with ${tracks.length} ${pluralize("track", tracks.length)}`
-                                        : `Queued ${title} at position #${Number(player?.queue.totalSize ?? 0)}`,
-                                color: KoosColor.Default,
-                            },
+                                        : `Queued ${title} at position #${Number(player?.queue.totalSize ?? 0)}`
+                                )
+                                .setColor(KoosColor.Default),
                         ],
                     });
 
