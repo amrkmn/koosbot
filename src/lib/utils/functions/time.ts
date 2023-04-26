@@ -24,3 +24,19 @@ export function years(years: number): number {
 export function time(unit: "sec" | "mins" | "hours" | "months" | "years", time: number) {
     return { sec, mins, hours, months, years }[unit](time);
 }
+
+export function timeToMs(timeStr: string) {
+    const timeArray = timeStr.split(":").map(Number);
+    let ms = 0;
+
+    if (timeArray.length === 3) {
+        // hh:mm:ss
+        ms += timeArray[0] * 60 * 60 * 1000; // hours to ms
+        timeArray.shift(); // remove hours from array
+    }
+
+    ms += timeArray[0] * 60 * 1000; // minutes to ms
+    ms += timeArray[1] * 1000; // seconds to ms
+
+    return ms;
+}
