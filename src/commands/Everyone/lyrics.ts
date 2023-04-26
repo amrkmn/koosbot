@@ -7,6 +7,8 @@ import {
     StringSelectMenuBuilder,
     TextChannel,
     SelectMenuComponentOptionData,
+    ButtonBuilder,
+    ButtonStyle,
 } from "discord.js";
 import { KoosColor, userAgent } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
@@ -91,11 +93,16 @@ export class LyricsCommand extends KoosCommand {
             return `${player.queue.current?.title}`;
         });
 
-        const { embed, selectMenu } = await this.lyrics(query);
+        const { embed, selectMenu, cancelButton } = await this.lyrics(query);
 
         const msg = await send(message, {
             embeds: [embed],
-            components: selectMenu ? [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu)] : undefined,
+            components: selectMenu
+                ? [
+                      new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu),
+                      new ActionRowBuilder<ButtonBuilder>().setComponents(cancelButton),
+                  ]
+                : undefined,
         });
 
         const collector = msg.createMessageComponentCollector({
@@ -113,23 +120,24 @@ export class LyricsCommand extends KoosCommand {
                 }
                 return true;
             },
-            componentType: ComponentType.StringSelect,
             time: ms("1m"),
         });
 
         collector.on("collect", async (i) => {
-            if (!i.isStringSelectMenu()) return;
-            await i.deferUpdate();
-            const id = i.customId;
-            if (id !== "lyricsOptions") return;
-            const input = Number(i.values[0]);
-            if (isNaN(input) && i.values[0] === "cancel") {
+            if (i.isButton() && i.customId === "cancel") {
+                await i.deferUpdate();
                 await send(message, {
                     embeds: [new EmbedBuilder().setDescription(`Canceled the search`).setColor(KoosColor.Default)],
                 });
                 collector.stop("cancel");
                 return;
             }
+
+            if (!i.isStringSelectMenu()) return;
+            await i.deferUpdate();
+            const id = i.customId;
+            if (id !== "lyricsOptions") return;
+            const input = Number(i.values[0]);
 
             await send(message, {
                 embeds: [new EmbedBuilder().setDescription("Fetching lyrics...").setColor(KoosColor.Default)],
@@ -237,18 +245,20 @@ export class LyricsCommand extends KoosCommand {
             description: cutText(`by ${song.artist.name}`, 100),
             value: `${song.id}`,
         }));
-        options.push({ label: `Cancel`, description: "Cancel this search", value: `cancel` });
+        // options.push({ label: `Cancel`, description: "Cancel this search", value: `cancel` });
 
         const selectMenu = new StringSelectMenuBuilder()
             .setCustomId("lyricsOptions")
             .setPlaceholder("Make a selection")
             .addOptions(options);
+        const cancelButton = new ButtonBuilder().setCustomId("cancel").setLabel("Cancel").setStyle(ButtonStyle.Danger);
 
         return {
             embed: new EmbedBuilder()
                 .setDescription(`There are ${result.length} ${pluralize("result", result.length)}`)
                 .setColor(KoosColor.Default),
             selectMenu,
+            cancelButton,
         };
     }
 }
