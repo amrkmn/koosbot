@@ -1,6 +1,7 @@
 import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener, UserError, ChatInputCommandDeniedPayload } from "@sapphire/framework";
+import { EmbedBuilder } from "discord.js";
 import prettyMs from "pretty-ms";
 
 @ApplyOptions<Listener.Options>({
@@ -18,9 +19,12 @@ export class ClientListener extends Listener<typeof Events.ChatInputCommandDenie
             }
         }
 
-        if (interaction.deferred) return interaction.followUp({ embeds: [{ description: content, color: KoosColor.Error }] });
+        if (interaction.deferred)
+            return interaction.followUp({
+                embeds: [new EmbedBuilder().setDescription(content).setColor(KoosColor.Error)],
+            });
 
-        return interaction.reply({ embeds: [{ description: content, color: KoosColor.Error }] });
+        return interaction.reply({ embeds: [new EmbedBuilder().setDescription(content).setColor(KoosColor.Error)] });
     }
 
     private isVoiceOnlyError(error: UserError) {

@@ -45,7 +45,10 @@ export class SetDJCommand extends KoosCommand {
         await sendLoadingMessage(message);
         const role = await args.pick("role").catch(() => undefined);
         if (!role && args.finished) return send(message, { embeds: [await this.setdj(message.guildId!, undefined)] });
-        if (!role) return send(message, { embeds: [{ description: `Role not found.`, color: KoosColor.Error }] });
+        if (!role)
+            return send(message, {
+                embeds: [new EmbedBuilder().setDescription(`Role not found.`).setColor(KoosColor.Error)],
+            });
 
         send(message, { embeds: [await this.setdj(message.guildId!, role.id)] });
     }

@@ -30,7 +30,7 @@ export class PrefixCommand extends KoosCommand {
                 });
             else if (error instanceof ResultError && error.value.identifier === "stringTooLong")
                 return send(message, {
-                    embeds: [{ description: "Prefix must be shorter than 5 characters.", color: KoosColor.Error }],
+                    embeds: [new EmbedBuilder().setDescription(`Prefix must be shorter than 5 characters.`).setColor(KoosColor.Error)],
                 });
         }
     }

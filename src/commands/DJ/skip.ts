@@ -37,7 +37,7 @@ export class SkipCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current))
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
                 ephemeral: true,
             });
 
@@ -53,7 +53,7 @@ export class SkipCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
             });
         }
 
@@ -61,7 +61,6 @@ export class SkipCommand extends KoosCommand {
     }
 
     private async skip(player: KazagumoPlayer, amount?: number) {
-        let embed: EmbedBuilder;
         if (typeof amount === "number" && amount > 1) {
             if (amount > player.queue.length)
                 return new EmbedBuilder().setDescription("Cannot skip more than the queue length.").setColor(KoosColor.Error);
@@ -71,19 +70,18 @@ export class SkipCommand extends KoosCommand {
             player.previous(player.queue.current!);
             skipped.forEach((track) => player.previous(track));
 
-            embed = new EmbedBuilder().setDescription(`Skipped ${amount} ${pluralize("song", amount)}`).setColor(KoosColor.Success);
-
             player.play(lastTrack, { replaceCurrent: true });
+
+            return new EmbedBuilder().setDescription(`Skipped ${amount} ${pluralize("song", amount)}`).setColor(KoosColor.Success);
         } else {
             const current = player.queue.current!;
             const title = createTitle(current);
 
-            embed = new EmbedBuilder() //
+            player.skip();
+
+            return new EmbedBuilder() //
                 .setDescription(`${title} has been skipped`)
                 .setColor(KoosColor.Success);
-            player.skip();
         }
-
-        return embed;
     }
 }

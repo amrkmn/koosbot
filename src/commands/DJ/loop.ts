@@ -32,7 +32,7 @@ export class LoopCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current))
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
             });
 
@@ -48,7 +48,7 @@ export class LoopCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
         }
 
@@ -57,39 +57,44 @@ export class LoopCommand extends KoosCommand {
 
     private async loop(player: KazagumoPlayer, type?: "off" | "queue" | "song") {
         if (!type) {
+            let msg: string;
             switch (player.loop) {
                 case "none":
                     player.setLoop("queue");
-                    return new EmbedBuilder({ description: "Looping the queue activated.", color: KoosColor.Default });
+                    msg = "Looping the queue activated.";
+                    break;
                 case "queue":
                     player.setLoop("track");
-                    return new EmbedBuilder({ description: "Looping the current song enabled.", color: KoosColor.Default });
+                    msg = "Looping the current song enabled.";
+                    break;
                 case "track":
                     player.setLoop("none");
-                    return new EmbedBuilder({ description: "Looping disabled.", color: KoosColor.Default });
+                    msg = "Looping disabled.";
+                    break;
             }
+            return new EmbedBuilder().setDescription(msg).setColor(KoosColor.Default);
         } else {
             switch (type) {
                 case "song":
                     if (player.loop === "track") {
                         player.setLoop("none");
-                        return new EmbedBuilder({ description: "Looping disabled.", color: KoosColor.Default });
+                        return new EmbedBuilder().setDescription("Looping disabled.").setColor(KoosColor.Default);
                     }
                     player.setLoop("track");
-                    return new EmbedBuilder({ description: "Looping the current song enabled.", color: KoosColor.Default });
+                    return new EmbedBuilder().setDescription("Looping the current song enabled.").setColor(KoosColor.Default);
                 case "queue":
                     if (player.loop === "queue") {
                         player.setLoop("none");
-                        return new EmbedBuilder({ description: "Looping disabled.", color: KoosColor.Default });
+                        return new EmbedBuilder().setDescription("Looping disabled.").setColor(KoosColor.Default);
                     }
                     player.setLoop("queue");
-                    return new EmbedBuilder({ description: "Looping the queue activated.", color: KoosColor.Default });
+                    return new EmbedBuilder().setDescription("Looping the queue activated.").setColor(KoosColor.Default);
                 case "off":
                     if (player.loop === "none") {
-                        return new EmbedBuilder({ description: "Looping is already set to off.", color: KoosColor.Default });
+                        return new EmbedBuilder().setDescription("Looping is already set to off.").setColor(KoosColor.Warn);
                     }
                     player.setLoop("none");
-                    return new EmbedBuilder({ description: "Looping disabled.", color: KoosColor.Default });
+                    return new EmbedBuilder().setDescription("Looping disabled.").setColor(KoosColor.Default);
             }
         }
     }

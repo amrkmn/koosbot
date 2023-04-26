@@ -41,7 +41,6 @@ export class ClientListener extends Listener {
                 player.resetPrevious();
             }
         }
-        // if (channel.isText()) channel.send({ embeds: [{ description: "There are no more tracks", color: embedColor.error }] });
 
         await this.setup(guild, player);
         return;

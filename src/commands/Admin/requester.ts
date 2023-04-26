@@ -48,11 +48,15 @@ export class RequesterCommand extends KoosCommand {
 
         if (error === "argsMissing")
             return send(message, {
-                embeds: [{ description: "Please enter an input.", color: KoosColor.Error }],
+                embeds: [new EmbedBuilder().setDescription(`Please enter an input.`).setColor(KoosColor.Error)],
             });
         if (error === "enumError")
             return send(message, {
-                embeds: [{ description: `Please enter a correct input. (${options.join(", ")})`, color: KoosColor.Error }],
+                embeds: [
+                    new EmbedBuilder()
+                        .setDescription(`Please enter a correct input. (${options.join(", ")})`)
+                        .setColor(KoosColor.Error),
+                ],
             });
         await sendLoadingMessage(message);
 

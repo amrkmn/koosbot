@@ -25,7 +25,7 @@ export class ClearCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current))
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
             });
 
@@ -40,7 +40,7 @@ export class ClearCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
         }
 
@@ -49,10 +49,10 @@ export class ClearCommand extends KoosCommand {
 
     private clear(player: KazagumoPlayer) {
         if (player.queue.isEmpty)
-            return new EmbedBuilder({ description: `There is currently no song in the queue.`, color: KoosColor.Error });
+            return new EmbedBuilder().setDescription(`There is currently no song in the queue.`).setColor(KoosColor.Error);
 
         player.queue.clear();
 
-        return new EmbedBuilder({ description: `The queue has been cleared.`, color: KoosColor.Default });
+        return new EmbedBuilder().setDescription(`The queue has been cleared.`).setColor(KoosColor.Default);
     }
 }

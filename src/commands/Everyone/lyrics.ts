@@ -53,10 +53,16 @@ export class LyricsCommand extends KoosCommand {
         await interaction.deferReply();
 
         const song = await genius.songs.get(Number(query)).catch(() => undefined);
-        if (!song) return interaction.followUp({ embeds: [{ description: "No result was found", color: KoosColor.Error }] });
+        if (!song)
+            return interaction.followUp({
+                embeds: [new EmbedBuilder().setDescription("No result was found").setColor(KoosColor.Error)],
+            });
 
         const lyrics = await this.getLyrics(song.url).catch(() => undefined);
-        if (!lyrics) return interaction.followUp({ embeds: [{ description: "Something went wrong!", color: KoosColor.Error }] });
+        if (!lyrics)
+            return interaction.followUp({
+                embeds: [new EmbedBuilder().setDescription("Something went wrong!").setColor(KoosColor.Error)],
+            });
 
         const lyric = chunk(lyrics.split("\n"), 25);
 
@@ -96,7 +102,11 @@ export class LyricsCommand extends KoosCommand {
             filter: (i) => {
                 if (i.user.id !== message.author.id) {
                     i.reply({
-                        embeds: [{ description: `This select menu can only be use by ${message.author}`, color: KoosColor.Error }],
+                        embeds: [
+                            new EmbedBuilder()
+                                .setDescription(`This select menu can only be use by ${message.author}`)
+                                .setColor(KoosColor.Error),
+                        ],
                         ephemeral: true,
                     });
                     return false;
@@ -114,12 +124,16 @@ export class LyricsCommand extends KoosCommand {
             if (id !== "lyricsOptions") return;
             const input = Number(i.values[0]);
             if (isNaN(input) && i.values[0] === "cancel") {
-                await send(message, { embeds: [{ description: `Canceled the search`, color: KoosColor.Default }] });
+                await send(message, {
+                    embeds: [new EmbedBuilder().setDescription(`Canceled the search`).setColor(KoosColor.Default)],
+                });
                 collector.stop("cancel");
                 return;
             }
 
-            await send(message, { embeds: [{ description: "Fetching lyrics...", color: KoosColor.Default }] });
+            await send(message, {
+                embeds: [new EmbedBuilder().setDescription("Fetching lyrics...").setColor(KoosColor.Default)],
+            });
             const song = await this.container.genius.songs.get(input).catch(() => undefined);
             const lyrics = await this.getLyrics(song?.url).catch(() => undefined);
             if (!song) {

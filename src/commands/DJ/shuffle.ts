@@ -25,7 +25,7 @@ export class ShuffleCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current))
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
             });
 
@@ -40,7 +40,7 @@ export class ShuffleCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
         }
 
@@ -50,6 +50,6 @@ export class ShuffleCommand extends KoosCommand {
     private shuffle(player: KazagumoPlayer) {
         player.queue.shuffle();
 
-        return new EmbedBuilder({ description: `Shuffled the queue`, color: KoosColor.Default });
+        return new EmbedBuilder().setDescription(`Shuffled the queue`).setColor(KoosColor.Default);
     }
 }

@@ -40,7 +40,11 @@ export class SetVolumeCommand extends KoosCommand {
 
         if (input && (input > 200 || input < 1))
             return send(message, {
-                embeds: [{ description: `The volume may not be less than 0 or more than 200`, color: KoosColor.Error }],
+                embeds: [
+                    new EmbedBuilder()
+                        .setDescription(`The volume may not be less than 0 or more than 200`)
+                        .setColor(KoosColor.Error),
+                ],
             });
 
         send(message, { embeds: [await this.setVolume(message.guildId!, input)] });

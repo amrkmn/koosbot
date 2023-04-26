@@ -35,12 +35,14 @@ export class VolumeCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current))
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
             });
         if (input && (input > 200 || input < 1))
             return interaction.reply({
-                embeds: [{ description: `The volume may not be less than 0 or more than 200`, color: KoosColor.Error }],
+                embeds: [
+                    new EmbedBuilder().setDescription(`The volume may not be less than 0 or more than 200`).setColor(KoosColor.Error),
+                ],
                 ephemeral: true,
             });
 
@@ -57,12 +59,14 @@ export class VolumeCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
         }
         if (input && (input > 200 || input < 1))
             return send(message, {
-                embeds: [{ description: `The volume may not be less than 0 or more than 200`, color: KoosColor.Error }],
+                embeds: [
+                    new EmbedBuilder().setDescription(`The volume may not be less than 0 or more than 200`).setColor(KoosColor.Error),
+                ],
             });
 
         send(message, { embeds: [await this.volume(player, input)] });

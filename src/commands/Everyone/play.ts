@@ -67,7 +67,7 @@ export class PlayCommand extends KoosCommand {
         const query = attachment ? attachment.proxyURL : await args.rest("string").catch(() => undefined);
         if (!query)
             return await send(message, {
-                embeds: [{ description: "Please provide an URL or search query", color: KoosColor.Error }],
+                embeds: [new EmbedBuilder().setDescription("Please provide an URL or search query").setColor(KoosColor.Error)],
             });
 
         const channel = message.member?.voice.channel as VoiceBasedChannel;
@@ -159,6 +159,6 @@ export class PlayCommand extends KoosCommand {
         player.queue.add(queue);
         if (!player.playing && !player.paused) player.play();
 
-        return new EmbedBuilder({ description: msg, color: KoosColor.Default });
+        return new EmbedBuilder().setDescription(msg).setColor(KoosColor.Default);
     }
 }

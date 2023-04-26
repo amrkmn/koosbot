@@ -41,7 +41,7 @@ export class ClientListener extends Listener {
             !this.checkDJ(interaction, data.dj)
         )
             return interaction.followUp({
-                embeds: [{ description: `This button can only be use by DJ.`, color: KoosColor.Error }],
+                embeds: [new EmbedBuilder().setDescription(`This button can only be use by DJ.`).setColor(KoosColor.Error)],
                 ephemeral: true,
             });
 
@@ -67,21 +67,22 @@ export class ClientListener extends Listener {
     }
 
     private checkMember(guild: Guild | null, member: GuildMember) {
-        if (!guild) return new EmbedBuilder({ description: "You cannot run this message command in DMs.", color: KoosColor.Error });
+        if (!guild) return new EmbedBuilder().setDescription("You cannot run this message command in DMs.").setColor(KoosColor.Error);
         if (
             !isNullish(guild.members.me) &&
             !isNullish(member.voice.channel) && //
             !isNullish(guild.members.me.voice.channel) &&
             member.voice.channelId !== guild.members.me!.voice.channelId
         )
-            return new EmbedBuilder({
-                description: `You aren't connected to the same voice channel as I am. I'm currently connected to ${guild.members.me.voice.channel}`,
-                color: KoosColor.Error,
-            });
+            return new EmbedBuilder()
+                .setDescription(
+                    `You aren't connected to the same voice channel as I am. I'm currently connected to ${guild.members.me.voice.channel}`
+                )
+                .setColor(KoosColor.Error);
 
         return !isNullish(member.voice.channel) //
             ? undefined
-            : new EmbedBuilder({ description: "You aren't connected to a voice channel.", color: KoosColor.Error });
+            : new EmbedBuilder().setDescription("You aren't connected to a voice channel.").setColor(KoosColor.Error);
     }
 
     private checkDJ(message: Message | ButtonInteraction, dj: string[]) {

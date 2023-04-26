@@ -25,7 +25,7 @@ export class PauseCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current))
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
             });
 
@@ -40,7 +40,7 @@ export class PauseCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
         }
 
@@ -48,10 +48,10 @@ export class PauseCommand extends KoosCommand {
     }
 
     private pause(player: KazagumoPlayer) {
-        if (player.paused) return new EmbedBuilder({ description: `The song is already paused.`, color: KoosColor.Warn });
+        if (player.paused) return new EmbedBuilder().setDescription(`The song is already paused.`).setColor(KoosColor.Warn);
 
         player.pause(true);
 
-        return new EmbedBuilder({ description: `Paused the song.`, color: KoosColor.Default });
+        return new EmbedBuilder().setDescription(`Paused the song.`).setColor(KoosColor.Default);
     }
 }

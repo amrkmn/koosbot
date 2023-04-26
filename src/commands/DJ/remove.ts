@@ -45,12 +45,12 @@ export class RemoveCommand extends KoosCommand {
 
         if (isNullish(position))
             return interaction.reply({
-                embeds: [{ description: "Please specify the song positions to remove.", color: KoosColor.Error }],
+                embeds: [new EmbedBuilder().setDescription("Please specify the song positions to remove.").setColor(KoosColor.Error)],
                 ephemeral: true,
             });
         if (!player || (player && !player.queue.current))
             return interaction.reply({
-                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
             });
 
@@ -67,12 +67,12 @@ export class RemoveCommand extends KoosCommand {
 
         if (isNullish(position)) {
             return reply(message, {
-                embeds: [{ description: "Please specify the song positions to remove.", color: KoosColor.Error }],
+                embeds: [new EmbedBuilder().setDescription("Please specify the song positions to remove.").setColor(KoosColor.Error)],
             });
         }
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [{ description: "There's nothing playing in this server", color: KoosColor.Warn }],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
         }
 
@@ -84,28 +84,23 @@ export class RemoveCommand extends KoosCommand {
         if (to && to < position) to = undefined;
 
         if (position > player.queue.size || (to && to > player.queue.size))
-            return new EmbedBuilder({
-                description: `The queue doesn't have that many tracks (Total tracks: ${player.queue.size})`,
-                color: KoosColor.Error,
-            });
+            return new EmbedBuilder()
+                .setDescription(`The queue doesn't have that many tracks (Total tracks: ${player.queue.size})`)
+                .setColor(KoosColor.Error);
         if (position < 1)
-            return new EmbedBuilder({
-                description: `The position number must be from 1 to ${player.queue.size}`,
-                color: KoosColor.Error,
-            });
+            return new EmbedBuilder()
+                .setDescription(`The position number must be from 1 to ${player.queue.size}`)
+                .setColor(KoosColor.Error);
         if (to && to <= player.queue.size && to > position) {
-            const firstTrack = player.queue[position - 1];
-            const lastTrack = player.queue[to - 1];
-
             player.queue.splice(position - 1, to - position + 1);
 
-            return new EmbedBuilder({ description: `Removed song from index ${position} to ${to}`, color: KoosColor.Default });
+            return new EmbedBuilder().setDescription(`Removed song from index ${position} to ${to}`).setColor(KoosColor.Default);
         }
 
         const track = player.queue[position - 1];
         const title = createTitle(track);
         player.queue.remove(position - 1);
 
-        return new EmbedBuilder({ description: `Removed ${title} from the queue`, color: KoosColor.Default });
+        return new EmbedBuilder().setDescription(`Removed ${title} from the queue`).setColor(KoosColor.Default);
     }
 }

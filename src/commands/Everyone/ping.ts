@@ -4,7 +4,7 @@ import { databasePing } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { isMessageInstance } from "@sapphire/discord.js-utilities";
 import { send } from "@sapphire/plugin-editable-commands";
-import type { Message } from "discord.js";
+import { type Message, EmbedBuilder } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Get the bot's latency.",
@@ -21,7 +21,9 @@ export class PingCommand extends KoosCommand {
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         await interaction.deferReply();
         const [msg, database] = await Promise.all([
-            (await interaction.followUp({ embeds: [{ description: "Ping?", color: KoosColor.Default }] })) as Message,
+            (await interaction.followUp({
+                embeds: [new EmbedBuilder().setDescription("Ping?").setColor(KoosColor.Default)],
+            })) as Message,
             databasePing(),
         ]);
 
@@ -30,13 +32,15 @@ export class PingCommand extends KoosCommand {
             const ping = Math.round(this.container.client.ws.ping);
             const content = `Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms. Database: ${Math.round(database)}ms.)`;
 
-            interaction.editReply({ embeds: [{ description: content, color: KoosColor.Default }] });
+            interaction.editReply({
+                embeds: [new EmbedBuilder().setDescription(content).setColor(KoosColor.Default)],
+            });
         }
     }
 
     public async messageRun(message: Message) {
         const [msg, database] = await Promise.all([
-            send(message, { embeds: [{ description: "Ping?", color: KoosColor.Default }] }),
+            send(message, { embeds: [new EmbedBuilder().setDescription("Ping?").setColor(KoosColor.Default)] }),
             databasePing(),
         ]);
 
@@ -44,6 +48,6 @@ export class PingCommand extends KoosCommand {
         const ping = Math.round(this.container.client.ws.ping);
         const content = `Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms. Database: ${Math.round(database)}ms.)`;
 
-        return send(message, { embeds: [{ description: content, color: KoosColor.Default }] });
+        return send(message, { embeds: [new EmbedBuilder().setDescription(content).setColor(KoosColor.Default)] });
     }
 }

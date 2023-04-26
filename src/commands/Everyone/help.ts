@@ -5,7 +5,7 @@ import { isString } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args, SapphirePrefix } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
-import { Collection, Message } from "discord.js";
+import { Collection, Message, EmbedBuilder } from "discord.js";
 
 const categoryLevel: { [key: string]: number } = {
     Admin: PermissionLevel.Administrator,
@@ -37,31 +37,32 @@ export class HelpCommand extends KoosCommand {
 
             return send(message, {
                 embeds: [
-                    {
-                        fields: [
+                    new EmbedBuilder()
+                        .setFields(
                             { name: `${buildedCommand.name} ${aliases ? `(${aliases})` : ``}`, value: buildedCommand.description },
                             { name: `• Usage ${buildedCommand.slashOnly ? `(Slash only)` : ``}`, value: usage },
-                            { name: `• Permission`, value: `\`${buildedCommand.category}\`` },
-                        ],
-                        color: KoosColor.Default,
-                    },
+                            { name: `• Permission`, value: `\`${buildedCommand.category}\`` }
+                        )
+                        .setColor(KoosColor.Default),
                 ],
             });
         } else if (command.isErr() && ["commandCannotResolve", "commandNotFound"].includes(command.err().unwrap().identifier))
             return send(message, {
-                embeds: [{ description: `${command.err().unwrap().message}`, color: KoosColor.Error }],
+                embeds: [new EmbedBuilder().setDescription(`${command.err().unwrap().message}`).setColor(KoosColor.Error)],
             });
 
         const help = await this.buildHelp(message);
 
         send(message, {
             embeds: [
-                {
-                    fields: help,
-                    color: KoosColor.Default,
-                    footer: { text: `Use ${prefix}help [ command ] to get more information about a command` },
-                    author: { name: `${this.client.user?.username}'s Command List`, icon_url: this.client.user?.displayAvatarURL() },
-                },
+                new EmbedBuilder()
+                    .setFields(help)
+                    .setColor(KoosColor.Default)
+                    .setFooter({ text: `Use ${prefix}help [ command ] to get more information about a command` })
+                    .setAuthor({
+                        name: `${this.client.user?.username}'s Command List`,
+                        iconURL: this.client.user?.displayAvatarURL(),
+                    }),
             ],
         });
     }
