@@ -29,7 +29,7 @@ export class ClientListener extends Listener {
         const data = await this.container.db.guild.findUnique({ where: { id: interaction.guildId! } });
         if (isNullish(player) || isNullish(data)) return;
 
-        let msg = player.nowPlaying();
+        const npMessage = player.nowPlaying();
 
         const id = interaction.customId as ButtonId;
         const checkMember = this.checkMember(interaction.guild!, interaction.member as GuildMember);
@@ -38,7 +38,7 @@ export class ClientListener extends Listener {
         if (!isNullish(checkMember)) return interaction.followUp({ embeds: [checkMember], ephemeral: true });
         if (
             [ButtonId.PauseOrResume, ButtonId.Previous, ButtonId.Skip, ButtonId.Stop].includes(id) && //
-            !this.checkDJ(interaction, player, data.dj)
+            !this.checkDJ(interaction, data.dj)
         )
             return interaction.followUp({
                 embeds: [{ description: `This button can only be use by DJ.`, color: KoosColor.Error }],
@@ -49,7 +49,7 @@ export class ClientListener extends Listener {
             case ButtonId.PauseOrResume:
                 const previousTrack = player.previous();
                 player.pause(!player.paused);
-                msg.edit({ components: [this.buttons(player.paused, isNullishOrEmpty(previousTrack))] });
+                npMessage.edit({ components: [this.buttons(player.paused, isNullishOrEmpty(previousTrack))] });
                 break;
             case ButtonId.Previous:
                 const prevTrack = player.previousTrack();
@@ -63,18 +63,6 @@ export class ClientListener extends Listener {
                 player.queue.clear();
                 player.skip();
                 break;
-            // case Button.ShowQueue:
-            //     const queue = await this.queue(player);
-            //     const embed = queue[0];
-
-            //     if (embed.data.footer?.text)
-            //         embed.setFooter({
-            //             text: `Page 1/${queue.length} | ${embed.data.footer?.text}`,
-            //             iconURL: embed.data.footer?.icon_url,
-            //         });
-
-            //     await interaction.followUp({ embeds: [embed], ephemeral: true });
-            //     break;
         }
     }
 
@@ -82,8 +70,8 @@ export class ClientListener extends Listener {
         if (!guild) return new EmbedBuilder({ description: "You cannot run this message command in DMs.", color: KoosColor.Error });
         if (
             !isNullish(guild.members.me) &&
-            member.voice.channel !== null && //
-            guild.members.me.voice.channel !== null &&
+            !isNullish(member.voice.channel) && //
+            !isNullish(guild.members.me.voice.channel) &&
             member.voice.channelId !== guild.members.me!.voice.channelId
         )
             return new EmbedBuilder({
@@ -91,22 +79,15 @@ export class ClientListener extends Listener {
                 color: KoosColor.Error,
             });
 
-        return member.voice.channel !== null //
+        return !isNullish(member.voice.channel) //
             ? undefined
             : new EmbedBuilder({ description: "You aren't connected to a voice channel.", color: KoosColor.Error });
     }
 
-    private checkDJ(message: Message | ButtonInteraction, player: KazagumoPlayer, dj: string[]) {
+    private checkDJ(message: Message | ButtonInteraction, dj: string[]) {
         const member = message.member as GuildMember;
 
-        // const current = player.queue.current!;
-        // const requester = current.requester;
-
         const roles = [...member.roles.cache.keys()].filter((id) => dj.includes(id));
-
-        // if (requester instanceof GuildMember && requester.user.id === member.user.id) {
-        //     return requester.user.id === member.user.id;
-        // }
 
         return !isNullishOrEmpty(roles);
     }
@@ -124,75 +105,6 @@ export class ClientListener extends Listener {
                 .setDisabled(firstTrack),
             new ButtonBuilder().setCustomId(ButtonId.Skip).setStyle(ButtonStyle.Primary).setLabel("Skip"),
             new ButtonBuilder().setCustomId(ButtonId.Stop).setStyle(ButtonStyle.Danger).setLabel("Stop")
-            // new ButtonBuilder().setCustomId(Button.ShowQueue).setStyle(ButtonStyle.Secondary).setLabel("Show Queue")
         );
-    }
-
-    private async queue(player: KazagumoPlayer) {
-        const data = await this.container.db.guild.findUnique({ where: { id: player.guildId } });
-        const current = player.queue.current!;
-        let timeLeft = current.isStream //
-            ? "Live"
-            : `${convertTime(Number(current.length) - player.shoukaku.position)} left`;
-        let duration = player.queue.isEmpty ? current.length : player.queue.durationLength + Number(current.length);
-        let totalDuration =
-            player.queue.some((track) => track.isStream) || current.isStream
-                ? "Live"
-                : `${convertTime(Number(duration) - player.shoukaku.position)}`;
-        let nowPlaying =
-            current.sourceName === "youtube"
-                ? `[${current.title}](${current.uri})`
-                : `[${current.title} ${current.author ? `by ${current.author}` : ``}](${current.uri})`;
-
-        if (player.queue.isEmpty) {
-            const embed = new EmbedBuilder()
-                .setDescription(
-                    stripIndents`
-                        __Now playing:__
-                        ${nowPlaying} [${timeLeft}]${data?.requester ? ` ~ ${current.requester}` : ``}
-
-                        __Up next:__
-                        No other tracks here
-                    `
-                )
-                .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
-                .setColor(KoosColor.Default);
-
-            return [embed];
-        }
-
-        let queueList = [];
-        for (let i = 0; i < player.queue.length; i += 10) {
-            let queue = player.queue.slice(i, i + 10);
-            queueList.push(
-                queue.map((track, index) => {
-                    const title = createTitle(track);
-                    return `**${i + ++index}.** ${title} [${track.isStream ? "Live" : convertTime(track.length!)}]${
-                        data?.requester ? ` ~ ${track.requester}` : ``
-                    }`;
-                })
-            );
-        }
-
-        let embeds = [];
-        for (let list of queueList) {
-            let upNext = list.join("\n");
-            embeds.push(
-                new EmbedBuilder()
-                    .setDescription(
-                        stripIndents`
-                            __Now playing:__
-                            ${nowPlaying} [${timeLeft}]${data?.requester ? ` ~ ${current.requester}` : ``}
-
-                            __Up next:__
-                            ${upNext}
-                        `
-                    )
-                    .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
-                    .setColor(KoosColor.Default)
-            );
-        }
-
-        return embeds;
     }
 }
