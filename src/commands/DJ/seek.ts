@@ -78,12 +78,12 @@ export class SeekCommand extends KoosCommand {
 
         if (isNaN(position))
             return new EmbedBuilder()
-                .setDescription(`Please enter a correct format. (e.g. hh:mm:ss, mm:ss, 2m 30s or 2 minutes 30 seconds)`)
+                .setDescription(`Please enter the correct format. (e.g. hh:mm:ss, mm:ss, 2m 30s or 2 minutes 30 seconds)`)
                 .setColor(KoosColor.Error);
 
         player.seek(position);
         return new EmbedBuilder()
-            .setDescription(`Seeked ${title} to ${convertTime(position)} / ${convertTime(current.length!)}`)
+            .setDescription(`Seeked ${title} to ${convertTime(current.position!)} / ${convertTime(current.length!)}`)
             .setColor(KoosColor.Success);
     }
 }

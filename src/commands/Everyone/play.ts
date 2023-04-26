@@ -4,13 +4,14 @@ import { ApplicationCommandOptionChoiceData, GuildMember, Message, EmbedBuilder,
 import { send } from "@sapphire/plugin-editable-commands";
 import { KoosColor } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
-import { filterNullishAndEmpty, isNullish, isNullishOrEmpty } from "@sapphire/utilities";
+import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
 import { createTitle, cutText, sendLoadingMessage } from "#utils/functions";
 import { PlayOptions } from "#lib/interfaces";
 import { oneLine } from "common-tags";
+import { KazagumoTrack } from "kazagumo";
+import { DiscordSnowflake } from "@sapphire/snowflake";
 import pluralize from "pluralize";
-import { KazagumoTrack, RawTrack } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Add a track to queue.",
@@ -19,7 +20,7 @@ import { KazagumoTrack, RawTrack } from "kazagumo";
     usage: "query",
 })
 export class PlayCommand extends KoosCommand {
-    private tracks: Map<string, string[]> = new Map<string, string[]>();
+    private tracks: Map<string, Map<string, string>> = new Map<string, Map<string, string>>();
 
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand((builder) =>
@@ -48,10 +49,10 @@ export class PlayCommand extends KoosCommand {
         const member = interaction.member! as GuildMember;
         const channel = member.voice.channel as VoiceBasedChannel;
 
-        let index = Number(query.split(":").filter(filterNullishAndEmpty)[1]);
         let player = kazagumo.getPlayer(interaction.guildId!);
-        let tracks = this.tracks.get(`${guildId}:${member.id}`) ?? [];
-        let selected = query.startsWith("a:") ? tracks[index] : query;
+        let tracks = this.tracks.get(`${guildId}:${member.id}`) ?? new Map<string, string>();
+        let selected = tracks.has(query) ? tracks.get(query)! : query;
+
         this.tracks.delete(`${guildId}:${member.id}`);
 
         await interaction.editReply({
@@ -89,24 +90,34 @@ export class PlayCommand extends KoosCommand {
         });
 
         if (type === "PLAYLIST") {
-            let tracks = [query.value];
+            const tracksMap = new Map<string, string>();
+
+            const id = `${DiscordSnowflake.generate()}`;
+            const tracks = tracksMap.set(id, query.value);
+
             this.tracks.set(`${guildId}:${memberId}`, tracks);
-            return interaction.respond([{ name: cutText(`${playlistName}`, 100), value: `a:${tracks.length - 1}` }]);
+
+            return interaction.respond([{ name: cutText(`${playlistName}`, 100), value: id }]);
         } else {
             tracks = tracks.slice(0, 10);
 
-            this.tracks.set(
-                `${guildId}:${memberId}`,
-                tracks.map((track) => track.uri)
-            );
-            const options: ApplicationCommandOptionChoiceData[] = tracks.map((track, i) => {
+            const options: ApplicationCommandOptionChoiceData[] = [];
+            const tracksMap = new Map<string, string>();
+
+            for (let track of tracks) {
+                const id = `${DiscordSnowflake.generate()}`;
                 const author = track.author;
                 const title = `${track.title} ${author && author.toLowerCase() !== "unknown artist" ? `by ${author}` : ``}`;
-                return {
+
+                tracksMap.set(id, track.uri);
+
+                options.push({
                     name: `${cutText(title, 100)}`,
-                    value: `a:${i}`,
-                };
-            });
+                    value: id,
+                });
+            }
+
+            this.tracks.set(`${guildId}:${memberId}`, tracksMap);
 
             return interaction.respond(options);
         }
