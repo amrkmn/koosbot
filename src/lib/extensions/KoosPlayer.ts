@@ -52,17 +52,7 @@ export class KoosPlayer extends KazagumoPlayer {
                 `
             )
             .setColor(KoosColor.Default);
-        const playerButtons = [
-            new ButtonBuilder().setLabel("Pause").setCustomId(ButtonId.PauseOrResume).setStyle(ButtonStyle.Success),
-            new ButtonBuilder()
-                .setLabel("Previous")
-                .setCustomId(ButtonId.Previous)
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(isNullishOrEmpty(previousTracks)),
-            new ButtonBuilder().setLabel("Skip").setCustomId(ButtonId.Skip).setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setLabel("Stop").setCustomId(ButtonId.Stop).setStyle(ButtonStyle.Danger),
-        ];
-        const row = new ActionRowBuilder<ButtonBuilder>().setComponents(playerButtons);
+        const row = this.createPlayerComponents(previousTracks);
 
         if (channel.isTextBased()) {
             const nowPlaying = await channel.send({ embeds: [embed], components: [row] });
@@ -97,6 +87,19 @@ export class KoosPlayer extends KazagumoPlayer {
 
     public resetPrevious() {
         this.#previous = [];
+    }
+
+    private createPlayerComponents(previousTracks: KazagumoTrack[]) {
+        const hasPrevious = isNullishOrEmpty(previousTracks);
+        const button = new ButtonBuilder();
+        const row = new ActionRowBuilder<ButtonBuilder>();
+
+        return row.setComponents([
+            button.setLabel("Pause").setCustomId(ButtonId.PauseOrResume).setStyle(ButtonStyle.Success),
+            button.setLabel("Previous").setCustomId(ButtonId.Previous).setStyle(ButtonStyle.Primary).setDisabled(hasPrevious),
+            button.setLabel("Skip").setCustomId(ButtonId.Skip).setStyle(ButtonStyle.Primary),
+            button.setLabel("Stop").setCustomId(ButtonId.Stop).setStyle(ButtonStyle.Danger),
+        ]);
     }
 }
 
