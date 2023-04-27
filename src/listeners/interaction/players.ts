@@ -1,22 +1,19 @@
 import { ButtonId } from "#lib/utils/constants";
-import { ApplyOptions } from "@sapphire/decorators";
-import { Listener, Events } from "@sapphire/framework";
-import {
-    Message,
-    ButtonBuilder,
-    ActionRowBuilder,
-    EmbedBuilder,
-    GuildMember,
-    Guild,
-    ButtonStyle,
-    Interaction,
-    ButtonInteraction,
-} from "discord.js";
-import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
-import { KazagumoPlayer } from "kazagumo";
-import { convertTime, createTitle } from "#utils/functions";
 import { KoosColor } from "#utils/constants";
-import { stripIndents } from "common-tags";
+import { ApplyOptions } from "@sapphire/decorators";
+import { Events, Listener } from "@sapphire/framework";
+import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonInteraction,
+    ButtonStyle,
+    EmbedBuilder,
+    Guild,
+    GuildMember,
+    Interaction,
+    Message
+} from "discord.js";
 
 @ApplyOptions<Listener.Options>({
     name: "players",

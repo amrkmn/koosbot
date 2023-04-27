@@ -1,12 +1,11 @@
 import { KoosCommand } from "#lib/extensions";
-import { ApplyOptions } from "@sapphire/decorators";
-import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
-import { KoosColor } from "#utils/constants";
-import { send } from "@sapphire/plugin-editable-commands";
 import { Emoji, PermissionLevel } from "#lib/utils/constants";
-import { Args, UserError } from "@sapphire/framework";
-import { isNullish, isObject } from "@sapphire/utilities";
+import { KoosColor } from "#utils/constants";
 import { sendLoadingMessage } from "#utils/functions";
+import { ApplyOptions } from "@sapphire/decorators";
+import { Args } from "@sapphire/framework";
+import { send } from "@sapphire/plugin-editable-commands";
+import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Enables/disables if the requester is shown on each track.",

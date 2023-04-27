@@ -22,10 +22,6 @@ export class KoosPlayer extends KazagumoPlayer {
         this.#nowPlaying = undefined;
     }
 
-    public skipTo(amount: number) {
-        // TODO
-    }
-
     public nowPlaying(): Message;
     public nowPlaying(message: Message): undefined;
     public nowPlaying(message?: Message) {

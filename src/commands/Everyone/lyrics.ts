@@ -1,24 +1,23 @@
-import {
-    ApplicationCommandOptionChoiceData,
-    ComponentType,
-    EmbedBuilder,
-    Message,
-    ActionRowBuilder,
-    StringSelectMenuBuilder,
-    TextChannel,
-    SelectMenuComponentOptionData,
-    ButtonBuilder,
-    ButtonStyle,
-} from "discord.js";
-import { KoosColor, userAgent } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
-import { ApplyOptions } from "@sapphire/decorators";
-import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
+import { KoosColor, userAgent } from "#utils/constants";
 import { chunk, cutText, decodeEntities, pagination, sendLoadingMessage } from "#utils/functions";
 import { request } from "@aytea/request";
-import { send } from "@sapphire/plugin-editable-commands";
+import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
+import { send } from "@sapphire/plugin-editable-commands";
+import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import * as cheerio from "cheerio";
+import {
+    ActionRowBuilder,
+    ApplicationCommandOptionChoiceData,
+    ButtonBuilder,
+    ButtonStyle,
+    EmbedBuilder,
+    Message,
+    SelectMenuComponentOptionData,
+    StringSelectMenuBuilder,
+    TextChannel
+} from "discord.js";
 import ms from "ms";
 import pluralize from "pluralize";
 

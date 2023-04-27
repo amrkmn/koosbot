@@ -1,7 +1,6 @@
 import { Precondition, PreconditionOptions } from "@sapphire/framework";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { CommandInteraction, GuildMember, Message } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
 
 export class DJPrecondition extends Precondition<PreconditionOptions> {
     public async messageRun(message: Message) {
@@ -12,7 +11,7 @@ export class DJPrecondition extends Precondition<PreconditionOptions> {
         const player = this.container.kazagumo.getPlayer(`${message.guildId}`);
         if (!player || (player && !player.queue.current)) return this.ok();
 
-        return this.checkDJ(message, player, data.dj)
+        return this.checkDJ(message, data.dj)
             ? this.ok()
             : this.error({ message: `This command can only run by DJ or the song requester.` });
     }
@@ -25,19 +24,19 @@ export class DJPrecondition extends Precondition<PreconditionOptions> {
         const player = this.container.kazagumo.getPlayer(`${interaction.guildId}`);
         if (!player || (player && !player.queue.current)) return this.ok();
 
-        return this.checkDJ(interaction, player, data.dj)
+        return this.checkDJ(interaction, data.dj)
             ? this.ok()
             : this.error({ message: `This command can only run by DJ or the song requester.` });
     }
 
-    private checkDJ(message: Message | CommandInteraction, player: KazagumoPlayer, dj: string[]) {
+    private checkDJ(message: Message | CommandInteraction, dj: string[]) {
         const member = message.member as GuildMember;
 
         // const current = player.queue.current!;
         // const requester = current.requester;
-        
+
         const roles = [...member.roles.cache.keys()].filter((id) => dj.includes(id));
-        
+
         // if (requester instanceof GuildMember && requester.user.id === member.user.id) {
         //     return requester.user.id === member.user.id;
         // }

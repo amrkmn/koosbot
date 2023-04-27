@@ -1,13 +1,12 @@
 import { KoosCommand } from "#lib/extensions";
-import { KoosColor, zws } from "#utils/constants";
+import { PermissionLevel } from "#lib/utils/constants";
+import { KoosColor } from "#utils/constants";
+import { removeItem, sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
-import { EmbedBuilder, Message, PermissionFlagsBits, Role } from "discord.js";
-// import { isNullishOrEmpty } from "@sapphire/utilities";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { isNullishOrEmpty } from "@sapphire/utilities";
-import { removeItem, sendLoadingMessage } from "#utils/functions";
-import { PermissionLevel } from "#lib/utils/constants";
+import { EmbedBuilder, Message, PermissionFlagsBits, Role } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Add or remove a DJ role.",

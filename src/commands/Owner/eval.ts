@@ -73,8 +73,11 @@ export class EvalCommand extends KoosCommand {
         if (flags.async) code = `(async () => {\n${code}\n})();`;
 
         const { container } = this;
-        const { client, db, genius, kazagumo, shoukaku, stores } = container;
+        // @ts-ignore
+        const { client, db, genius, kazagumo, shoukaku, stores } = container; 
+        // @ts-ignore
         const msg = message;
+        // @ts-ignore
         const utils = functions;
 
         const stopwatch = new Stopwatch();

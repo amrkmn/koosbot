@@ -1,15 +1,14 @@
 import { KoosCommand } from "#lib/extensions";
-import { ApplyOptions } from "@sapphire/decorators";
-import { KazagumoTrack } from "kazagumo";
-import { EmbedBuilder, GuildMember, VoiceBasedChannel, ApplicationCommandOptionChoiceData, Message } from "discord.js";
 import { PlayOptions } from "#lib/interfaces";
 import { KoosColor } from "#utils/constants";
-import { Args } from "@sapphire/framework";
-import { filterNullishAndEmpty, isNullish, isNullishOrEmpty } from "@sapphire/utilities";
-import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
 import { createTitle, cutText } from "#utils/functions";
+import { ApplyOptions } from "@sapphire/decorators";
+import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
+import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
+import { filterNullishAndEmpty, isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { oneLine } from "common-tags";
+import { ApplicationCommandOptionChoiceData, EmbedBuilder, GuildMember, Message, VoiceBasedChannel } from "discord.js";
 import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({

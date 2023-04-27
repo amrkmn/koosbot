@@ -7,16 +7,15 @@ import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import {
-    Message,
-    CommandInteraction,
-    EmbedBuilder,
     ActionRowBuilder,
-    GuildMember,
-    StringSelectMenuBuilder,
-    SelectMenuComponentOptionData,
-    ComponentType,
     ButtonBuilder,
     ButtonStyle,
+    CommandInteraction,
+    EmbedBuilder,
+    GuildMember,
+    Message,
+    SelectMenuComponentOptionData,
+    StringSelectMenuBuilder
 } from "discord.js";
 import { Kazagumo } from "kazagumo";
 import pluralize from "pluralize";

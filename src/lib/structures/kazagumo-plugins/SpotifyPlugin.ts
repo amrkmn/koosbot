@@ -12,6 +12,8 @@ import {
     Track,
     TrackResult,
 } from "#lib/interfaces";
+import { request } from "@aytea/request";
+import { filterNullish } from "@sapphire/utilities";
 import {
     Kazagumo,
     KazagumoError,
@@ -21,8 +23,6 @@ import {
     KazagumoTrack,
     SearchResultTypes,
 } from "kazagumo";
-import { request } from "@aytea/request";
-import { filterNullish } from "@sapphire/utilities";
 
 const REGEX = /(?:https:\/\/open\.spotify\.com\/|spotify:)(?:.+)?(track|playlist|album|artist)[\/:]([A-Za-z0-9]+)/;
 export class KazagumoPlugin extends Plugin implements Plugin {
@@ -32,7 +32,6 @@ export class KazagumoPlugin extends Plugin implements Plugin {
     public options: SpotifyOptions;
 
     private _search: ((query: string, options?: KazagumoSearchOptions) => Promise<KazagumoSearchResult>) | null;
-    private token: string = "";
     private kazagumo: Kazagumo | null;
 
     private readonly methods: Record<string, (id: string, requester: unknown) => Promise<Result>>;
