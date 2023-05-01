@@ -5,6 +5,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
+import { DiscordSnowflake } from "@sapphire/snowflake";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import {
     ActionRowBuilder,
@@ -15,9 +16,10 @@ import {
     GuildMember,
     Message,
     SelectMenuComponentOptionData,
-    StringSelectMenuBuilder
+    Snowflake,
+    StringSelectMenuBuilder,
 } from "discord.js";
-import { Kazagumo } from "kazagumo";
+import { Kazagumo, KazagumoTrack } from "kazagumo";
 import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
@@ -27,6 +29,8 @@ import pluralize from "pluralize";
     usage: "query",
 })
 export class SearchCommand extends KoosCommand {
+    private tracksMap: Map<Snowflake, KazagumoTrack> = new Map<Snowflake, KazagumoTrack>();
+
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand((builder) =>
             builder //
@@ -89,12 +93,13 @@ export class SearchCommand extends KoosCommand {
                 value: `playlist`,
             });
         } else {
-            let i = 0;
             for (let track of tracks) {
+                const id = `${DiscordSnowflake.generate()}`;
+                this.tracksMap.set(id, track);
                 options.push({
                     label: cutText(`${track.title}`, 100),
                     description: `Duration: ${convertTime(track.length!)} | Author: ${track.author ?? "Unknown artist"}`,
-                    value: `${i++}`,
+                    value: id,
                 });
             }
         }
@@ -133,10 +138,10 @@ export class SearchCommand extends KoosCommand {
 
                 let player = kazagumo.getPlayer(`${message.guildId}`);
                 try {
-                    const userOption = Number(interaction.values.at(0));
+                    const userOption = interaction.values.at(0)!;
 
                     collector.stop("picked");
-                    const selected = type === "PLAYLIST" && isNaN(userOption) ? tracks : tracks[userOption];
+                    const selected = type === "PLAYLIST" && userOption === "playlist" ? tracks : this.tracksMap.get(userOption)!;
 
                     const title = !Array.isArray(selected) ? createTitle(selected) : `[${playlistName}](${query})`;
 

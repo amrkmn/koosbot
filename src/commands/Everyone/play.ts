@@ -1,6 +1,6 @@
 import { Args } from "@sapphire/framework";
 import { ApplyOptions } from "@sapphire/decorators";
-import { ApplicationCommandOptionChoiceData, GuildMember, Message, EmbedBuilder, VoiceBasedChannel } from "discord.js";
+import { ApplicationCommandOptionChoiceData, GuildMember, Message, EmbedBuilder, VoiceBasedChannel, Snowflake } from "discord.js";
 import { send } from "@sapphire/plugin-editable-commands";
 import { KoosColor } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
@@ -20,7 +20,7 @@ import pluralize from "pluralize";
     usage: "query",
 })
 export class PlayCommand extends KoosCommand {
-    private tracks: Map<string, Map<string, string>> = new Map<string, Map<string, string>>();
+    private tracks: Map<Snowflake, Map<Snowflake, string>> = new Map<Snowflake, Map<Snowflake, string>>();
 
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand((builder) =>

@@ -30,7 +30,7 @@ export class QueueCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
             });
         }
@@ -46,7 +46,7 @@ export class QueueCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
         }
 
@@ -80,6 +80,7 @@ export class QueueCommand extends KoosCommand {
                         No other tracks here
                     `
                 )
+                .setThumbnail(current.thumbnail ?? null)
                 .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
                 .setColor(KoosColor.Default);
 
@@ -113,6 +114,7 @@ export class QueueCommand extends KoosCommand {
                             ${upNext}
                         `
                     )
+                    .setThumbnail(current.thumbnail ?? null)
                     .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
                     .setColor(KoosColor.Default)
             );
