@@ -9,8 +9,8 @@ import { KazagumoPlayer } from "kazagumo";
 @ApplyOptions<KoosCommand.Options>({
     description: `Change the current loop mode (queue, song, off).`,
     preconditions: ["VoiceOnly", "DJ"],
-    usage: {
-        type: ["queue", "song", "off"],
+    detailedDescription: {
+        usages: [";queue|;song|;off"],
     },
 })
 export class LoopCommand extends KoosCommand {
@@ -19,16 +19,20 @@ export class LoopCommand extends KoosCommand {
             builder //
                 .setName(this.name)
                 .setDescription(this.description)
-                .addSubcommand((subcommand) => subcommand.setName("queue").setDescription("Loop the queue."))
-                .addSubcommand((subcommand) => subcommand.setName("song").setDescription("Loop the current playing song."))
-                .addSubcommand((subcommand) => subcommand.setName("off").setDescription("Turn looping off"))
+                .addStringOption((option) =>
+                    option
+                        .setName("mode")
+                        .setDescription("Select a loop mode")
+                        .setRequired(true)
+                        .addChoices({ name: "queue", value: "queue" }, { name: "song", value: "song" }, { name: "off", value: "off" })
+                )
         );
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(interaction.guildId!)!;
-        const mode = interaction.options.getSubcommand(true) as "off" | "queue" | "song";
+        const mode = interaction.options.getString("mode", true) as "off" | "queue" | "song";
 
         if (!player || (player && !player.queue.current))
             return interaction.reply({

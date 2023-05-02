@@ -15,7 +15,9 @@ import pluralize from "pluralize";
     description: "Insert the tracks right after the current song playing.",
     aliases: ["pt"],
     preconditions: ["VoiceOnly", "DJ"],
-    usage: "query",
+    detailedDescription: {
+        usages: [":query"],
+    },
 })
 export class PlayTopCommand extends KoosCommand {
     private tracks: Map<string, string[]> = new Map<string, string[]>();

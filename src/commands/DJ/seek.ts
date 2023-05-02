@@ -10,9 +10,8 @@ import { convertTime, createTitle, timeToMs } from "#utils/functions";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Seek to a specific time in the currently playing track",
-    usage: {
-        type: "time",
-        required: true,
+    detailedDescription: {
+        usages: [":time"],
     },
 })
 export class SeekCommand extends KoosCommand {

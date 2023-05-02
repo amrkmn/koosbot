@@ -15,7 +15,9 @@ import pluralize from "pluralize";
     description: "Play the tracks right away.",
     aliases: ["ps"],
     preconditions: ["VoiceOnly", "DJ"],
-    usage: "query",
+    detailedDescription: {
+        usages: [":query"],
+    },
 })
 export class PlaySkipCommand extends KoosCommand {
     private tracks: Map<string, string[]> = new Map<string, string[]>();

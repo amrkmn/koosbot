@@ -12,8 +12,8 @@ import { sendLoadingMessage } from "#utils/functions";
 @ApplyOptions<KoosCommand.Options>({
     description: `Lets you set a new prefix.`,
     permissionLevels: PermissionLevel.Administrator,
-    usage: {
-        types: [{ type: "new prefix", required: false }],
+    detailedDescription: {
+        usages: [";newPrefix"],
     },
 })
 export class PrefixCommand extends KoosCommand {

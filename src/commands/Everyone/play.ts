@@ -17,7 +17,9 @@ import pluralize from "pluralize";
     description: "Add a track to queue.",
     aliases: ["p"],
     preconditions: ["VoiceOnly"],
-    usage: "query",
+    detailedDescription: {
+        usages: [":query"],
+    },
 })
 export class PlayCommand extends KoosCommand {
     private tracks: Map<Snowflake, Map<Snowflake, string>> = new Map<Snowflake, Map<Snowflake, string>>();

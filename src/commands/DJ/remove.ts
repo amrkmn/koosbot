@@ -12,8 +12,8 @@ import { createTitle } from "#utils/functions";
     description: "Remove a track from the queue.",
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["rm", "del", "delete"],
-    usage: {
-        types: [{ type: "position", required: true }, { type: "to" }],
+    detailedDescription: {
+        usages: [":position", ";to"],
     },
 })
 export class RemoveCommand extends KoosCommand {

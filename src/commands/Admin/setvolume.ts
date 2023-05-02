@@ -12,8 +12,8 @@ import { Message, EmbedBuilder, PermissionFlagsBits } from "discord.js";
     description: "Lets you change the bots default output volume.",
     aliases: ["setvol", "svol"],
     permissionLevels: PermissionLevel.Administrator,
-    usage: {
-        types: [{ type: "1-200" }],
+    detailedDescription: {
+        usages: [":1-200"],
     },
 })
 export class SetVolumeCommand extends KoosCommand {
@@ -41,9 +41,7 @@ export class SetVolumeCommand extends KoosCommand {
         if (input && (input > 200 || input < 1))
             return send(message, {
                 embeds: [
-                    new EmbedBuilder()
-                        .setDescription(`The volume may not be less than 0 or more than 200`)
-                        .setColor(KoosColor.Error),
+                    new EmbedBuilder().setDescription(`The volume may not be less than 0 or more than 200`).setColor(KoosColor.Error),
                 ],
             });
 

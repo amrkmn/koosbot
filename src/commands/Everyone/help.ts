@@ -1,11 +1,13 @@
 import { KoosCommand } from "#lib/extensions";
+import { DocumentCommand } from "#lib/interfaces";
 import { PermissionLevel } from "#lib/utils/constants";
 import { KoosColor } from "#utils/constants";
-import { isString } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args, SapphirePrefix } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
-import { Collection, Message, EmbedBuilder } from "discord.js";
+import { isNullish, isObject } from "@sapphire/utilities";
+import { ApplicationCommandOptionChoiceData } from "discord.js";
+import { Collection, EmbedBuilder, Message } from "discord.js";
 
 const categoryLevel: { [key: string]: number } = {
     Admin: PermissionLevel.Administrator,
@@ -17,11 +19,83 @@ const categoryLevel: { [key: string]: number } = {
 @ApplyOptions<KoosCommand.Options>({
     description: `Lists all the commands`,
     aliases: ["h", "cmds", "cmd"],
-    usage: {
-        type: "command",
+    detailedDescription: {
+        usages: [";command"],
     },
 })
 export class HelpCommand extends KoosCommand {
+    public override registerApplicationCommands(registery: KoosCommand.Registry) {
+        registery.registerChatInputCommand((builder) =>
+            builder
+                .setName(this.name)
+                .setDescription(this.description)
+                .addStringOption((option) =>
+                    option //
+                        .setName("command")
+                        .setDescription("Get info about a specific command.")
+                        .setRequired(false)
+                        .setAutocomplete(true)
+                )
+        );
+    }
+
+    public async autocompleteRun(interaction: KoosCommand.AutocompleteInteraction) {
+        const search = interaction.options.getString("command");
+        const result = await this.container.meili.get<DocumentCommand>("commands", search ?? "");
+
+        const options: ApplicationCommandOptionChoiceData[] = result.hits.map(({ name }) => ({ name, value: name }));
+
+        return interaction.respond(options);
+    }
+
+    public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
+        const prefix = "/";
+        const option = interaction.options.getString("command");
+
+        await interaction.deferReply({ ephemeral: true });
+
+        if (!isNullish(option)) {
+            const command = this.container.stores.get("commands").get(option) as KoosCommand | undefined;
+            if (!command)
+                return interaction.followUp({
+                    embeds: [new EmbedBuilder().setDescription(`I couldn't find that command`).setColor(KoosColor.Error)],
+                    ephemeral: true,
+                });
+
+            const buildedCommand = await this.buildCommand(command);
+            const aliases = buildedCommand.aliases && buildedCommand.aliases.length ? buildedCommand.aliases.join(", ") : undefined;
+
+            const usage = this.parseUsage(command, prefix);
+
+            return interaction.followUp({
+                embeds: [
+                    new EmbedBuilder()
+                        .setFields(
+                            { name: `${buildedCommand.name} ${aliases ? `(${aliases})` : ``}`, value: buildedCommand.description },
+                            { name: `• Usage ${buildedCommand.slashOnly ? `(Slash only)` : ``}`, value: usage },
+                            { name: `• Permission`, value: `\`${buildedCommand.category}\`` }
+                        )
+                        .setColor(KoosColor.Default),
+                ],
+            });
+        }
+
+        const help = await this.buildChatInputHelp(interaction);
+
+        return interaction.followUp({
+            embeds: [
+                new EmbedBuilder()
+                    .setFields(help)
+                    .setColor(KoosColor.Default)
+                    .setFooter({ text: `Use ${prefix}help [ command ] to get more information about a command` })
+                    .setAuthor({
+                        name: `${this.client.user?.username}'s Command List`,
+                        iconURL: this.client.user?.displayAvatarURL(),
+                    }),
+            ],
+        });
+    }
+
     public async messageRun(message: Message, args: Args) {
         const prefix = await this.client.fetchPrefix(message);
         const command = await args.pickResult("commandName");
@@ -51,7 +125,7 @@ export class HelpCommand extends KoosCommand {
                 embeds: [new EmbedBuilder().setDescription(`${command.err().unwrap().message}`).setColor(KoosColor.Error)],
             });
 
-        const help = await this.buildHelp(message);
+        const help = await this.buildMessageHelp(message);
 
         send(message, {
             embeds: [
@@ -78,76 +152,30 @@ export class HelpCommand extends KoosCommand {
     }
 
     parseUsage(command: KoosCommand, prefix: SapphirePrefix) {
-        const types = command.usage?.types;
-        const parsedTypes = types?.map(({ type, required }) => {
-            let brackets = required ? `{}` : `[]`;
-            return isString(type) || Array.isArray(type)
-                ? Array.isArray(type)
-                    ? `${brackets[0]} ${type.join(" | ")} ${brackets[1]}`
-                    : `${brackets[0]} ${type} ${brackets[1]}`
-                : ``;
-        });
-        let brackets = command.usage?.required ? `{}` : `[]`;
-        let text =
-            isString(command.usage?.type) || Array.isArray(command.usage?.type)
-                ? Array.isArray(command.usage?.type)
-                    ? `${brackets[0]} ${command.usage?.type.join(" | ")} ${brackets[1]}`
-                    : `${brackets[0]} ${command.usage?.type} ${brackets[1]}`
-                : ``;
-        if (parsedTypes && parsedTypes.length !== 0) text = parsedTypes.join(" ");
+        const { detailedDescription } = command;
 
-        return `${prefix}${command.name} ${text}`;
+        if (!isNullish(detailedDescription) && !isObject(detailedDescription)) return `${prefix}${command.name}`;
+
+        const usages = detailedDescription.usages;
+        if (isNullish(usages)) return `${prefix}${command.name}`;
+
+        const parsed = usages.map((usage) => {
+            let brackets = usage.startsWith(":") ? "{}" : "[]";
+            usage = usage.replaceAll(/[:;]/g, "");
+
+            if (usage.includes("|")) {
+                let types = usage.split("|").map((usage) => usage.trim());
+                return `${brackets[0]} ${types.join(" | ")} ${brackets[1]}`;
+            }
+
+            return `${brackets[0]} ${usage} ${brackets[1]}`;
+        });
+
+        return `${prefix}${command.name} ${parsed.join(" ")}`;
     }
 
-    // private parseUsage(command: KoosCommand, prefix: SapphirePrefix): EmbedFieldData[] {
-    //     let category = `[${command.fullCategory.at(-1) ?? command.category}]`;
-    //     if (isNullish(command.usage)) return [{ name: `${prefix}${command.name}`, value: `${command.description}\n\`${category}\`` }];
-
-    //     let usages: EmbedFieldData[] = [];
-    //     let brackets = command.usage.required ? `<>` : `[]`;
-    //     let text = "";
-    //     if (Array.isArray(command.usage.type)) {
-    //         if (command.usage.type.some((value) => isString(value))) {
-    //             text = Array.isArray(command.usage?.type)
-    //                 ? `${brackets[0]}${command.usage.type.join("|")}${brackets[1]}`
-    //                 : `${brackets[0]}${command.usage.type}${brackets[1]}`;
-    //         } else {
-    //             const types = command.usage.type
-    //                 .map((v) => {
-    //                     if (isString(v)) return "";
-    //                     let brackets = v.required ? `<>` : `[]`;
-    //                     return Array.isArray(v.type)
-    //                         ? `${brackets[0]}${v.type.join("|")}${brackets[1]}`
-    //                         : `${brackets[0]}${v.type}${brackets[1]}`;
-    //                 })
-    //                 .filter(String);
-
-    //             text = !isNullishOrEmpty(types) ? types.join(" ") : `${command.usage.type.join("|")}`;
-    //         }
-    //     }
-
-    //     usages.push({
-    //         name: `${prefix}${command.name}${text ? ` ${text}` : ``}`,
-    //         value: `${command.usage.description ?? command.description ?? "No description provided."}\n\`${category}\``,
-    //     });
-    //     if (isNullishOrEmpty(command.usage.types) || !Array.isArray(command.usage.types)) return usages;
-
-    //     for (let { type, description, required, subcommand } of command.usage.types) {
-    //         let brackets = required ? `<>` : `[]`;
-    //         let text = subcommand
-    //             ? ` ${Array.isArray(type) ? type.join("|") : type}`
-    //             : ` ${brackets[0]}${Array.isArray(type) ? type.join("|") : type}${brackets[1]}`;
-    //         usages.push({
-    //             name: `${prefix}${command.name}${text}`,
-    //             value: `${description ?? "No description provided."}\n\`${category}\``,
-    //         });
-    //     }
-
-    //     return usages;
-    // }
-
-    private async buildHelp(message: Message) {
-        const commands = await this.fetchCommands(message);
+    private async buildChatInputHelp(interaction: KoosCommand.ChatInputCommandInteraction) {
+        const commands = await this.fetchChatInputCommands(interaction);
         const helpMessage: { name: string; value: string }[] = [];
 
         commands.sort((_, __, a, b) => categoryLevel[a] - categoryLevel[b]);
@@ -161,7 +189,43 @@ export class HelpCommand extends KoosCommand {
         return helpMessage;
     }
 
-    private async fetchCommands(message: Message) {
+    private async buildMessageHelp(message: Message) {
+        const commands = await this.fetchMessageCommands(message);
+        const helpMessage: { name: string; value: string }[] = [];
+
+        commands.sort((_, __, a, b) => categoryLevel[a] - categoryLevel[b]);
+        for (const [category, list] of commands) {
+            list.sort((a, b) => a.name.localeCompare(b.name));
+            helpMessage.push({
+                name: `${category} commands`,
+                value: list.map((cmd) => `\`${cmd.name}\``).join(", "),
+            });
+        }
+        return helpMessage;
+    }
+
+    private async fetchChatInputCommands(interaction: KoosCommand.ChatInputCommandInteraction) {
+        const commands = this.container.stores.get("commands");
+        const filtered = new Collection<string, KoosCommand[]>();
+
+        await Promise.all(
+            commands.map(async (cmd) => {
+                const command = cmd as unknown as KoosCommand;
+                if (command.hidden || !command.enabled) return;
+
+                const result = await cmd.preconditions.chatInputRun(interaction, command as any, { command: null });
+                if (result.isErr() && Reflect.get(result.unwrapErr(), "identifier") === "OwnerOnly") return;
+
+                const category = filtered.get(`${command.category}`);
+                if (category) category.push(command);
+                else filtered.set(`${command.category}`, [command]);
+            })
+        );
+
+        return filtered.sort(sortCommandsAlphabetically);
+    }
+
+    private async fetchMessageCommands(message: Message) {
         const commands = this.container.stores.get("commands");
         const filtered = new Collection<string, KoosCommand[]>();
         await Promise.all(
@@ -170,11 +234,11 @@ export class HelpCommand extends KoosCommand {
                 if (command.hidden || !command.enabled || command.slashOnly) return;
 
                 const result = await cmd.preconditions.messageRun(message, command as any, { command: null! });
-                if (result.isErr() && Reflect.get(result.err().unwrap(), "identifier") === "OwnerOnly") return;
+                if (result.isErr() && Reflect.get(result.unwrapErr(), "identifier") === "OwnerOnly") return;
 
                 const category = filtered.get(`${command.category}`);
                 if (category) category.push(command);
-                else filtered.set(`${command.category}`, [command as KoosCommand]);
+                else filtered.set(`${command.category}`, [command]);
             })
         );
 

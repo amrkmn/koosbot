@@ -8,6 +8,7 @@ import { KoosPlayer } from "#lib/extensions/KoosPlayer";
 import { envParseNumber, envParseString } from "@skyra/env-utilities";
 import { Client as GeniusClient } from "genius-lyrics";
 import { KazagumoPlugin as Spotify } from "#lib/structures";
+import { MeilisearchClient } from "#lib/extensions";
 
 const NODES: NodeOption[] = [
     // { name: "lavalink.aytea.ga", url: "lavalink.aytea.ga:443", auth: "maybeiwasboring", secure: true },
@@ -87,6 +88,7 @@ export class KoosClient extends SapphireClient {
             { moveOnDisconnect: true }
         );
         container.shoukaku = container.kazagumo.shoukaku;
+        container.meili = new MeilisearchClient();
 
         await container.db.$connect().then(() => this.logger.info("Successfully connected to database"));
         return super.login(token);
@@ -99,6 +101,7 @@ declare module "@sapphire/pieces" {
         kazagumo: Kazagumo;
         shoukaku: Shoukaku;
         genius: GeniusClient;
+        meili: MeilisearchClient;
     }
 }
 

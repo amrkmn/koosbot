@@ -18,11 +18,19 @@ declare module "@skyra/env-utilities" {
         REDIS_HOST_SECRET?: string;
         REDIS_PORT_SECRET?: NumberString;
         REDIS_PASSWORD_SECRET?: string;
+        MEILISEARCH_URL_SECRET?: string;
+        MEILISEARCH_API_SECRET?: string;
 
         SPOTIFY_ID?: string;
         SPOTIFY_SECRET?: string;
         GENIUS_TOKEN?: string;
 
         PORT?: NumberString;
+    }
+}
+
+declare module "@sapphire/framework" {
+    interface DetailedDescriptionCommandObject {
+        usages?: string[];
     }
 }

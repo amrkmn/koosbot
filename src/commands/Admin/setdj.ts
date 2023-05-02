@@ -12,8 +12,8 @@ import { EmbedBuilder, Message, PermissionFlagsBits, Role } from "discord.js";
     description: "Add or remove a DJ role.",
     aliases: ["dj"],
     permissionLevels: PermissionLevel.Administrator,
-    usage: {
-        types: [{ type: "role" }],
+    detailedDescription: {
+        usages: [":role"],
     },
 })
 export class SetDJCommand extends KoosCommand {

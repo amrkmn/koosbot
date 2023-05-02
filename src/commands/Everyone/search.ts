@@ -26,7 +26,9 @@ import pluralize from "pluralize";
     description: `Searches and lets you choose a track.`,
     aliases: ["s"],
     preconditions: ["VoiceOnly"],
-    usage: "query",
+    detailedDescription: {
+        usages: [":query"],
+    },
 })
 export class SearchCommand extends KoosCommand {
     private tracksMap: Map<Snowflake, KazagumoTrack> = new Map<Snowflake, KazagumoTrack>();

@@ -12,8 +12,8 @@ import { KazagumoPlayer } from "kazagumo";
     description: "Lets you change the bots output volume.",
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["v", "vol"],
-    usage: {
-        types: [{ type: "1-200", required: false }],
+    detailedDescription: {
+        usages: [";1-200"],
     },
 })
 export class VolumeCommand extends KoosCommand {

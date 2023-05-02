@@ -16,7 +16,7 @@ import {
     Message,
     SelectMenuComponentOptionData,
     StringSelectMenuBuilder,
-    TextChannel
+    TextChannel,
 } from "discord.js";
 import ms from "ms";
 import pluralize from "pluralize";
@@ -24,7 +24,9 @@ import pluralize from "pluralize";
 @ApplyOptions<KoosCommand.Options>({
     description: "Get the lyrics of a song.",
     aliases: ["ly"],
-    usage: "query",
+    detailedDescription: {
+        usages: [":query"],
+    },
 })
 export class LyricsCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {

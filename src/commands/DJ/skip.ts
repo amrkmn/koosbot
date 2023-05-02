@@ -12,8 +12,8 @@ import pluralize from "pluralize";
     description: "Skip to the next track or to a specific track in the queue.",
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["n", "next"],
-    usage: {
-        types: [{ type: "to" }],
+    detailedDescription: {
+        usages: [";to"],
     },
 })
 export class SkipCommand extends KoosCommand {
@@ -37,7 +37,7 @@ export class SkipCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current))
             return interaction.reply({
-                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
             });
 
@@ -53,7 +53,7 @@ export class SkipCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
         }
 

@@ -11,9 +11,8 @@ import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
     description: "Enables/disables if the requester is shown on each track.",
     permissionLevels: PermissionLevel.Administrator,
     aliases: ["req"],
-    usage: {
-        type: ["enable", "disable"],
-        required: true,
+    detailedDescription: {
+        usages: [":enable|:disable"],
     },
 })
 export class RequesterCommand extends KoosCommand {
