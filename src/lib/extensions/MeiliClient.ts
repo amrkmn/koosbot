@@ -48,6 +48,13 @@ export class MeilisearchClient extends MeiliSearch {
 
     public async resetIndex(index: MeiliIndex, documents: MeiliDocument<typeof index>[]) {
         await super.index(index).deleteAllDocuments();
+
+        if (index === "commands")
+            super.index(index).updateSettings({
+                searchableAttributes: ["name", "aliases"],
+                displayedAttributes: ["name", "description", "aliases"],
+            });
+
         return super
             .index(index) //
             .updateDocuments(documents);
