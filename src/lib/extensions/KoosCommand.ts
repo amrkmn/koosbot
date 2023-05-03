@@ -94,7 +94,7 @@ export class KoosCommand extends Command {
 
 export namespace KoosCommand {
     export type Options = Command.Options & {
-        permissionLevels?: number;
+        permissionLevels?: PermissionLevel | number;
         usage?: CommandUsageOptions | string;
         permissions?: PermissionResolvable;
         hidden?: boolean;

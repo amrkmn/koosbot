@@ -14,20 +14,20 @@ export enum KoosColor {
     Default = 0xda6c56,
 }
 
-export const PermissionLevel = {
-    Everyone: 0,
-    DJ: 3,
-    Administrator: 6,
-    ServerOwner: 7,
-    BotOwner: 10,
-};
+export enum PermissionLevel {
+    Everyone = 0,
+    DJ = 3,
+    Administrator = 6,
+    ServerOwner = 7,
+    BotOwner = 10,
+}
 
-export const Emoji = {
-    Yes: "<:yes:896571151315255366>",
-    No: "<:no:926367736794341428>",
-    Blank: "<:blank:1020712225616445561> ",
-    Loading: "<a:loading:1027594528460386495>",
-};
+export enum Emoji {
+    Yes = "<:yes:896571151315255366>",
+    No = "<:no:926367736794341428>",
+    Blank = "<:blank:1020712225616445561> ",
+    Loading = "<a:loading:1027594528460386495>",
+}
 
 export enum ButtonId {
     PauseOrResume = "buttonPauseOrResume",
