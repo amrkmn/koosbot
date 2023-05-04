@@ -1,16 +1,23 @@
-import { Args } from "@sapphire/framework";
-import { ApplyOptions } from "@sapphire/decorators";
-import { ApplicationCommandOptionChoiceData, GuildMember, Message, EmbedBuilder, VoiceBasedChannel, Snowflake } from "discord.js";
-import { send } from "@sapphire/plugin-editable-commands";
-import { KoosColor } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
-import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
-import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
-import { createTitle, cutText, sendLoadingMessage } from "#utils/functions";
 import { PlayOptions } from "#lib/interfaces";
-import { oneLine } from "common-tags";
-import { KazagumoTrack } from "kazagumo";
+import { KoosColor } from "#utils/constants";
+import { canJoinVoiceChannel, createTitle, cutText, sendLoadingMessage } from "#utils/functions";
+import { ApplyOptions } from "@sapphire/decorators";
+import { Args } from "@sapphire/framework";
+import { send } from "@sapphire/plugin-editable-commands";
 import { DiscordSnowflake } from "@sapphire/snowflake";
+import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
+import { oneLine } from "common-tags";
+import {
+    ApplicationCommandOptionChoiceData,
+    ChannelType,
+    EmbedBuilder,
+    GuildMember,
+    Message,
+    Snowflake,
+    VoiceBasedChannel,
+} from "discord.js";
+import { KazagumoTrack } from "kazagumo";
 import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
@@ -132,14 +139,15 @@ export class PlayCommand extends KoosCommand {
         const { kazagumo } = this.container;
         const result = await kazagumo.search(query, { requester: message.member }).catch(() => undefined);
         if (!result) return new EmbedBuilder().setDescription(`Something went wrong`).setColor(KoosColor.Error);
-        if (isNullishOrEmpty(!result.tracks.length))
-            return new EmbedBuilder().setDescription(`I couldn't find anything in the query you gave me`).setColor(KoosColor.Default);
+        if (isNullishOrEmpty(result.tracks))
+            return new EmbedBuilder().setDescription(`I couldn't find anything in the query you gave me`).setColor(KoosColor.Error);
 
         if (!player) {
-            if (!canJoinVoiceChannel(channel))
+            if (!canJoinVoiceChannel(channel)) {
                 return new EmbedBuilder()
                     .setDescription(`I cannot join your voice channel. It seem like I don't have the right permissions.`)
                     .setColor(KoosColor.Error);
+            }
             player ??= await kazagumo.createPlayer({
                 guildId: message.guildId!,
                 textId: message.channelId!,
@@ -147,6 +155,10 @@ export class PlayCommand extends KoosCommand {
                 deaf: true,
                 volume: isNullish(data) ? 100 : data.volume,
             });
+
+            if (channel.type === ChannelType.GuildStageVoice) {
+                message.guild?.members.me?.voice.setSuppressed(false);
+            }
         }
 
         let msg: string = "";
