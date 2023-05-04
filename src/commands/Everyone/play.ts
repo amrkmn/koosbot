@@ -84,27 +84,30 @@ export class PlayCommand extends KoosCommand {
         const query = interaction.options.getFocused(true);
         const guildId = `${interaction.guildId}`;
         const memberId = (interaction.member as GuildMember).id;
+        const tracksMap = new Map<string, string>();
 
-        if (!query.value) return interaction.respond([]);
+        const queryId = `${DiscordSnowflake.generate()}`;
+        const options: ApplicationCommandOptionChoiceData[] = [];
+
+        if (isNullishOrEmpty(query.value)) return interaction.respond([]);
         let { tracks, type, playlistName } = await kazagumo.search(query.value, {
             requester: interaction.member,
             engine: "youtube_music",
         });
 
-        if (type === "PLAYLIST") {
-            const tracksMap = new Map<string, string>();
+        tracksMap.set(queryId, query.value);
+        options.push({ name: cutText(`${query.value}`, 100), value: queryId });
 
+        if (type === "PLAYLIST") {
             const id = `${DiscordSnowflake.generate()}`;
             const tracks = tracksMap.set(id, query.value);
 
             this.tracks.set(`${guildId}:${memberId}`, tracks);
+            options.push({ name: cutText(`${playlistName}`, 100), value: id });
 
-            return interaction.respond([{ name: cutText(`${playlistName}`, 100), value: id }]);
+            return interaction.respond(options);
         } else {
             tracks = tracks.slice(0, 10);
-
-            const options: ApplicationCommandOptionChoiceData[] = [];
-            const tracksMap = new Map<string, string>();
 
             for (let track of tracks) {
                 const id = `${DiscordSnowflake.generate()}`;
