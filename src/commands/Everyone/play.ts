@@ -179,8 +179,8 @@ export class PlayCommand extends KoosCommand {
                 let title = createTitle(track);
 
                 queue.push(track);
-                const position = player.queue.findIndex((x) => x.identifier === track.identifier);
-                msg = `Queued ${title} at position #${position + 1}`;
+                const position = player.queue.totalSize ?? 0;
+                msg = `Queued ${title} at position #${position}`;
                 break;
         }
 

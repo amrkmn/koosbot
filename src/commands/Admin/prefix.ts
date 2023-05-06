@@ -35,8 +35,6 @@ export class PrefixCommand extends KoosCommand {
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         const prefix = interaction.options.getString("new") ?? undefined;
 
-        console.log(prefix);
-
         await interaction.deferReply();
 
         if (isNullish(prefix))

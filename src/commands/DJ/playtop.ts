@@ -1,7 +1,7 @@
 import { KoosCommand } from "#lib/extensions";
 import { PlayOptions } from "#lib/interfaces";
 import { KoosColor } from "#utils/constants";
-import { createTitle, cutText } from "#utils/functions";
+import { createTitle, cutText, sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
 import { Args } from "@sapphire/framework";
@@ -62,6 +62,7 @@ export class PlayTopCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message, args: Args) {
+        await sendLoadingMessage(message);
         const { kazagumo, db } = this.container;
         const data = await db.guild.findUnique({ where: { id: `${message.guildId}` } });
         const attachment = message.attachments.first();
@@ -150,8 +151,8 @@ export class PlayTopCommand extends KoosCommand {
                 let title = createTitle(track);
 
                 player.queue.unshift(track);
-                const position = player.queue.findIndex((x) => x.identifier === track.identifier);
-                msg = `Queued ${title} at position #${position}`;
+                // const position = player.queue.findIndex((x) => x.identifier === track.identifier);
+                msg = `Queued ${title} at position #0`;
                 break;
         }
 

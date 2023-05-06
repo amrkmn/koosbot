@@ -1,9 +1,10 @@
 import { ButtonId } from "#lib/utils/constants";
 import { KoosColor } from "#utils/constants";
-import { convertTime, createTitle } from "#utils/functions";
+import { convertTime, createTitle, cutText } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
+import { isStageChannel } from "@sapphire/discord.js-utilities";
 import { container, Listener } from "@sapphire/framework";
-import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
+import { isNullish, isNullishOrEmpty, noop } from "@sapphire/utilities";
 import { oneLine } from "common-tags";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
 import { Events, KazagumoPlayer, KazagumoTrack } from "kazagumo";
@@ -19,14 +20,24 @@ export class ClientListener extends Listener {
 
         const data = await db.guild.findUnique({ where: { id: player.guildId } });
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
-        // const voiceChannel =
-        //     client.channels.cache.get(player.voiceId!) ?? (await client.channels.fetch(player.voiceId!).catch(() => null));
-        if (isNullish(channel)) return;
+        const voiceChannel =
+            client.channels.cache.get(player.voiceId!) ?? (await client.channels.fetch(player.voiceId!).catch(() => null));
+        const guild = client.guilds.cache.get(player.guildId) ?? (await client.guilds.fetch(player.guildId).catch(() => null));
+        if (isNullish(channel) || isNullish(guild)) return;
 
         const previousTracks = player.previous();
 
         const title = createTitle(track);
-        // const cleanTitle = createTitle(track, false);
+        const cleanTitle = createTitle(track, false);
+
+        if (!isNullish(voiceChannel) && isStageChannel(voiceChannel)) {
+            const stageChannel =
+                guild.stageInstances.cache.get(voiceChannel.id) ??
+                (await guild.stageInstances.fetch(voiceChannel.id).catch(() => null));
+
+            if (isNullish(stageChannel)) return;
+            await stageChannel.edit({ topic: cutText(cleanTitle, 120) }).catch(noop);
+        }
 
         const embed = new EmbedBuilder() //
             .setDescription(
@@ -47,12 +58,6 @@ export class ClientListener extends Listener {
             new ButtonBuilder().setLabel("Stop").setCustomId(ButtonId.Stop).setStyle(ButtonStyle.Danger),
         ];
         const row = new ActionRowBuilder<ButtonBuilder>().setComponents(playerButtons);
-
-        // if (!isNullish(voiceChannel) && isStageChannel(voiceChannel)) {
-        //     console.log(voiceChannel.topic);
-        //     await voiceChannel.edit({ topic: cutText(cleanTitle, 120) });
-        //     console.log(voiceChannel.topic);
-        // }
 
         if (channel.isTextBased()) {
             const msg = await channel.send({ embeds: [embed], components: [row] });

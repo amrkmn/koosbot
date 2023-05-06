@@ -1,4 +1,10 @@
-import { ChannelTypes, isGuildBasedChannel, isVoiceBasedChannel } from "@sapphire/discord.js-utilities";
+import {
+    ChannelTypes,
+    isGuildBasedChannel,
+    isStageChannel,
+    isVoiceBasedChannel,
+    isVoiceChannel,
+} from "@sapphire/discord.js-utilities";
 import { isNullish, Nullish } from "@sapphire/utilities";
 import { PermissionFlagsBits, PermissionsBitField, VoiceBasedChannel } from "discord.js";
 
@@ -7,7 +13,8 @@ const canJoinVoiceChannelPermissions = new PermissionsBitField([PermissionFlagsB
 export function canJoinVoiceChannel(channel: VoiceBasedChannel | Nullish): boolean {
     if (isNullish(channel)) return false;
     if (!isVoiceBasedChannel(channel)) return false;
-    if (channel.members.size >= channel.userLimit) return false;
+    if (isVoiceChannel(channel) && channel.userLimit >= channel.members.size) return false;
+    if (isStageChannel(channel) && channel.members.size >= channel.userLimit) return false;
 
     return canDoUtility(channel, canJoinVoiceChannelPermissions);
 }

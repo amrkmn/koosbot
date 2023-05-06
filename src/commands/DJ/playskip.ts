@@ -1,7 +1,7 @@
 import { KoosCommand } from "#lib/extensions";
 import { PlayOptions } from "#lib/interfaces";
 import { KoosColor } from "#utils/constants";
-import { createTitle, cutText } from "#utils/functions";
+import { createTitle, cutText, sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
 import { Args } from "@sapphire/framework";
@@ -55,13 +55,15 @@ export class PlaySkipCommand extends KoosCommand {
         let selected = query.startsWith("a:") ? tracks[index] : query;
         this.tracks.delete(`${guildId}:${member.id}`);
 
-        // await this.playSkip(selected, { message: interaction, player, channel, data });
+        const response = await this.playSkip(selected, { message: interaction, player, channel, data });
+
         await interaction.editReply({
-            embeds: [await this.playSkip(selected, { message: interaction, player, channel, data })],
+            embeds: [response],
         });
     }
 
     public async messageRun(message: Message, args: Args) {
+        await sendLoadingMessage(message);
         const { kazagumo, db } = this.container;
         const data = await db.guild.findUnique({ where: { id: `${message.guildId}` } });
         const attachment = message.attachments.first();
@@ -74,8 +76,9 @@ export class PlaySkipCommand extends KoosCommand {
         const channel = message.member?.voice.channel as VoiceBasedChannel;
         let player = kazagumo.getPlayer(message.guildId!);
 
-        // await this.playSkip(query, { message, player, channel, data });
-        await send(message, { embeds: [await this.playSkip(query, { message, player, channel, data })] });
+        const response = await this.playSkip(query, { message, player, channel, data });
+
+        await send(message, { embeds: [response] });
     }
 
     public async autocompleteRun(interaction: KoosCommand.AutocompleteInteraction) {
@@ -134,30 +137,22 @@ export class PlaySkipCommand extends KoosCommand {
             });
         }
 
-        let msg: string = "";
-        switch (result.type) {
-            case "PLAYLIST":
-                for (let track of result.tracks.reverse()) player.queue.unshift(track);
-                const playlistLength = result.tracks.length;
-                msg = oneLine`
-                    Queued playlist [${result.playlistName}](${query}) with
-                    ${playlistLength} ${pluralize("track", playlistLength)}
-                `;
-                break;
-            case "SEARCH":
-            case "TRACK":
-                let [track] = result.tracks;
-                let title = createTitle(track);
+        if (result.type === "PLAYLIST") {
+            for (let track of result.tracks.reverse()) player.queue.unshift(track);
+            const playlistLength = result.tracks.length;
+            let msg = oneLine`
+                Queued playlist [${result.playlistName}](${query}) with
+                ${playlistLength} ${pluralize("track", playlistLength)}
+            `;
 
-                player.queue.unshift(track);
-                const position = player.queue.findIndex((x) => x.identifier === track.identifier);
-                msg = `Queued ${title} at position #${position}`;
-                break;
-        }
+            return new EmbedBuilder().setDescription(msg).setColor(KoosColor.Default);
+        } else if (["SEARCH", "TRACK"].includes(result.type)) {
+            const track = result.tracks[0];
+            const title = createTitle(track);
 
-        player.skip();
-        if (!player.playing && !player.paused) player.play();
-
-        return new EmbedBuilder().setDescription(msg).setColor(KoosColor.Default);
+            player.play(track);
+            return new EmbedBuilder().setDescription(`Playing ${title} right away`).setColor(KoosColor.Default);
+        } else
+            return new EmbedBuilder().setDescription(`Something went wrong when trying to play the track`).setColor(KoosColor.Error);
     }
 }
