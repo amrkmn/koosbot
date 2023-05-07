@@ -1,9 +1,8 @@
 import { KoosCommand } from "#lib/extensions";
 import { PlayOptions } from "#lib/interfaces";
 import { KoosColor } from "#utils/constants";
-import { createTitle, cutText, sendLoadingMessage } from "#utils/functions";
+import { createTitle, cutText, sendLoadingMessage, canJoinVoiceChannel } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
-import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { filterNullishAndEmpty, isNullish, isNullishOrEmpty } from "@sapphire/utilities";

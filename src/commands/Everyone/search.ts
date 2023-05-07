@@ -1,8 +1,7 @@
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
-import { convertTime, createTitle, cutText, mins, sendLoadingMessage } from "#utils/functions";
+import { canJoinVoiceChannel, convertTime, createTitle, cutText, mins, sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
-import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { DiscordSnowflake } from "@sapphire/snowflake";
@@ -15,9 +14,9 @@ import {
     EmbedBuilder,
     GuildMember,
     Message,
-    SelectMenuComponentOptionData,
     Snowflake,
     StringSelectMenuBuilder,
+    StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { Kazagumo, KazagumoTrack } from "kazagumo";
 import pluralize from "pluralize";
@@ -76,7 +75,7 @@ export class SearchCommand extends KoosCommand {
         if (message instanceof CommandInteraction && !message.deferred) await message.deferReply();
         const member = message.member as GuildMember;
         const data = await this.container.db.guild.findUnique({ where: { id: `${message.guildId}` } });
-        const options: SelectMenuComponentOptionData[] = [];
+        const options: StringSelectMenuOptionBuilder[] = [];
 
         let { tracks, type, playlistName } = await kazagumo.search(query, { requester: message.member });
         tracks = type === "PLAYLIST" ? tracks : tracks.slice(0, 15);
@@ -89,25 +88,32 @@ export class SearchCommand extends KoosCommand {
             return;
         } else if (type === "PLAYLIST") {
             let duration = tracks.reduce((all, track) => all + Number(track.length), 0);
-            options.push({
-                label: cutText(`${playlistName}`, 100),
-                description: `Duration: ${convertTime(duration)} | Tracks: ${tracks.length}`,
-                value: `playlist`,
-            });
+            options.push(
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(cutText(`${playlistName}`, 100))
+                    .setDescription(`Duration: ${convertTime(duration)} | Tracks: ${tracks.length}`)
+                    .setLabel(`playlist`)
+            );
         } else {
             for (let track of tracks) {
                 const id = `${DiscordSnowflake.generate()}`;
                 this.tracksMap.set(id, track);
-                options.push({
-                    label: cutText(`${track.title}`, 100),
-                    description: `Duration: ${convertTime(track.length!)} | Author: ${track.author ?? "Unknown artist"}`,
-                    value: id,
-                });
+
+                options.push(
+                    new StringSelectMenuOptionBuilder()
+                        .setLabel(cutText(`${track.title}`, 100))
+                        .setDescription(`Duration: ${convertTime(track.length!)} | Author: ${track.author ?? "Unknown artist"}`)
+                        .setValue(id)
+                );
             }
         }
-        // options.push({ label: "Cancel", description: "Cancel this search", value: `cancel` });
 
-        const selectMenu = new StringSelectMenuBuilder().setCustomId("searchSongs").setOptions(options).setPlaceholder("Pick a track");
+        const selectMenu = new StringSelectMenuBuilder()
+            .setCustomId("searchedTracks")
+            .setOptions(options)
+            .setPlaceholder("Pick a tracks")
+            .setMinValues(1)
+            .setMaxValues(options.length);
         const cancelButton = new ButtonBuilder().setCustomId("cancel").setLabel("Cancel").setStyle(ButtonStyle.Danger);
 
         const embed = new EmbedBuilder()
@@ -135,54 +141,86 @@ export class SearchCommand extends KoosCommand {
                 });
                 collector.stop("cancel");
                 return;
-            } else if (interaction.isStringSelectMenu() && interaction.customId === "searchSongs") {
+            } else if (interaction.isStringSelectMenu() && interaction.customId === "searchedTracks") {
+                const userOptions = interaction.values;
                 await interaction.deferUpdate();
 
                 let player = kazagumo.getPlayer(`${message.guildId}`);
-                try {
-                    const userOption = interaction.values.at(0)!;
-
-                    collector.stop("picked");
-                    const selected = type === "PLAYLIST" && userOption === "playlist" ? tracks : this.tracksMap.get(userOption)!;
-
-                    const title = !Array.isArray(selected) ? createTitle(selected) : `[${playlistName}](${query})`;
-
-                    if (!player) {
-                        if (!canJoinVoiceChannel(member.voice.channel)) {
-                            interaction.followUp({
-                                embeds: [
-                                    new EmbedBuilder()
-                                        .setDescription(
-                                            `I cannot join your voice channel. It seem like I don't have the right permissions`
-                                        )
-                                        .setColor(KoosColor.Error),
-                                ],
-                            });
-                            return;
-                        }
-                        player ??= await kazagumo.createPlayer({
-                            guildId: `${message.guildId}`,
-                            textId: `${message.channelId}`,
-                            voiceId: `${member.voice.channelId}`,
-                            deaf: true,
-                            volume: isNullish(data) ? 100 : data.volume,
+                if (!player) {
+                    if (!canJoinVoiceChannel(member.voice.channel)) {
+                        interaction.followUp({
+                            embeds: [
+                                new EmbedBuilder()
+                                    .setDescription(
+                                        `I cannot join your voice channel. It seem like I don't have the right permissions`
+                                    )
+                                    .setColor(KoosColor.Error),
+                            ],
                         });
+                        return;
                     }
-
-                    interaction.followUp({
-                        embeds: [
-                            new EmbedBuilder()
-                                .setDescription(
-                                    type === "PLAYLIST"
-                                        ? `Queued playlist ${title} with ${tracks.length} ${pluralize("track", tracks.length)}`
-                                        : `Queued ${title} at position #${Number(player?.queue.totalSize ?? 0)}`
-                                )
-                                .setColor(KoosColor.Default),
-                        ],
+                    player ??= await kazagumo.createPlayer({
+                        guildId: `${message.guildId}`,
+                        textId: `${message.channelId}`,
+                        voiceId: `${member.voice.channelId}`,
+                        deaf: true,
+                        volume: isNullish(data) ? 100 : data.volume,
                     });
+                }
 
-                    player.queue.add(selected);
-                    if (!player.playing && !player.paused) player.play();
+                try {
+                    if (userOptions.length === 1 && type === "PLAYLIST" && userOptions[0] === "playlist") {
+                        collector.stop("picked");
+                        const title = `[${playlistName}](${query})`;
+
+                        player.queue.add(tracks);
+                        if (!player.playing && !player.paused) player.play();
+
+                        interaction.followUp({
+                            embeds: [
+                                new EmbedBuilder()
+                                    .setDescription(
+                                        `Queued playlist ${title} with ${tracks.length} ${pluralize("track", tracks.length)}`
+                                    )
+                                    .setColor(KoosColor.Default),
+                            ],
+                        });
+
+                        return;
+                    } else if (userOptions.length >= 1 && type === "SEARCH") {
+                        collector.stop("picked");
+                        let selected = [];
+                        let msg = "";
+
+                        for (let id of userOptions) selected.push(this.tracksMap.get(id)!);
+
+                        if (selected.length > 1) msg = `Queued ${selected.length} ${pluralize("track", selected.length)}`;
+                        else msg = `Queued ${createTitle(selected[0])} at position #${player.queue.totalSize ?? 0}`;
+
+                        player.queue.add(selected);
+                        if (!player.playing && !player.paused) player.play();
+
+                        interaction.followUp({
+                            embeds: [new EmbedBuilder().setDescription(msg).setColor(KoosColor.Default)],
+                        });
+                        return;
+                    } else {
+                        collector.stop("picked");
+                        let option = userOptions[0];
+                        let selected = this.tracksMap.get(option)!;
+
+                        player.queue.add(selected);
+                        if (!player.playing && !player.paused) player.play();
+
+                        interaction.followUp({
+                            embeds: [
+                                new EmbedBuilder()
+                                    .setDescription(`Queued ${createTitle(selected)} at position #${player.queue.totalSize ?? 0}`)
+                                    .setColor(KoosColor.Default),
+                            ],
+                        });
+                        return;
+                    }
                 } catch (error) {
                     collector.stop("error");
                 }

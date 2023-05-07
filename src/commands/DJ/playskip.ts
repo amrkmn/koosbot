@@ -1,14 +1,14 @@
 import { KoosCommand } from "#lib/extensions";
 import { PlayOptions } from "#lib/interfaces";
 import { KoosColor } from "#utils/constants";
-import { createTitle, cutText, sendLoadingMessage } from "#utils/functions";
+import { createTitle, cutText, sendLoadingMessage, canJoinVoiceChannel } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
-import { canJoinVoiceChannel } from "@sapphire/discord.js-utilities";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { filterNullishAndEmpty, isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { oneLine } from "common-tags";
 import { ApplicationCommandOptionChoiceData, EmbedBuilder, GuildMember, Message, VoiceBasedChannel } from "discord.js";
+import { KazagumoTrack } from "kazagumo";
 import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
@@ -138,12 +138,25 @@ export class PlaySkipCommand extends KoosCommand {
         }
 
         if (result.type === "PLAYLIST") {
-            for (let track of result.tracks.reverse()) player.queue.unshift(track);
+            const newQueue: KazagumoTrack[] = [];
+            const currentQueue = player.queue.slice();
+            player.queue.clear();
+
+            for (let track of result.tracks) newQueue.push(track);
+
             const playlistLength = result.tracks.length;
-            let msg = oneLine`
+            const msg = oneLine`
                 Queued playlist [${result.playlistName}](${query}) with
                 ${playlistLength} ${pluralize("track", playlistLength)}
             `;
+
+            const firstTrack = newQueue.shift();
+
+            if (!isNullish(player.queue.current)) player.queue.push(player.queue.current);
+
+            for (let track of currentQueue) player.queue.push(track);
+            for (let track of newQueue.reverse()) player.queue.unshift(track);
+            player.play(firstTrack, { replaceCurrent: true });
 
             return new EmbedBuilder().setDescription(msg).setColor(KoosColor.Default);
         } else if (["SEARCH", "TRACK"].includes(result.type)) {
