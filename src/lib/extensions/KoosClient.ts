@@ -22,6 +22,7 @@ const NODES: NodeOption[] = [
 export class KoosClient extends SapphireClient {
     constructor() {
         super({
+            id: envParseString("CLIENT_ID"),
             intents: [
                 GatewayIntentBits.Guilds,
                 GatewayIntentBits.GuildMessages,

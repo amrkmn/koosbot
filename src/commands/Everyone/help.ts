@@ -24,6 +24,8 @@ const categoryLevel: { [key: string]: number } = {
     },
 })
 export class HelpCommand extends KoosCommand {
+    private readonly forbiddenCategories = ["Owner"];
+
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand((builder) =>
             builder
@@ -56,7 +58,7 @@ export class HelpCommand extends KoosCommand {
 
         if (!isNullish(option)) {
             const command = this.container.stores.get("commands").get(option) as KoosCommand | undefined;
-            if (!command)
+            if (!command || (command && this.forbiddenCategories.includes(command.category ?? "")))
                 return interaction.followUp({
                     embeds: [new EmbedBuilder().setDescription(`I couldn't find that command`).setColor(KoosColor.Error)],
                     ephemeral: true,
@@ -72,7 +74,7 @@ export class HelpCommand extends KoosCommand {
                     new EmbedBuilder()
                         .setFields(
                             { name: `${buildedCommand.name} ${aliases ? `(${aliases})` : ``}`, value: buildedCommand.description },
-                            { name: `• Usage ${buildedCommand.slashOnly ? `(Slash only)` : ``}`, value: usage },
+                            { name: `• Usage`, value: usage },
                             { name: `• Permission`, value: `\`${buildedCommand.category}\`` }
                         )
                         .setColor(KoosColor.Default),
@@ -114,7 +116,7 @@ export class HelpCommand extends KoosCommand {
                     new EmbedBuilder()
                         .setFields(
                             { name: `${buildedCommand.name} ${aliases ? `(${aliases})` : ``}`, value: buildedCommand.description },
-                            { name: `• Usage ${buildedCommand.slashOnly ? `(Slash only)` : ``}`, value: usage },
+                            { name: `• Usage`, value: usage },
                             { name: `• Permission`, value: `\`${buildedCommand.category}\`` }
                         )
                         .setColor(KoosColor.Default),
@@ -146,9 +148,8 @@ export class HelpCommand extends KoosCommand {
         const description = command.description || "No description provided";
         const aliases = command.aliases || [];
         const category = `${command.fullCategory.at(-1) ?? command.category}`;
-        const slashOnly = command.slashOnly;
 
-        return { name, description, aliases, category, slashOnly };
+        return { name, description, aliases, category };
     }
 
     parseUsage(command: KoosCommand, prefix: SapphirePrefix) {
@@ -231,7 +232,7 @@ export class HelpCommand extends KoosCommand {
         await Promise.all(
             commands.map(async (cmd) => {
                 const command = cmd as unknown as KoosCommand;
-                if (command.hidden || !command.enabled || command.slashOnly) return;
+                if (command.hidden || !command.enabled) return;
 
                 const result = await cmd.preconditions.messageRun(message, command as any, { command: null! });
                 if (result.isErr() && Reflect.get(result.unwrapErr(), "identifier") === "OwnerOnly") return;

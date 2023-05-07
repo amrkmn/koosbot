@@ -1,5 +1,4 @@
 import { KoosCommand } from "#lib/extensions";
-import { PermissionLevel } from "#lib/utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args, Piece, Store } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
@@ -9,7 +8,7 @@ import { Message } from "discord.js";
 @ApplyOptions<KoosCommand.Options>({
     description: "Reloads a Sapphire piece, or all pieces of a Sapphire store.",
     aliases: ["r"],
-    permissionLevels: PermissionLevel.BotOwner,
+    preconditions: ["OwnerOnly"],
     hidden: true,
 })
 export class ReloadCommand extends KoosCommand {

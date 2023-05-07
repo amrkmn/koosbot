@@ -1,17 +1,16 @@
-import type { Message } from "discord.js";
-import { type Args } from "@sapphire/framework";
-import { ApplyOptions } from "@sapphire/decorators";
-import { codeBlock, isThenable } from "@sapphire/utilities";
-import { send } from "@sapphire/plugin-editable-commands";
-import { inspect } from "util";
-import { Stopwatch } from "@sapphire/stopwatch";
-import { request } from "@aytea/request";
-import { clean } from "#utils/functions";
-import { PermissionLevel } from "#utils/constants";
 import { KoosCommand } from "#lib/extensions";
-import { envParseString } from "@skyra/env-utilities";
-import Type from "@sapphire/type";
 import * as functions from "#utils/functions";
+import { clean } from "#utils/functions";
+import { request } from "@aytea/request";
+import { ApplyOptions } from "@sapphire/decorators";
+import { type Args } from "@sapphire/framework";
+import { send } from "@sapphire/plugin-editable-commands";
+import { Stopwatch } from "@sapphire/stopwatch";
+import Type from "@sapphire/type";
+import { codeBlock, isThenable } from "@sapphire/utilities";
+import { envParseString } from "@skyra/env-utilities";
+import type { Message } from "discord.js";
+import { inspect } from "util";
 
 type HasteBinResponse = {
     key?: string;
@@ -26,8 +25,7 @@ type HasteBinResponse = {
     flags: ["async", "hidden", "showHidden", "silent", "s"],
     options: ["depth"],
     hidden: true,
-    permissionLevels: PermissionLevel.BotOwner,
-    typing: false,
+    preconditions: ["OwnerOnly"],
 })
 export class EvalCommand extends KoosCommand {
     private codeRegex = /```(?:(?<lang>\S+)\n)?\s?(?<code>[^]+?)\s?```/s;
@@ -74,7 +72,7 @@ export class EvalCommand extends KoosCommand {
 
         const { container } = this;
         // @ts-ignore
-        const { client, db, genius, kazagumo, shoukaku, stores } = container; 
+        const { client, db, genius, kazagumo, shoukaku, stores } = container;
         // @ts-ignore
         const msg = message;
         // @ts-ignore

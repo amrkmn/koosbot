@@ -18,11 +18,11 @@ export class OwnerOnlyPrecondition extends Precondition {
         const OWNERS = envParseArray("CLIENT_OWNERS");
 
         if (isNullishOrEmpty(OWNERS))
-            return this.error({ message: "This command can only be used by the owner.", context: { silent: false } });
+            return this.error({ message: "This command can only be used by the owner.", context: { silent: true } });
 
         return OWNERS.includes(userId)
             ? this.ok()
-            : this.error({ message: "This command can only be used by the owner.", context: { silent: false } });
+            : this.error({ message: "This command can only be used by the owner.", context: { silent: true } });
     }
 }
 

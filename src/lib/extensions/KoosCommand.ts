@@ -1,64 +1,33 @@
 import { Command, PreconditionEntryResolvable, SapphireClient, UserPermissionsPrecondition } from "@sapphire/framework";
-import { PermissionLevel } from "#lib/utils/constants";
-import { isString } from "#utils/functions";
-import { isNullish } from "@sapphire/utilities";
 import { Time } from "@sapphire/timestamp";
-import type { PermissionResolvable } from "discord.js";
+import { PermissionFlagsBits, PermissionResolvable, PermissionsBitField } from "discord.js";
 
-interface CommandUsageOptions {
-    description?: string;
-    required?: boolean;
-    types?: Array<{
-        type: string | string[];
-        description?: string;
-        subcommand?: boolean;
-        required?: boolean;
-    }>;
-    type?:
-        | string
-        | Array<string>
-        | Array<{
-              type: string | string[];
-              description?: string;
-              subcommand?: boolean;
-              required?: boolean;
-          }>;
-}
-
-export class KoosCommand extends Command {
+export abstract class KoosCommand extends Command {
     public client: SapphireClient;
-    public readonly permissionLevel: number;
-    public readonly usage?: CommandUsageOptions;
     public readonly hidden: boolean;
-    public readonly slashOnly: boolean;
 
     constructor(ctx: Command.Context, options: KoosCommand.Options) {
-        super(ctx, { ...options, ...KoosCommand.resolvePreConditions(ctx, options) });
-        const usage = options.usage as CommandUsageOptions;
+        const resolvedPermissions = new PermissionsBitField(options.requiredClientPermissions).add(PermissionFlagsBits.EmbedLinks);
+        const userResolvedPermissions = new PermissionsBitField(options.requiredUserPermissions)
+            .add(PermissionFlagsBits.SendMessages)
+            .add(PermissionFlagsBits.SendMessagesInThreads);
 
         options.typing ??= false;
         options.cooldown ??= Time.Second * 2.5;
         options.requiredUserPermissions = options.permissions;
 
+        super(ctx, {
+            ...options,
+            ...KoosCommand.resolvePreConditions(ctx, options),
+            requiredClientPermissions: resolvedPermissions,
+            requiredUserPermissions: userResolvedPermissions,
+        });
+
         this.client = this.container.client;
-        this.permissionLevel = options.permissionLevels ?? PermissionLevel.Everyone;
         this.hidden = options.hidden ?? false;
-        this.slashOnly = options.slashOnly ?? false;
-        this.usage =
-            !isNullish(usage) && isString(usage)
-                ? {
-                      type: usage as string,
-                      required: isString(usage) ? true : false,
-                      types: [],
-                  }
-                : {
-                      type: Reflect.get(usage ?? {}, "type"),
-                      required: Reflect.get(usage ?? {}, "required") ?? false,
-                      types: Reflect.get(usage ?? {}, "types"),
-                  };
     }
 
-    protected static resolvePreConditions(_context: Command.Context, options: KoosCommand.Options): KoosCommand.Options {
+    protected static resolvePreConditions(_ctx: Command.Context, options: KoosCommand.Options): KoosCommand.Options {
         options.generateDashLessAliases ??= true;
 
         const preconditions = (options.preconditions ??= []) as PreconditionEntryResolvable[];
@@ -67,11 +36,6 @@ export class KoosCommand extends Command {
         if (options.permissions) {
             preconditions.push(new UserPermissionsPrecondition(options.permissions));
         }
-
-        const permissionLevelPreCondition = this.resolvePermissionLevelPreCondition(options.permissionLevels);
-        if (permissionLevelPreCondition !== null) {
-            preconditions.push(permissionLevelPreCondition);
-        }
         if (options.cooldown) {
             preconditions.push({
                 name: "Cooldown",
@@ -79,29 +43,18 @@ export class KoosCommand extends Command {
             });
         }
 
-        return options;
-    }
+        options.preconditions = preconditions;
 
-    protected static resolvePermissionLevelPreCondition(permissionLevel = 0): PreconditionEntryResolvable | null {
-        if (permissionLevel === 0) return null;
-        if (permissionLevel <= PermissionLevel.Administrator) {
-            return ["OwnerOnly", "Administrator"];
-        }
-        if (permissionLevel <= PermissionLevel.BotOwner) return "OwnerOnly";
-        return null;
+        return options;
     }
 }
 
 export namespace KoosCommand {
     export type Options = Command.Options & {
-        permissionLevels?: PermissionLevel | number;
-        usage?: CommandUsageOptions | string;
         permissions?: PermissionResolvable;
         hidden?: boolean;
-        guarded?: boolean;
         bucket?: number;
         cooldown?: number;
-        slashOnly?: boolean;
     };
     export type ChatInputCommandInteraction = Command.ChatInputCommandInteraction;
     export type AutocompleteInteraction = Command.AutocompleteInteraction;

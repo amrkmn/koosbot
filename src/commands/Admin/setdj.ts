@@ -1,5 +1,4 @@
 import { KoosCommand } from "#lib/extensions";
-import { PermissionLevel } from "#lib/utils/constants";
 import { KoosColor } from "#utils/constants";
 import { removeItem, sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
@@ -10,8 +9,8 @@ import { EmbedBuilder, Message, PermissionFlagsBits, Role } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Add or remove a DJ role.",
+    permissions: [PermissionFlagsBits.ManageGuild],
     aliases: ["dj"],
-    permissionLevels: PermissionLevel.Administrator,
     detailedDescription: {
         usages: [":role"],
     },

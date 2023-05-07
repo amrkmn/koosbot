@@ -1,17 +1,16 @@
 import { KoosCommand } from "#lib/extensions";
-import { PermissionLevel } from "#lib/utils/constants";
 import { KoosColor } from "#utils/constants";
 import { sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { isNullish } from "@sapphire/utilities";
-import { Message, EmbedBuilder, PermissionFlagsBits } from "discord.js";
+import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Lets you change the bots default output volume.",
+    permissions: [PermissionFlagsBits.ManageGuild],
     aliases: ["setvol", "svol"],
-    permissionLevels: PermissionLevel.Administrator,
     detailedDescription: {
         usages: [":1-200"],
     },

@@ -15,7 +15,7 @@ import {
     GuildMember,
     Message,
     Snowflake,
-    VoiceBasedChannel,
+    VoiceBasedChannel
 } from "discord.js";
 import { KazagumoTrack } from "kazagumo";
 import pluralize from "pluralize";

@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { Emoji, PermissionLevel } from "#lib/utils/constants";
+import { Emoji } from "#lib/utils/constants";
 import { KoosColor } from "#utils/constants";
 import { sendLoadingMessage } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
@@ -9,7 +9,7 @@ import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Enables/disables if the requester is shown on each track.",
-    permissionLevels: PermissionLevel.Administrator,
+    permissions: [PermissionFlagsBits.ManageGuild],
     aliases: ["req"],
     detailedDescription: {
         usages: [":enable|:disable"],
