@@ -7,6 +7,7 @@ import { reply } from "@sapphire/plugin-editable-commands";
 import { Message, EmbedBuilder, TextChannel, User } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 import { stripIndents } from "common-tags";
+import { chunk, isNullishOrEmpty } from "@sapphire/utilities";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Display the current queue.",
@@ -69,40 +70,20 @@ export class QueueCommand extends KoosCommand {
                 ? `[${current.title}](${current.uri})`
                 : `[${current.title} ${current.author ? `by ${current.author}` : ``}](${current.uri})`;
 
-        if (player.queue.isEmpty) {
-            const embed = new EmbedBuilder()
-                .setDescription(
-                    stripIndents`
-                        __Now playing:__
-                        ${nowPlaying} [${timeLeft}]${data?.requester ? ` ~ ${current.requester}` : ``}
+        let tracks = player.queue.map((track, i) => {
+            const title = createTitle(track);
+            const duration = convertTime(track.length ?? 0);
+            const requester = data?.requester ? `~ ${track.requester}` : ``;
+            return `**${i + 1}.** ${title} [${duration}] ${requester}`;
+        });
+        let pagesNum = Math.ceil(tracks.length / 10) <= 0 ? 1 : Math.ceil(tracks.length / 10);
+        let list = chunk(tracks, 10);
 
-                        __Up next:__
-                        No other tracks here
-                    `
-                )
-                .setThumbnail(current.thumbnail ?? null)
-                .setFooter({ text: `Tracks in queue: ${player.queue.size} | Total Length: ${totalDuration}` })
-                .setColor(KoosColor.Default);
+        const embeds = [];
 
-            return [embed];
-        }
+        for (let i = 0; i < pagesNum; i++) {
+            const upNext = isNullishOrEmpty(list) ? `No other tracks here` : list[i].join("\n");
 
-        let queueList = [];
-        for (let i = 0; i < player.queue.length; i += 10) {
-            let queue = player.queue.slice(i, i + 10);
-            queueList.push(
-                queue.map((track, index) => {
-                    let title = createTitle(track);
-                    return `**${i + ++index}.** ${title} [${track.isStream ? "Live" : convertTime(track.length!)}]${
-                        data?.requester ? ` ~ ${track.requester}` : ``
-                    }`;
-                })
-            );
-        }
-
-        let embeds = [];
-        for (let list of queueList) {
-            let upNext = list.join("\n");
             embeds.push(
                 new EmbedBuilder()
                     .setDescription(

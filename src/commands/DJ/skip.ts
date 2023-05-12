@@ -67,8 +67,8 @@ export class SkipCommand extends KoosCommand {
             const skipped = player.queue.splice(0, amount);
             const lastTrack = skipped.pop();
 
-            player.previous(player.queue.current!);
-            skipped.forEach((track) => player.previous(track));
+            player.history.tracks.add(player.queue.current!);
+            skipped.forEach((track) => player.history.tracks.add(track));
 
             player.play(lastTrack, { replaceCurrent: true });
 

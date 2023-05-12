@@ -1,92 +1,62 @@
+import { QueueHistory } from "#lib/structures";
+import { ButtonId, KoosColor } from "#utils/constants";
 import { convertTime, createTitle } from "#utils/functions";
-import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
-import { oneLine } from "common-tags";
+import { container } from "@sapphire/framework";
+import { isNullish, Nullish } from "@sapphire/utilities";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message } from "discord.js";
 import { Kazagumo, KazagumoPlayer, KazagumoPlayerOptions, KazagumoTrack } from "kazagumo";
-import { container } from "@sapphire/framework";
 import { Player } from "shoukaku";
-import { ButtonId, KoosColor } from "#utils/constants";
-import { Signal } from "#lib/structures";
 
 export class KoosPlayer extends KazagumoPlayer {
-    #previous: KazagumoTrack[];
-    #nowPlaying: Message | undefined;
+    #dashboard: Message | undefined;
     public skipVotes: Set<string>;
-    public skipped = new Signal<KazagumoTrack[]>();
+    public history: QueueHistory;
 
     constructor(kazagumo: Kazagumo, player: Player, options: KazagumoPlayerOptions, customData: unknown) {
         super(kazagumo, player, options, customData);
 
+        this.history = new QueueHistory(this);
         this.skipVotes = new Set<string>();
-        this.#previous = [];
-        this.#nowPlaying = undefined;
+        this.#dashboard = undefined;
     }
 
-    public nowPlaying(): Message;
-    public nowPlaying(message: Message): undefined;
-    public nowPlaying(message?: Message) {
-        const savedNp = this.#nowPlaying;
-        if (isNullish(message)) return savedNp;
+    public dashboard(): Message;
+    public dashboard(message: Message): undefined;
+    public dashboard(message?: Message) {
+        const dashboard = this.#dashboard;
+        if (isNullish(message)) return dashboard;
 
-        this.#nowPlaying = message;
+        this.#dashboard = message;
     }
 
-    public async newNowPlaying(track: KazagumoTrack) {
+    public async newDashboard(track: KazagumoTrack) {
         const { client } = container;
         const data = await container.db.guild.findUnique({ where: { id: this.guildId } });
         const channel = client.channels.cache.get(this.textId) ?? (await client.channels.fetch(this.textId).catch(() => null));
         if (isNullish(channel)) return;
 
         const title = createTitle(track);
-        const previousTracks = this.previous();
+        const duration = track.isStream ? `Live` : convertTime(Number(track.length));
+        const requester = data?.requester ? `~ ${track.requester}` : "";
+        const previousTrack = this.history.previousTrack;
 
         const embed = new EmbedBuilder() //
-            .setDescription(
-                oneLine`
-                    ${title} [${track.isStream ? `Live` : convertTime(Number(track.length))}]
-                    ${data?.requester ? ` ~ ${track.requester}` : ""}
-                `
-            )
+            .setDescription(`${title} [${duration}] ${requester}`)
             .setColor(KoosColor.Default);
-        const row = this.createPlayerComponents(previousTracks);
+        const row = this.createPlayerComponents(previousTrack);
 
         if (channel.isTextBased()) {
             const nowPlaying = await channel.send({ embeds: [embed], components: [row] });
-            this.#nowPlaying = nowPlaying;
+            this.#dashboard = nowPlaying;
         }
     }
 
-    public resetNowPlaying() {
-        this.#nowPlaying = undefined;
+    public resetDashboard() {
+        this.#dashboard = undefined;
     }
 
-    public previous(): KazagumoTrack[];
-    public previous(track: KazagumoTrack): undefined;
-    public previous(track?: KazagumoTrack) {
-        const previousTracks = this.#previous;
-        if (isNullish(track)) return previousTracks;
-
-        let array: KazagumoTrack[] = [];
-
-        if (isNullishOrEmpty(previousTracks)) this.#previous = array.concat(track);
-        else this.#previous = array.concat(previousTracks, track);
-    }
-
-    public previousTrack() {
-        const previousTracks = this.#previous;
-        if (isNullishOrEmpty(previousTracks)) return undefined;
-
-        const track = previousTracks.pop();
-
-        return track;
-    }
-
-    public resetPrevious() {
-        this.#previous = [];
-    }
-
-    private createPlayerComponents(previousTracks: KazagumoTrack[]) {
-        const hasPrevious = isNullishOrEmpty(previousTracks);
+    private createPlayerComponents(previousTracks: KazagumoTrack | Nullish) {
+        const hasPrevious = isNullish(previousTracks);
         const button = new ButtonBuilder();
         const row = new ActionRowBuilder<ButtonBuilder>();
 
@@ -101,16 +71,12 @@ export class KoosPlayer extends KazagumoPlayer {
 
 declare module "kazagumo" {
     interface KazagumoPlayer {
+        history: QueueHistory;
         skipVotes: Set<string>;
-        skipped: Signal<KazagumoTrack[]>;
-        nowPlaying(): Message;
-        nowPlaying(message: Message): undefined;
-        nowPlaying(message?: Message): Message | undefined;
-        resetNowPlaying(): void;
-        previous(): KazagumoTrack[];
-        previous(track: KazagumoTrack): undefined;
-        previous(track?: KazagumoTrack): KazagumoTrack[] | undefined;
-        previousTrack(): KazagumoTrack | undefined;
-        resetPrevious(): void;
+        dashboard(): Message;
+        dashboard(message: Message): undefined;
+        dashboard(message?: Message): Message | undefined;
+        newDashboard(track: KazagumoTrack): Promise<void>;
+        resetDashboard(): void;
     }
 }

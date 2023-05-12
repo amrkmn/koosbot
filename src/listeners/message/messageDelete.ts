@@ -18,7 +18,7 @@ export class ClientListener extends Listener {
         const data = await db.guild.findUnique({ where: { id: message.guildId! } });
         if (isNullish(player) || isNullish(data)) return;
 
-        const npMessage = player.nowPlaying();
+        const npMessage = player.dashboard();
 
         if (npMessage instanceof Message && message.id === npMessage.id) {
             let { embeds, components } = npMessage;
@@ -41,7 +41,7 @@ export class ClientListener extends Listener {
             }
 
             const newNpMessage = await send(npMessage, { components, embeds: isNullishOrEmpty(newEmbeds) ? embeds : newEmbeds });
-            player.nowPlaying(newNpMessage);
+            player.dashboard(newNpMessage);
         }
 
         return;

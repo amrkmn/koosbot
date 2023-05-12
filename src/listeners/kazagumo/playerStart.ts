@@ -25,7 +25,7 @@ export class ClientListener extends Listener {
         const guild = client.guilds.cache.get(player.guildId) ?? (await client.guilds.fetch(player.guildId).catch(() => null));
         if (isNullish(channel) || isNullish(guild)) return;
 
-        const previousTracks = player.previous();
+        const previousTrack = player.history.previousTrack
 
         const title = createTitle(track);
         const cleanTitle = createTitle(track, false);
@@ -53,7 +53,7 @@ export class ClientListener extends Listener {
                 .setLabel("Previous")
                 .setCustomId(ButtonId.Previous)
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(isNullishOrEmpty(previousTracks)),
+                .setDisabled(isNullishOrEmpty(previousTrack)),
             new ButtonBuilder().setLabel("Skip").setCustomId(ButtonId.Skip).setStyle(ButtonStyle.Primary),
             new ButtonBuilder().setLabel("Stop").setCustomId(ButtonId.Stop).setStyle(ButtonStyle.Danger),
         ];
@@ -61,7 +61,7 @@ export class ClientListener extends Listener {
 
         if (channel.isTextBased()) {
             const msg = await channel.send({ embeds: [embed], components: [row] });
-            player.nowPlaying(msg);
+            player.dashboard(msg);
         }
     }
 }

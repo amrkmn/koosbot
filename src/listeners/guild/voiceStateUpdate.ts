@@ -1,20 +1,20 @@
+import { KoosColor } from "#utils/constants";
+import { time } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
 import { isNullish, Nullish } from "@sapphire/utilities";
 import { envParseString } from "@skyra/env-utilities";
-import { Guild, ActionRowBuilder, ButtonBuilder, EmbedBuilder, VoiceBasedChannel, VoiceState, ButtonStyle } from "discord.js";
-import { ButtonId, KoosColor } from "#utils/constants";
+import { EmbedBuilder, Guild, VoiceBasedChannel, VoiceState } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
-import { time } from "#utils/functions";
 import ms from "ms";
 
 @ApplyOptions<Listener.Options>({
     event: Events.VoiceStateUpdate,
-    enabled: false,
+    enabled: true,
 })
 export class ClientListener extends Listener {
     timeoutId: NodeJS.Timeout | undefined;
-    leaveAfter: number = envParseString("NODE_ENV") === "production" ? time("mins", 3) : time("sec", 25);
+    leaveAfter: number = envParseString("NODE_ENV") === "production" ? time("mins", 1) : time("sec", 25);
 
     public async run(oldState: VoiceState, newState: VoiceState) {
         const { client, kazagumo } = this.container;
@@ -31,32 +31,14 @@ export class ClientListener extends Listener {
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
         if (isNullish(channel)) return;
 
-        const npMessage = player.nowPlaying();
-
         const state = this.checkState(oldState, newState);
-        const vcSize = clientVc.members.filter((x) => client.user?.id === x.id || !x.user.bot).size;
+        if (state === "BOT") return;
 
-        if (state === "LEFT" && vcSize <= 1 && player.paused) this.setup(clientVc.guild, player);
-        else {
-            if (["LEFT", "JOINED"].includes(state)) {
-                this.cancel();
-                if (state === "JOINED" && vcSize === 2 && player.paused) player.pause(false);
-                if (npMessage.editable) npMessage.edit({ components: [this.createButtons(player.paused)] });
-            }
-        }
-    }
+        const voiceChannel = clientVc.members.filter((x) => client.user?.id === x.id || !x.user.bot);
 
-    createButtons(paused: boolean) {
-        const playerButtons = [
-            new ButtonBuilder()
-                .setLabel(paused ? "Resume" : "Pause")
-                .setCustomId(ButtonId.PauseOrResume)
-                .setStyle(ButtonStyle.Success),
-            new ButtonBuilder().setLabel("Skip").setCustomId(ButtonId.Skip).setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setLabel("Stop").setCustomId(ButtonId.Stop).setStyle(ButtonStyle.Danger),
-            // new ButtonBuilder().setLabel("Show Queue").setCustomId(Button.ShowQueue).setStyle(ButtonStyle.Secondary),
-        ];
-        return new ActionRowBuilder<ButtonBuilder>().setComponents(playerButtons);
+        if (state === "LEFT" && voiceChannel.size <= 1) this.setupTimeout(clientVc.guild, player);
+        else if (state === "LEFT" && voiceChannel.size > 1) this.cancelTimeout();
+        else this.cancelTimeout();
     }
 
     checkState(oldState: VoiceState, newState: VoiceState) {
@@ -67,12 +49,13 @@ export class ClientListener extends Listener {
         else return "MOVED";
     }
 
-    async setup(guild: Guild | null, player: KazagumoPlayer) {
-        if (typeof this.timeoutId !== "undefined") this.cancel();
+    async setupTimeout(guild: Guild | null, player: KazagumoPlayer) {
+        if (typeof this.timeoutId !== "undefined") this.cancelTimeout();
 
         const { client } = this.container;
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
-        if (isNullish(guild) || isNullish(player) || isNullish(channel)) return this.cancel();
+        if (isNullish(guild) || isNullish(player) || isNullish(channel)) return this.cancelTimeout();
+        const time = ms(this.leaveAfter, { long: true });
 
         this.timeoutId = setTimeout(() => {
             if (!isNullish(guild.members.me?.voice.channelId)) {
@@ -81,18 +64,18 @@ export class ClientListener extends Listener {
                     channel.send({
                         embeds: [
                             new EmbedBuilder()
-                                .setDescription(`No one was listening for ${ms(this.leaveAfter, { long: true })}, leaving.`)
+                                .setDescription(`Left the channel after ${time} due to channel inactivity`)
                                 .setColor(KoosColor.Error),
                         ],
                     });
             }
         }, this.leaveAfter);
     }
-    reset() {
+    resetTimeout() {
         this.timeoutId = undefined;
     }
-    cancel() {
+    cancelTimeout() {
         clearTimeout(this.timeoutId);
-        this.reset();
+        this.resetTimeout();
     }
 }

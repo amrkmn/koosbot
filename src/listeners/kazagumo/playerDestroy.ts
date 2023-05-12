@@ -23,7 +23,7 @@ export class ClientListener extends Listener {
                 - Player has been destroyed in ${guild.name}[${cyan(guild.id)}] on ${cyan(player.shoukaku.node.name)} node`
         );
 
-        const npMessage = player.nowPlaying();
+        const npMessage = player.dashboard();
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
 
         if (channel && channel.isTextBased() && npMessage instanceof Message) {
@@ -36,8 +36,8 @@ export class ClientListener extends Listener {
                 // );
 
                 msg.edit({ components: [] });
-                player.resetNowPlaying();
-                player.resetPrevious();
+                player.resetDashboard();
+                player.history.clear()
             }
         }
     }

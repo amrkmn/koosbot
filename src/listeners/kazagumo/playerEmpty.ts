@@ -25,41 +25,36 @@ export class ClientListener extends Listener {
 
         if (player.queue.current) return;
 
-        const npMessage = player.nowPlaying();
+        const npMessage = player.dashboard();
 
         if (channel && channel.isTextBased() && npMessage instanceof Message) {
             const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id).catch(() => null));
 
             if (!isNullish(msg) && msg.editable) {
-                // const row = npMessage.components;
-                // const disabled = row[0].components.map((component) =>
-                //     new ButtonBuilder(component.data).setStyle(ButtonStyle.Secondary).setDisabled(true)
-                // );
-
                 msg.edit({ components: [] });
-                player.resetNowPlaying();
-                player.resetPrevious();
+                player.resetDashboard();
+                player.history.clear();
             }
         }
 
-        await this.setup(guild, player);
+        await this.setupTimeout(guild, player);
         return;
     }
 
-    async setup(guild: Guild | null, player: KazagumoPlayer) {
-        if (typeof this.timeoutId !== "undefined") this.cancel();
+    async setupTimeout(guild: Guild | null, player: KazagumoPlayer) {
+        if (typeof this.timeoutId !== "undefined") this.cancelTimeout();
 
         const { client, kazagumo } = this.container;
         const channel =
             container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
-        if (isNullish(guild) || isNullish(player) || isNullish(channel)) return this.cancel();
+        if (isNullish(guild) || isNullish(player) || isNullish(channel)) return this.cancelTimeout();
 
         this.timeoutId = setTimeout(() => {
             const player = kazagumo.getPlayer(guild.id);
-            if (isNullish(player)) return this.cancel();
-            if (player.queue.current) return this.cancel();
-            if (!player.queue.isEmpty && isNullish(guild.members.me?.voice.channelId)) return this.cancel();
-            if (!channel.isTextBased()) return this.cancel();
+            if (isNullish(player)) return this.cancelTimeout();
+            if (player.queue.current) return this.cancelTimeout();
+            if (!player.queue.isEmpty && isNullish(guild.members.me?.voice.channelId)) return this.cancelTimeout();
+            if (!channel.isTextBased()) return this.cancelTimeout();
 
             player.destroy();
             channel.send({
@@ -71,11 +66,11 @@ export class ClientListener extends Listener {
             });
         }, this.leaveAfter);
     }
-    reset() {
+    resetTimeout() {
         this.timeoutId = undefined;
     }
-    cancel() {
+    cancelTimeout() {
         clearTimeout(this.timeoutId);
-        this.reset();
+        this.resetTimeout();
     }
 }

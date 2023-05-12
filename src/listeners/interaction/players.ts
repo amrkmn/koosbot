@@ -2,7 +2,7 @@ import { ButtonId } from "#lib/utils/constants";
 import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
-import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
+import { isNullish, isNullishOrEmpty, noop } from "@sapphire/utilities";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -12,7 +12,7 @@ import {
     Guild,
     GuildMember,
     Interaction,
-    Message
+    Message,
 } from "discord.js";
 
 @ApplyOptions<Listener.Options>({
@@ -26,7 +26,7 @@ export class ClientListener extends Listener {
         const data = await this.container.db.guild.findUnique({ where: { id: interaction.guildId! } });
         if (isNullish(player) || isNullish(data)) return;
 
-        const npMessage = player.nowPlaying();
+        const npMessage = player.dashboard();
 
         const id = interaction.customId as ButtonId;
         const checkMember = this.checkMember(interaction.guild!, interaction.member as GuildMember);
@@ -44,14 +44,12 @@ export class ClientListener extends Listener {
 
         switch (id) {
             case ButtonId.PauseOrResume:
-                const previousTrack = player.previous();
+                const previousTrack = player.history.previousTrack;
                 player.pause(!player.paused);
                 npMessage.edit({ components: [this.buttons(player.paused, isNullishOrEmpty(previousTrack))] });
                 break;
             case ButtonId.Previous:
-                const prevTrack = player.previousTrack();
-                if (isNullish(prevTrack)) return;
-                player.play(prevTrack);
+                player.history.previous().catch(noop);
                 break;
             case ButtonId.Skip:
                 player.skip();
