@@ -66,6 +66,6 @@ export class BindCommand extends KoosCommand {
 
     private bind(player: KazagumoPlayer, channel: TextBasedChannel) {
         player.setTextChannel(channel.id);
-        return new EmbedBuilder().setDescription(`The dashboard had been bound to ${channel}`).setColor(KoosColor.Default);
+        return new EmbedBuilder().setDescription(`The dashboard has been bound to ${channel}`).setColor(KoosColor.Default);
     }
 }
