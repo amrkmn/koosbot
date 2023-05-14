@@ -13,8 +13,8 @@ import ms from "ms";
     enabled: true,
 })
 export class ClientListener extends Listener {
-    timeoutId: NodeJS.Timeout | undefined;
-    leaveAfter: number = envParseString("NODE_ENV") === "production" ? time("mins", 1) : time("sec", 25);
+    _timeoutId: NodeJS.Timeout | undefined = undefined;
+    _leaveAfter: number = envParseString("NODE_ENV") === "production" ? time("mins", 1) : time("sec", 25);
 
     public async run(oldState: VoiceState, newState: VoiceState) {
         const { client, kazagumo } = this.container;
@@ -50,32 +50,31 @@ export class ClientListener extends Listener {
     }
 
     async setupTimeout(guild: Guild | null, player: KazagumoPlayer) {
-        if (typeof this.timeoutId !== "undefined") this.cancelTimeout();
+        if (typeof this._timeoutId !== "undefined") this.cancelTimeout();
 
         const { client } = this.container;
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
         if (isNullish(guild) || isNullish(player) || isNullish(channel)) return this.cancelTimeout();
-        const time = ms(this.leaveAfter, { long: true });
+        const time = ms(this._leaveAfter, { long: true });
 
-        this.timeoutId = setTimeout(() => {
-            if (!isNullish(guild.members.me?.voice.channelId)) {
-                player.destroy();
-                if (channel.isTextBased())
-                    channel.send({
-                        embeds: [
-                            new EmbedBuilder()
-                                .setDescription(`Left the channel after ${time} due to channel inactivity`)
-                                .setColor(KoosColor.Error),
-                        ],
-                    });
-            }
-        }, this.leaveAfter);
-    }
-    resetTimeout() {
-        this.timeoutId = undefined;
+        const checking = () => {
+            if (isNullish(guild.members.me?.voice.channelId)) return this.cancelTimeout();
+
+            player.destroy();
+            if (channel.isTextBased())
+                channel.send({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setDescription(`Left the channel after ${time} due to channel inactivity`)
+                            .setColor(KoosColor.Error),
+                    ],
+                });
+        };
+
+        this._timeoutId = setTimeout(checking, this._leaveAfter);
     }
     cancelTimeout() {
-        clearTimeout(this.timeoutId);
-        this.resetTimeout();
+        clearTimeout(this._timeoutId);
+        this._timeoutId = undefined;
     }
 }
