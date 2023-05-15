@@ -9,6 +9,10 @@ import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
     description: `Bind the dashboard to current channel`,
+    preconditions: ["VoiceOnly", "DJ"],
+    detailedDescription: {
+        usages: [";channel"],
+    },
 })
 export class BindCommand extends KoosCommand {
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
