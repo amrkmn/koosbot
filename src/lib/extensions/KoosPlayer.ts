@@ -57,14 +57,17 @@ export class KoosPlayer extends KazagumoPlayer {
 
     private createPlayerComponents(previousTracks: KazagumoTrack | Nullish) {
         const hasPrevious = isNullish(previousTracks);
-        const button = new ButtonBuilder();
         const row = new ActionRowBuilder<ButtonBuilder>();
 
         return row.setComponents([
-            button.setLabel("Pause").setCustomId(ButtonId.PauseOrResume).setStyle(ButtonStyle.Success),
-            button.setLabel("Previous").setCustomId(ButtonId.Previous).setStyle(ButtonStyle.Primary).setDisabled(hasPrevious),
-            button.setLabel("Skip").setCustomId(ButtonId.Skip).setStyle(ButtonStyle.Primary),
-            button.setLabel("Stop").setCustomId(ButtonId.Stop).setStyle(ButtonStyle.Danger),
+            new ButtonBuilder().setLabel("Pause").setCustomId(ButtonId.PauseOrResume).setStyle(ButtonStyle.Success),
+            new ButtonBuilder()
+                .setLabel("Previous")
+                .setCustomId(ButtonId.Previous)
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(hasPrevious),
+            new ButtonBuilder().setLabel("Skip").setCustomId(ButtonId.Skip).setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setLabel("Stop").setCustomId(ButtonId.Stop).setStyle(ButtonStyle.Danger),
         ]);
     }
 }

@@ -14,8 +14,8 @@ import ms from "ms";
     event: Events.PlayerEmpty,
 })
 export class ClientListener extends Listener {
-    timeoutId: NodeJS.Timeout | undefined;
-    leaveAfter: number = envParseString("NODE_ENV") === "production" ? time("mins", 3) : time("sec", 25);
+    _timeoutId: NodeJS.Timeout | undefined;
+    _leaveAfter: number = envParseString("NODE_ENV") === "production" ? time("mins", 3) : time("sec", 25);
 
     public async run(player: KazagumoPlayer) {
         const { client } = this.container;
@@ -38,18 +38,17 @@ export class ClientListener extends Listener {
         }
 
         await this.setupTimeout(guild, player);
-        return;
     }
 
     async setupTimeout(guild: Guild | null, player: KazagumoPlayer) {
-        if (typeof this.timeoutId !== "undefined") this.cancelTimeout();
+        if (typeof this._timeoutId !== "undefined") this.cancelTimeout();
 
         const { client, kazagumo } = this.container;
         const channel =
             container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
         if (isNullish(guild) || isNullish(player) || isNullish(channel)) return this.cancelTimeout();
 
-        this.timeoutId = setTimeout(() => {
+        this._timeoutId = setTimeout(() => {
             const player = kazagumo.getPlayer(guild.id);
             if (isNullish(player)) return this.cancelTimeout();
             if (player.queue.current) return this.cancelTimeout();
@@ -60,17 +59,17 @@ export class ClientListener extends Listener {
             channel.send({
                 embeds: [
                     new EmbedBuilder()
-                        .setDescription(`No tracks have been playing for the past ${ms(this.leaveAfter, { long: true })}, leaving.`)
+                        .setDescription(`No tracks have been playing for the past ${ms(this._leaveAfter, { long: true })}, leaving.`)
                         .setColor(KoosColor.Error),
                 ],
             });
-        }, this.leaveAfter);
+        }, this._leaveAfter);
     }
     resetTimeout() {
-        this.timeoutId = undefined;
+        this._timeoutId = undefined;
     }
     cancelTimeout() {
-        clearTimeout(this.timeoutId);
+        clearTimeout(this._timeoutId);
         this.resetTimeout();
     }
 }
