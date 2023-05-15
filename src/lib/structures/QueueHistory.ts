@@ -90,7 +90,7 @@ export class QueueHistory {
     }
 
     /**
-     * Alias to [GuildQueueHistory].previous()
+     * Alias to [QueueHistory].previous()
      */
     public back() {
         return this.previous();

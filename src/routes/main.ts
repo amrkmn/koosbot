@@ -1,11 +1,9 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { DurationFormatter } from "@sapphire/duration";
 import { ApiRequest, ApiResponse, methods, Route } from "@sapphire/plugin-api";
-import { readFileSync } from "fs";
-import { resolve } from "path";
 
 const formatter = new DurationFormatter();
-const version = Reflect.get(JSON.parse(readFileSync(resolve(process.cwd(), "package.json")).toString()), "version");
+const version = "[VI]{{inject}}[/VI]";
 @ApplyOptions<Route.Options>({ route: `` })
 export class UserRoute extends Route {
     public [methods.GET](_request: ApiRequest, response: ApiResponse) {

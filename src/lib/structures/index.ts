@@ -1,4 +1,4 @@
 export * from "./KazagumoPlugins/index.js";
-export * from "./Queue/index.js";
-export * from "./Signal/index.js";
-
+export * from "./Queue.js";
+export * from "./QueueHistory.js";
+export * from "./Signal.js";

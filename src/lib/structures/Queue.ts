@@ -35,17 +35,11 @@ export class Queue<T = unknown> {
 
     public add(item: T | T[]) {
         if (this.strategy === "FIFO") {
-            if (Array.isArray(item)) {
-                this.store.push(...item);
-            } else {
-                this.store.push(item);
-            }
+            if (Array.isArray(item)) this.store.push(...item);
+            else this.store.push(item);
         } else {
-            if (Array.isArray(item)) {
-                this.store.unshift(...item);
-            } else {
-                this.store.unshift(item);
-            }
+            if (Array.isArray(item)) this.store.unshift(...item);
+            else this.store.unshift(item);
         }
     }
 
