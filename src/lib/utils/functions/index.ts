@@ -3,3 +3,4 @@ export * from "./functions.js";
 export * from "./pagination.js";
 export * from "./clean.js";
 export * from "./utilities.js";
+export * from "./check.js";

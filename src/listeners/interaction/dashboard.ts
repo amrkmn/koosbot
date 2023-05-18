@@ -1,22 +1,13 @@
 import { ButtonId } from "#lib/utils/constants";
 import { KoosColor } from "#utils/constants";
+import { checkDJ, checkMember } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
 import { isNullish, isNullishOrEmpty, noop } from "@sapphire/utilities";
-import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonInteraction,
-    ButtonStyle,
-    EmbedBuilder,
-    Guild,
-    GuildMember,
-    Interaction,
-    Message,
-} from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, GuildMember, Interaction } from "discord.js";
 
 @ApplyOptions<Listener.Options>({
-    name: "players",
+    name: "dashboard",
     event: Events.InteractionCreate,
 })
 export class ClientListener extends Listener {
@@ -26,19 +17,20 @@ export class ClientListener extends Listener {
         const data = await this.container.db.guild.findUnique({ where: { id: interaction.guildId! } });
         if (isNullish(player) || isNullish(data)) return;
 
-        const npMessage = player.dashboard();
+        const dashboard = player.dashboard();
+        const member = interaction.member as GuildMember;
 
         const id = interaction.customId as ButtonId;
-        const checkMember = this.checkMember(interaction.guild!, interaction.member as GuildMember);
+        const checkedMember = checkMember(interaction.guild!, member);
 
         if (Object.values(ButtonId).includes(id)) await interaction.deferUpdate();
-        if (!isNullish(checkMember)) return interaction.followUp({ embeds: [checkMember], ephemeral: true });
+        if (!isNullish(checkedMember)) return interaction.followUp({ embeds: [checkedMember], ephemeral: true });
         if (
             [ButtonId.PauseOrResume, ButtonId.Previous, ButtonId.Skip, ButtonId.Stop].includes(id) && //
-            !this.checkDJ(interaction, data.dj)
+            !checkDJ(member, data.dj)
         )
             return interaction.followUp({
-                embeds: [new EmbedBuilder().setDescription(`This button can only be use by DJ.`).setColor(KoosColor.Error)],
+                embeds: [new EmbedBuilder().setDescription(`This button can only be used by DJ.`).setColor(KoosColor.Error)],
                 ephemeral: true,
             });
 
@@ -46,7 +38,7 @@ export class ClientListener extends Listener {
             case ButtonId.PauseOrResume:
                 const previousTrack = player.history.previousTrack;
                 player.pause(!player.paused);
-                npMessage.edit({ components: [this.buttons(player.paused, isNullishOrEmpty(previousTrack))] });
+                dashboard.edit({ components: [this.buttons(player.paused, isNullishOrEmpty(previousTrack))] });
                 break;
             case ButtonId.Previous:
                 player.history.previous().catch(noop);
@@ -59,33 +51,6 @@ export class ClientListener extends Listener {
                 player.skip();
                 break;
         }
-    }
-
-    private checkMember(guild: Guild | null, member: GuildMember) {
-        if (!guild) return new EmbedBuilder().setDescription("You cannot run this message command in DMs.").setColor(KoosColor.Error);
-        if (
-            !isNullish(guild.members.me) &&
-            !isNullish(member.voice.channel) && //
-            !isNullish(guild.members.me.voice.channel) &&
-            member.voice.channelId !== guild.members.me!.voice.channelId
-        )
-            return new EmbedBuilder()
-                .setDescription(
-                    `You aren't connected to the same voice channel as I am. I'm currently connected to ${guild.members.me.voice.channel}`
-                )
-                .setColor(KoosColor.Error);
-
-        return !isNullish(member.voice.channel) //
-            ? undefined
-            : new EmbedBuilder().setDescription("You aren't connected to a voice channel.").setColor(KoosColor.Error);
-    }
-
-    private checkDJ(message: Message | ButtonInteraction, dj: string[]) {
-        const member = message.member as GuildMember;
-
-        const roles = [...member.roles.cache.keys()].filter((id) => dj.includes(id));
-
-        return !isNullishOrEmpty(roles);
     }
 
     private buttons(paused = false, firstTrack: boolean) {

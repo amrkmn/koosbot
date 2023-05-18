@@ -1,6 +1,6 @@
 import { Command, PreconditionEntryResolvable, SapphireClient, UserPermissionsPrecondition } from "@sapphire/framework";
 import { Time } from "@sapphire/timestamp";
-import { PermissionFlagsBits, PermissionResolvable, PermissionsBitField } from "discord.js";
+import { PermissionFlagsBits, PermissionResolvable, PermissionsBitField, Message as DiscordMessage } from "discord.js";
 
 export abstract class KoosCommand extends Command {
     public client: SapphireClient;
@@ -56,6 +56,7 @@ export namespace KoosCommand {
         bucket?: number;
         cooldown?: number;
     };
+    export type Message = DiscordMessage;
     export type ChatInputCommandInteraction = Command.ChatInputCommandInteraction;
     export type AutocompleteInteraction = Command.AutocompleteInteraction;
     export type ContextMenuCommandInteraction = Command.ContextMenuCommandInteraction;
