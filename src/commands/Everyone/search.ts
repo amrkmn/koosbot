@@ -52,7 +52,7 @@ export class SearchCommand extends KoosCommand {
 
         if (!query)
             return interaction.reply({
-                embeds: [new EmbedBuilder().setDescription("Please provide an URL or search query").setColor(KoosColor.Error)],
+                embeds: [new EmbedBuilder().setDescription("Please provide a URL or search query").setColor(KoosColor.Error)],
                 ephemeral: true,
             });
 
@@ -65,7 +65,7 @@ export class SearchCommand extends KoosCommand {
         const query = await args.rest("string").catch(() => undefined);
         if (!query)
             return send(message, {
-                embeds: [new EmbedBuilder().setDescription("Please provide an URL or search query").setColor(KoosColor.Error)],
+                embeds: [new EmbedBuilder().setDescription("Please provide a URL or search query").setColor(KoosColor.Error)],
             });
 
         await this.search(kazagumo, message, query);

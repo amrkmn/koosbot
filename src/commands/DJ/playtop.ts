@@ -68,7 +68,7 @@ export class PlayTopCommand extends KoosCommand {
         const query = attachment ? attachment.proxyURL : await args.rest("string").catch(() => undefined);
         if (!query)
             return await send(message, {
-                embeds: [new EmbedBuilder().setDescription("Please provide an URL or search query").setColor(KoosColor.Error)],
+                embeds: [new EmbedBuilder().setDescription("Please provide a URL or search query").setColor(KoosColor.Error)],
             });
 
         const channel = message.member?.voice.channel as VoiceBasedChannel;
