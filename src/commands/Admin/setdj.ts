@@ -64,8 +64,8 @@ export class SetDJCommand extends KoosCommand {
 
         const isNewRole = data.dj.includes(roleId) ? false : true;
         const roles = isNewRole //
-            ? removeItem(data.dj, roleId)
-            : [...data.dj, roleId];
+            ? [...data.dj, roleId]
+            : removeItem(data.dj, roleId);
 
         await db.guild.upsert({
             where: { id: guildId },
