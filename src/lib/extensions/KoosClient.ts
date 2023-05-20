@@ -82,6 +82,7 @@ export class KoosClient extends SapphireClient {
                 ],
                 defaultSearchEngine: "youtube",
                 extends: { player: KoosPlayer },
+                defaultYoutubeThumbnail: "maxresdefault",
                 send: (id, payload) => this.guilds.cache.get(id)?.shard?.send(payload),
             },
             new Connectors.DiscordJS(this),

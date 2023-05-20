@@ -8,12 +8,15 @@ import { Message } from "discord.js";
 })
 export class ClientListener extends Listener {
     public async run(message: Message) {
-        const { kazagumo, db } = this.container;
+        const { kazagumo } = this.container;
 
         const player = kazagumo.getPlayer(message.guildId!);
-        const data = await db.guild.findUnique({ where: { id: message.guildId! } });
-        if (isNullish(player) || isNullish(data)) return;
+        if (isNullish(player)) return;
 
-        await player.newDashboard(player.queue.current!);
+        const dashboard = player.dashboard();
+        if (isNullish(dashboard)) return;
+        if (dashboard.id !== message.id) return;
+
+        await player.newDashboard();
     }
 }
