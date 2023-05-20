@@ -1,37 +1,55 @@
-FROM debian:bullseye as builder
+# syntax = docker/dockerfile:1
 
-ARG NODE_VERSION=16.18.0
-ARG YARN_VERSION=1.22.19
+# Adjust NODE_VERSION as desired
+ARG NODE_VERSION=18.12.1
+FROM node:${NODE_VERSION}-slim as base
 
-RUN apt-get update; apt install -y curl
-RUN curl https://get.volta.sh | bash
-ENV VOLTA_HOME /root/.volta
-ENV PATH /root/.volta/bin:$PATH
-RUN volta install node@${NODE_VERSION} yarn@${YARN_VERSION}
+LABEL fly_launch_runtime="Node.js/Prisma"
 
-#######################################################################
-
-RUN mkdir /app
+# Node.js/Prisma app lives here
 WORKDIR /app
 
-# Yarn will not install any package listed in "devDependencies" when NODE_ENV is set to "production"
-# to install all modules: "yarn install --production=false"
-# Ref: https://classic.yarnpkg.com/lang/en/docs/cli/install/#toc-yarn-install-production-true-false
+# Set production environment
+ENV NODE_ENV=production
 
-ENV NODE_ENV production
 
-COPY . .
+# Throw-away build stage to reduce size of final image
+FROM base as build
 
-RUN yarn install && yarn generate
-FROM debian:bullseye
+# Install packages needed to build node modules
+RUN apt-get update -qq && \
+    apt-get install -y python-is-python3 pkg-config build-essential openssl 
 
-LABEL fly_launch_runtime="nodejs"
+# Install node modules
+COPY --link package.json package-lock.json ./
+RUN npm ci --include=dev
 
-COPY --from=builder /root/.volta /root/.volta
-COPY --from=builder /app /app
+# Generate Prisma Client
+COPY --link prisma .
+RUN npx prisma generate
 
-WORKDIR /app
-ENV NODE_ENV production
-ENV PATH /root/.volta/bin:$PATH
+# Copy application code
+COPY --link . .
 
-CMD [ "yarn", "run", "start" ]
+# Build application
+RUN npm run build
+
+# Remove development dependencies
+RUN npm prune --omit=dev
+
+
+# Final stage for app image
+FROM base
+
+# Copy built application
+COPY --from=build /app /app
+
+# Adjust entrypoint to be executable on Linux
+RUN chmod +x ./docker-entrypoint
+
+# Entrypoint prepares the database.
+ENTRYPOINT [ "/app/docker-entrypoint" ]
+
+# Start the server by default, this can be overwritten at runtime
+EXPOSE 3000
+CMD [ "npm", "run", "start" ]
