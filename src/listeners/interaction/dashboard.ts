@@ -25,10 +25,7 @@ export class ClientListener extends Listener {
 
         if (Object.values(ButtonId).includes(id)) await interaction.deferUpdate();
         if (!isNullish(checkedMember)) return interaction.followUp({ embeds: [checkedMember], ephemeral: true });
-        if (
-            [ButtonId.PauseOrResume, ButtonId.Previous, ButtonId.Skip, ButtonId.Stop].includes(id) && //
-            !checkDJ(member, data.dj)
-        )
+        if (!checkDJ(member, data.dj))
             return interaction.followUp({
                 embeds: [new EmbedBuilder().setDescription(`This button can only be used by DJ.`).setColor(KoosColor.Error)],
                 ephemeral: true,

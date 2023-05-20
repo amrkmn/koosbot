@@ -1,12 +1,10 @@
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
-import { createTitle, progressBar } from "#utils/functions";
+import { createTitle } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
-import { oneLine } from "common-tags";
-import { Message, EmbedBuilder } from "discord.js";
+import { EmbedBuilder, Message } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
-import prettyMs from "pretty-ms";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Show information about the currently playing track.",
@@ -29,7 +27,7 @@ export class NowPlayingCommand extends KoosCommand {
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
             return interaction.reply({
-                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
             });
         }
@@ -43,7 +41,7 @@ export class NowPlayingCommand extends KoosCommand {
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
-                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
         }
 
@@ -56,13 +54,8 @@ export class NowPlayingCommand extends KoosCommand {
         const title = createTitle(current);
 
         const description = `${title}${data?.requester ? ` ~ ${current.requester}` : ``}`;
-        const duration = Number(current.length);
-        const progress = oneLine`
-                ${progressBar(player.shoukaku.position, duration, 20, current.isStream)}
-                ${prettyMs(player.shoukaku.position, { secondsDecimalDigits: 0 }).replace("ms", "s")} /
-                ${!current.isStream ? prettyMs(duration, { secondsDecimalDigits: 0 }) : "∞"}
-            `;
+        const progressBar = player.createProgressBar({ length: 20 });
 
-        return new EmbedBuilder({ description, footer: { text: progress }, color: KoosColor.Default });
+        return new EmbedBuilder({ description, footer: { text: progressBar }, color: KoosColor.Default });
     }
 }

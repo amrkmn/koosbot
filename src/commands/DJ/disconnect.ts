@@ -2,6 +2,7 @@ import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
+import { isNullish } from "@sapphire/utilities";
 import { Message, EmbedBuilder } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 
@@ -23,11 +24,19 @@ export class DisconnectCommand extends KoosCommand {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${interaction.guildId}`);
 
-        if (!player || (player && !player.queue.current))
+        if (isNullish(player)) {
+            if (!isNullish(interaction.guild?.members.me?.voice)) {
+                await interaction.guild?.members.me?.voice.disconnect();
+                return interaction.reply({
+                    embeds: [new EmbedBuilder().setDescription("Left the voice channel").setColor(KoosColor.Default)],
+                    ephemeral: true,
+                });
+            }
             return interaction.reply({
-                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
             });
+        }
 
         await interaction.deferReply();
 
@@ -38,9 +47,15 @@ export class DisconnectCommand extends KoosCommand {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${message.guildId}`);
 
-        if (!player) {
+        if (isNullish(player)) {
+            if (!isNullish(message.guild?.members.me?.voice)) {
+                await message.guild?.members.me?.voice.disconnect();
+                return send(message, {
+                    embeds: [new EmbedBuilder().setDescription("Left the voice channel").setColor(KoosColor.Default)],
+                });
+            }
             return reply(message, {
-                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
         }
 

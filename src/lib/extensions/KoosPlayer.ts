@@ -5,7 +5,16 @@ import { container } from "@sapphire/framework";
 import { isNullish, Nullish } from "@sapphire/utilities";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message } from "discord.js";
 import { Kazagumo, KazagumoPlayer, KazagumoPlayerOptions, KazagumoTrack } from "kazagumo";
+import prettyMs from "pretty-ms";
 import { Player } from "shoukaku";
+
+interface PlayerProgressbarOptions {
+    timecodes?: boolean;
+    length?: number;
+    line?: string;
+    indicator?: string;
+    queue?: boolean;
+}
 
 export class KoosPlayer extends KazagumoPlayer {
     #dashboard: Message | undefined;
@@ -55,6 +64,29 @@ export class KoosPlayer extends KazagumoPlayer {
         this.#dashboard = undefined;
     }
 
+    public createProgressBar(options?: PlayerProgressbarOptions) {
+        const current = this.queue.current;
+        const duration = current?.length ?? 0;
+        const position = duration > 0 ? this.shoukaku.position : 0;
+
+        const { indicator = "🔵", length = 15, line = "▬", timecodes = true } = options ?? {};
+
+        if (isNaN(length) || length < 0 || !Number.isFinite(length)) throw new Error("Invalid progressbar length");
+        const index = Math.round((position / duration) * length);
+        const prettyPosition = prettyMs(position, { secondsDecimalDigits: 0 }).replace("ms", "s");
+        const prettyDuration = !current?.isStream ? prettyMs(duration, { secondsDecimalDigits: 0 }) : "∞";
+
+        if (index >= 1 && index <= length) {
+            const bar = line.repeat(length - 1).split("");
+            bar.splice(index, 0, indicator);
+            if (timecodes) return `${bar.join("")} ${prettyPosition} / ${prettyDuration}`;
+            return `${bar.join("")}`;
+        } else {
+            if (timecodes) return `${indicator}${line.repeat(length - 1)} ${prettyPosition} / ${prettyDuration}`;
+            return `${indicator}${line.repeat(length - 1)}`;
+        }
+    }
+
     private createPlayerComponents(previousTracks: KazagumoTrack | Nullish) {
         const hasPrevious = isNullish(previousTracks);
         const row = new ActionRowBuilder<ButtonBuilder>();
@@ -81,5 +113,6 @@ declare module "kazagumo" {
         dashboard(message?: Message): Message | undefined;
         newDashboard(track: KazagumoTrack): Promise<void>;
         resetDashboard(): void;
+        createProgressBar(options?: PlayerProgressbarOptions): string;
     }
 }
