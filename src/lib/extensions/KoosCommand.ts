@@ -7,14 +7,16 @@ export abstract class KoosCommand extends Command {
     public readonly hidden: boolean;
 
     constructor(ctx: Command.Context, options: KoosCommand.Options) {
-        const resolvedPermissions = new PermissionsBitField(options.requiredClientPermissions).add(PermissionFlagsBits.EmbedLinks);
-        const userResolvedPermissions = new PermissionsBitField(options.requiredUserPermissions)
+        const resolvedPermissions = new PermissionsBitField(options.requiredClientPermissions ?? options.clientPermissions)
+            .add(PermissionFlagsBits.SendMessages)
+            .add(PermissionFlagsBits.ViewChannel)
+            .add(PermissionFlagsBits.EmbedLinks);
+        const userResolvedPermissions = new PermissionsBitField(options.requiredUserPermissions ?? options.permissions)
             .add(PermissionFlagsBits.SendMessages)
             .add(PermissionFlagsBits.SendMessagesInThreads);
 
         options.typing ??= false;
         options.cooldown ??= Time.Second * 2.5;
-        options.requiredUserPermissions = options.permissions;
 
         super(ctx, {
             ...options,
@@ -51,6 +53,7 @@ export abstract class KoosCommand extends Command {
 
 export namespace KoosCommand {
     export type Options = Command.Options & {
+        clientPermissions?: PermissionResolvable;
         permissions?: PermissionResolvable;
         hidden?: boolean;
         bucket?: number;

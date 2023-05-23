@@ -38,7 +38,7 @@
     "typescript": "4.9.5"
   },
   "dependencies": {
-    "@aytea/request": "^0.1.1",
+    "@aytea/request": "^0.1.2",
     "@prisma/client": "^4.11.0",
     "@sapphire/decorators": "^6.0.0",
     "@sapphire/discord.js-utilities": "^6.1.0",
