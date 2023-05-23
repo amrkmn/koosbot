@@ -56,8 +56,8 @@ export class KoosPlayer extends KazagumoPlayer {
         const row = this.createPlayerComponents();
 
         if (channel.isTextBased()) {
-            const nowPlaying = await channel.send({ embeds: [embed], components: [row] });
-            this.#dashboard = nowPlaying;
+            const newDashboard = await channel.send({ embeds: [embed], components: [row] });
+            this.#dashboard = newDashboard;
         }
     }
 
