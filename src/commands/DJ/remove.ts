@@ -9,7 +9,7 @@ import { KoosCommand } from "#lib/extensions";
 import { createTitle } from "#utils/functions";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: "Remove a track from the queue.",
+    description: "Remove one or multiple tracks from the queue.",
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["rm", "del", "delete"],
     detailedDescription: {
