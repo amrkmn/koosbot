@@ -1,10 +1,10 @@
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
 import { canJoinVoiceChannel, convertTime, createTitle, cutText, mins, sendLoadingMessage } from "#utils/functions";
+import { generate } from "#utils/snowflake";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
-import { DiscordSnowflake } from "@sapphire/snowflake";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import {
     ActionRowBuilder,
@@ -96,7 +96,7 @@ export class SearchCommand extends KoosCommand {
             );
         } else {
             for (let track of tracks) {
-                const id = `${DiscordSnowflake.generate()}`;
+                const id = generate();
                 this.tracksMap.set(id, track);
 
                 options.push(

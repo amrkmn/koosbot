@@ -11,7 +11,7 @@ import { createTitle } from "#utils/functions";
 @ApplyOptions<KoosCommand.Options>({
     description: "Remove one or multiple tracks from the queue.",
     preconditions: ["VoiceOnly", "DJ"],
-    aliases: ["rm", "del", "delete"],
+    aliases: ["rm"],
     detailedDescription: {
         usages: [":position", ";to"],
     },

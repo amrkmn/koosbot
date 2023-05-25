@@ -111,8 +111,8 @@ export function sendLoadingMessage(message: Message) {
 }
 
 export function createTitle(track: KazagumoTrack, withUrl = true) {
-    const author = track?.author;
-    if (isNullish(author)) return "Unknown artist";
+    let author = track?.author;
+    if (isNullish(author)) author = "Unknown artist";
 
     const title =
         track.sourceName === "youtube"

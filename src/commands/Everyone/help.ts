@@ -1,19 +1,16 @@
 import { KoosCommand } from "#lib/extensions";
-import { DocumentCommand } from "#lib/interfaces";
-import { PermissionLevel } from "#lib/utils/constants";
 import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args, SapphirePrefix } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { isNullish, isObject } from "@sapphire/utilities";
-import { ApplicationCommandOptionChoiceData } from "discord.js";
 import { Collection, EmbedBuilder, Message } from "discord.js";
 
 const categoryLevel: { [key: string]: number } = {
-    Admin: PermissionLevel.Administrator,
-    DJ: PermissionLevel.DJ,
-    Everyone: PermissionLevel.Everyone,
-    General: PermissionLevel.Everyone,
+    Everyone: 0,
+    Playlist: 2,
+    DJ: 3,
+    Admin: 6,
 };
 
 @ApplyOptions<KoosCommand.Options>({
@@ -42,12 +39,21 @@ export class HelpCommand extends KoosCommand {
     }
 
     public async autocompleteRun(interaction: KoosCommand.AutocompleteInteraction) {
-        const search = interaction.options.getString("command");
-        const result = await this.container.meili.get<DocumentCommand>("commands", search ?? "");
+        const search = interaction.options.getString("command")?.toLowerCase();
 
-        const options: ApplicationCommandOptionChoiceData[] = result.hits.map(({ name }) => ({ name, value: name }));
+        if (search) {
+            const commands = this.container.stores
+                .get("commands")
+                .filter((cmd) => cmd.aliases.some((alias) => alias.includes(search)) || cmd.name.includes(search))
+                .map((cmd) => ({ name: cmd.name, value: cmd.name }));
+            return interaction.respond(commands);
+        }
 
-        return interaction.respond(options);
+        const allCommands = this.container.stores
+            .get("commands")
+            .map((cmd) => ({ name: cmd.name, value: cmd.name }))
+            .splice(0, 25);
+        return interaction.respond(allCommands);
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
