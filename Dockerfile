@@ -21,8 +21,8 @@ RUN apt-get update -qq && \
     apt-get install -y python-is-python3 pkg-config build-essential openssl 
 
 # Install node modules
-COPY --link package.json package-lock.json ./
-RUN npm ci --include=dev
+COPY --link package.json yarn.lock ./
+RUN yarn install --frozen-lockfile --production=false
 
 # Generate Prisma Client
 COPY --link prisma .
@@ -32,10 +32,10 @@ RUN npx prisma generate
 COPY --link . .
 
 # Build application
-RUN npm run build
+RUN yarn run build
 
 # Remove development dependencies
-RUN npm prune --omit=dev
+RUN yarn install --production=true
 
 
 # Final stage for app image
@@ -52,4 +52,4 @@ ENTRYPOINT [ "/app/docker-entrypoint" ]
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD [ "npm", "run", "start" ]
+CMD [ "yarn", "run", "start" ]
