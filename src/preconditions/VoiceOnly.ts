@@ -1,6 +1,6 @@
 import { Precondition } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
-import { Message, Interaction, GuildMember, Guild } from "discord.js";
+import { Message, type Interaction, GuildMember, Guild } from "discord.js";
 
 export class UserPrecondition extends Precondition {
     public async messageRun(message: Message) {

@@ -4,7 +4,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, Store } from "@sapphire/framework";
 import { blue, yellow } from "colorette";
 import { OAuth2Scopes, ActivityType } from "discord.js";
-import { DocumentCommand } from "#lib/types/interfaces/Meili";
+import { type DocumentCommand } from "#lib/types/interfaces/Meili";
 import { isNullishOrEmpty } from "@sapphire/utilities";
 
 const dev = envParseString("NODE_ENV") !== "production";

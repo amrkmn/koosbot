@@ -1,7 +1,7 @@
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
-import { Args, SapphirePrefix } from "@sapphire/framework";
+import { Args, type SapphirePrefix } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { isNullish, isObject } from "@sapphire/utilities";
 import { Collection, EmbedBuilder, Message } from "discord.js";

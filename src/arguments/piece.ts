@@ -1,4 +1,4 @@
-import { Argument, ArgumentContext, Piece } from "@sapphire/framework";
+import { Argument, type ArgumentContext, Piece } from "@sapphire/framework";
 import { oneLine } from "common-tags";
 
 export class PieceArgument extends Argument<Piece> {

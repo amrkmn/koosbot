@@ -9,12 +9,12 @@ import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import * as cheerio from "cheerio";
 import {
     ActionRowBuilder,
-    ApplicationCommandOptionChoiceData,
+    type ApplicationCommandOptionChoiceData,
     ButtonBuilder,
     ButtonStyle,
     EmbedBuilder,
     Message,
-    SelectMenuComponentOptionData,
+    type SelectMenuComponentOptionData,
     StringSelectMenuBuilder,
     TextChannel,
 } from "discord.js";

@@ -4,7 +4,7 @@ import { checkDJ, checkMember } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
 import { isNullish, isNullishOrEmpty, noop } from "@sapphire/utilities";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, GuildMember, Interaction } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, GuildMember, type Interaction } from "discord.js";
 
 @ApplyOptions<Listener.Options>({
     name: "dashboard",

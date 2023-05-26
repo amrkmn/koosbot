@@ -1,6 +1,6 @@
 import { KoosCommand } from "#lib/extensions";
-import { Guild } from "@prisma/client";
-import { Message, VoiceBasedChannel } from "discord.js";
+import { type Guild } from "@prisma/client";
+import { Message, type VoiceBasedChannel } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 
 export interface PlayOptions {

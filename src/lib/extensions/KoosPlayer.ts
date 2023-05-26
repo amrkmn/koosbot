@@ -4,7 +4,7 @@ import { convertTime, createTitle } from "#utils/functions";
 import { container } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message } from "discord.js";
-import { Kazagumo, KazagumoPlayer, KazagumoPlayerOptions } from "kazagumo";
+import { Kazagumo, KazagumoPlayer, type KazagumoPlayerOptions } from "kazagumo";
 import prettyMs from "pretty-ms";
 import { Player } from "shoukaku";
 

@@ -1,6 +1,6 @@
-import { MeiliCategories, MeiliDocument, MeiliIndex } from "#lib/types/interfaces/Meili";
+import { MeiliCategories, type MeiliDocument,type  MeiliIndex } from "#lib/types/interfaces/Meili";
 import { envParseString } from "@skyra/env-utilities";
-import { MeiliSearch, SearchResponse } from "meilisearch";
+import { MeiliSearch, type SearchResponse } from "meilisearch";
 
 export class MeilisearchClient extends MeiliSearch {
     public constructor() {

@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client";
-import { Awaitable, container, LogLevel, SapphireClient, SapphirePrefix } from "@sapphire/framework";
+import { type Awaitable, container, LogLevel, SapphireClient, type SapphirePrefix } from "@sapphire/framework";
 import { Guild, Message, Partials, GatewayIntentBits } from "discord.js";
 import { resolve } from "path";
 import { Kazagumo, Plugins } from "kazagumo";
-import { Connectors, NodeOption, Shoukaku } from "shoukaku";
+import { Connectors, type NodeOption, Shoukaku } from "shoukaku";
 import { KoosPlayer } from "#lib/extensions/KoosPlayer";
 import { envParseNumber, envParseString } from "@skyra/env-utilities";
 import { Client as GeniusClient } from "genius-lyrics";
@@ -80,7 +80,7 @@ export class KoosClient extends SapphireClient {
                     }),
                     new Plugins.PlayerMoved(this),
                 ],
-                defaultSearchEngine: "youtube",
+                defaultSearchEngine: "youtube_music",
                 extends: { player: KoosPlayer },
                 defaultYoutubeThumbnail: "maxresdefault",
                 send: (id, payload) => this.guilds.cache.get(id)?.shard?.send(payload),

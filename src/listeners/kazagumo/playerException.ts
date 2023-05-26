@@ -4,7 +4,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
 import { EmbedBuilder } from "discord.js";
 import { Events, KazagumoPlayer } from "kazagumo";
-import { TrackExceptionEvent } from "shoukaku";
+import { type TrackExceptionEvent } from "shoukaku";
 
 @ApplyOptions<Listener.Options>({
     emitter: container.kazagumo,

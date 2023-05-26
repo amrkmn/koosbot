@@ -14,7 +14,7 @@ import {
     EmbedBuilder,
     GuildMember,
     Message,
-    Snowflake,
+    type Snowflake,
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
 } from "discord.js";

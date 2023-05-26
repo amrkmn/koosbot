@@ -59,7 +59,7 @@ export class EvalCommand extends KoosCommand {
                     }.txt\n\n${typeFooter}`,
                 });
             } catch (error: unknown) {
-                const content = `${codeBlock("bash", (error as HasteBinResponse)?.message ?? error)}`;
+                const content = `${codeBlock("bash", (error as HasteBinResponse)?.message ?? `${error}`)}`;
                 return send(message, { content: `**Error**: ${content}\n${typeFooter}` });
             }
         }
@@ -92,7 +92,7 @@ export class EvalCommand extends KoosCommand {
                 stopwatch.restart();
                 result = await result;
                 asyncTime = stopwatch.toString();
-                type = type.toString();
+                type = type;
             }
             success = true;
         } catch (error) {
@@ -113,7 +113,7 @@ export class EvalCommand extends KoosCommand {
         }
         result = clean(result);
 
-        return { result, success, type, time: this.formatTime(syncTime, asyncTime) };
+        return { result, success, type: type.toString(), time: this.formatTime(syncTime, asyncTime) };
     }
     formatTime(syncTime: Stopwatch | string, asyncTime?: string) {
         return asyncTime ? `⏱ ${asyncTime}<${syncTime}>` : `⏱ ${syncTime}`;

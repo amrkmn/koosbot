@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { PlayOptions } from "#lib/interfaces";
+import { type PlayOptions } from "#lib/interfaces";
 import { KoosColor } from "#utils/constants";
 import { canJoinVoiceChannel, createTitle, cutText, sendLoadingMessage } from "#utils/functions";
 import { generate } from "#utils/snowflake";
@@ -9,13 +9,13 @@ import { send } from "@sapphire/plugin-editable-commands";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { oneLine } from "common-tags";
 import {
-    ApplicationCommandOptionChoiceData,
+    type ApplicationCommandOptionChoiceData,
     ChannelType,
     EmbedBuilder,
     GuildMember,
     Message,
-    Snowflake,
-    VoiceBasedChannel,
+    type Snowflake,
+    type VoiceBasedChannel,
 } from "discord.js";
 import { KazagumoTrack } from "kazagumo";
 import pluralize from "pluralize";

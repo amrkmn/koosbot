@@ -1,5 +1,5 @@
 import { checkDJ } from "#utils/functions";
-import { Precondition, PreconditionOptions } from "@sapphire/framework";
+import { Precondition, type PreconditionOptions } from "@sapphire/framework";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
 

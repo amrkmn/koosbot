@@ -1,7 +1,6 @@
 import { KoosColor } from "#utils/constants";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { EmbedBuilder, Guild, GuildMember } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
 
 export function checkMember(guild: Guild | null, member: GuildMember) {
     if (!guild) return new EmbedBuilder().setDescription("You cannot run this message command in DMs.").setColor(KoosColor.Error);

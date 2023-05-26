@@ -4,7 +4,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
 import { EmbedBuilder } from "discord.js";
 import { Events, KazagumoPlayer } from "kazagumo";
-import { TrackStuckEvent } from "shoukaku";
+import { type TrackStuckEvent } from "shoukaku";
 
 @ApplyOptions<Listener.Options>({
     emitter: container.kazagumo,

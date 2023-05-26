@@ -2,9 +2,9 @@ import { KoosColor } from "#utils/constants";
 import { time } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
-import { isNullish, Nullish } from "@sapphire/utilities";
+import { isNullish, type Nullish } from "@sapphire/utilities";
 import { envParseString } from "@skyra/env-utilities";
-import { EmbedBuilder, Guild, VoiceBasedChannel, VoiceState } from "discord.js";
+import { EmbedBuilder, Guild, type VoiceBasedChannel, VoiceState } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 import ms from "ms";
 

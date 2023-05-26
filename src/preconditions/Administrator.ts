@@ -1,4 +1,4 @@
-import { Precondition, PreconditionResult } from "@sapphire/framework";
+import { Precondition, type PreconditionResult } from "@sapphire/framework";
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 
 export class AdministratorPrecondition extends Precondition {

@@ -1,6 +1,6 @@
 import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
-import { Events, Listener, UserError, ChatInputCommandDeniedPayload } from "@sapphire/framework";
+import { Events, Listener, UserError, type ChatInputCommandDeniedPayload } from "@sapphire/framework";
 import { EmbedBuilder } from "discord.js";
 import prettyMs from "pretty-ms";
 

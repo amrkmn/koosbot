@@ -1,6 +1,6 @@
 import { KoosPlayer } from "#lib/extensions";
 import { Queue } from "#lib/structures";
-import { Nullish } from "@sapphire/utilities";
+import { type Nullish } from "@sapphire/utilities";
 import { KazagumoTrack } from "kazagumo";
 
 export class QueueHistory {

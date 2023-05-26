@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { PlayOptions } from "#lib/interfaces";
+import { type PlayOptions } from "#lib/interfaces";
 import { KoosColor } from "#utils/constants";
 import { createTitle, cutText, sendLoadingMessage, canJoinVoiceChannel } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
@@ -7,7 +7,7 @@ import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { filterNullishAndEmpty, isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { oneLine } from "common-tags";
-import { ApplicationCommandOptionChoiceData, EmbedBuilder, GuildMember, Message, VoiceBasedChannel } from "discord.js";
+import { type ApplicationCommandOptionChoiceData, EmbedBuilder, GuildMember, Message, type VoiceBasedChannel } from "discord.js";
 import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({

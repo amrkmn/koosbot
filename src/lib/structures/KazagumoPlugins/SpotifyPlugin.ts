@@ -1,16 +1,16 @@
 // https://github.com/Takiyo0/kazagumo-spotify
 
 import {
-    AlbumResult,
-    Artist,
-    ArtistResult,
-    PlaylistResult,
-    PlaylistTracks,
-    Result,
-    SearchResult,
-    SpotifyOptions,
-    Track,
-    TrackResult,
+    type AlbumResult,
+    type Artist,
+    type ArtistResult,
+    type PlaylistResult,
+    type PlaylistTracks,
+    type Result,
+    type SearchResult,
+    type SpotifyOptions,
+    type Track,
+    type TrackResult,
 } from "#lib/interfaces";
 import { request } from "@aytea/request";
 import { filterNullish } from "@sapphire/utilities";
@@ -18,10 +18,10 @@ import {
     Kazagumo,
     KazagumoError,
     KazagumoPlugin as Plugin,
-    KazagumoSearchOptions,
-    KazagumoSearchResult,
+    type KazagumoSearchOptions,
+    type KazagumoSearchResult,
     KazagumoTrack,
-    SearchResultTypes,
+    type SearchResultTypes,
 } from "kazagumo";
 
 const REGEX = /(?:https:\/\/open\.spotify\.com\/|spotify:)(?:.+)?(track|playlist|album|artist)[\/:]([A-Za-z0-9]+)/;

@@ -1,12 +1,12 @@
 import {
-    ChannelTypes,
+    type ChannelTypes,
     isGuildBasedChannel,
     isStageChannel,
     isVoiceBasedChannel,
     isVoiceChannel,
 } from "@sapphire/discord.js-utilities";
-import { isNullish, Nullish } from "@sapphire/utilities";
-import { PermissionFlagsBits, PermissionsBitField, VoiceBasedChannel } from "discord.js";
+import { isNullish, type Nullish } from "@sapphire/utilities";
+import { PermissionFlagsBits, PermissionsBitField, type VoiceBasedChannel } from "discord.js";
 
 const canJoinVoiceChannelPermissions = new PermissionsBitField([PermissionFlagsBits.Connect]);
 
