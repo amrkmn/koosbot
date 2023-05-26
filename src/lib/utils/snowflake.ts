@@ -2,7 +2,7 @@ import { Snowflake } from "@sapphire/snowflake";
 
 const snowflake = new Snowflake(1684991400000);
 
-export function generate() {
+export function generateId() {
     return `${snowflake.generate()}`;
 }
 

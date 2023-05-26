@@ -2,7 +2,7 @@ import { KoosCommand } from "#lib/extensions";
 import { type PlayOptions } from "#lib/interfaces";
 import { KoosColor } from "#utils/constants";
 import { canJoinVoiceChannel, createTitle, cutText, sendLoadingMessage } from "#utils/functions";
-import { generate } from "#utils/snowflake";
+import { generateId } from "#utils/snowflake";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
@@ -93,7 +93,7 @@ export class PlayCommand extends KoosCommand {
         const memberId = (interaction.member as GuildMember).id;
         const tracksMap = new Map<string, string>();
 
-        const queryId = generate();
+        const queryId = generateId();
         const options: ApplicationCommandOptionChoiceData[] = [];
 
         if (isNullishOrEmpty(query.value)) return interaction.respond([]);
@@ -106,7 +106,7 @@ export class PlayCommand extends KoosCommand {
         options.push({ name: cutText(`${query.value}`, 100), value: queryId });
 
         if (type === "PLAYLIST") {
-            const id = generate();
+            const id = generateId();
             const tracks = tracksMap.set(id, query.value);
 
             this.tracks.set(`${guildId}:${memberId}`, tracks);
@@ -117,7 +117,7 @@ export class PlayCommand extends KoosCommand {
             tracks = tracks.slice(0, 10);
 
             for (let track of tracks) {
-                const id = generate();
+                const id = generateId();
                 const author = track.author;
                 const title = `${track.title} ${author && author.toLowerCase() !== "unknown artist" ? `by ${author}` : ``}`;
 
