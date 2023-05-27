@@ -56,6 +56,6 @@ export class NowPlayingCommand extends KoosCommand {
         const description = `${title}${data?.requester ? ` ~ ${current.requester}` : ``}`;
         const progressBar = player.createProgressBar({ length: 20 });
 
-        return new EmbedBuilder({ description, footer: { text: progressBar }, color: KoosColor.Default });
+        return new EmbedBuilder().setDescription(description).setFooter({ text: progressBar }).setColor(KoosColor.Default);
     }
 }

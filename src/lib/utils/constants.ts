@@ -30,8 +30,15 @@ export enum Emoji {
 }
 
 export enum ButtonId {
+    // Dashboard
     PauseOrResume = "buttonPauseOrResume",
     Previous = "buttonPrevious",
     Skip = "buttonSkip",
     Stop = "buttonStop",
+
+    // Settings
+    PlayerSetting = "buttonPlayerSetting",
+    DJSetting = "buttonDJSetting",
+    SongRequestChannelSetting = "buttonSongRequestChannelSetting",
+    Back = "buttonBack",
 }

@@ -13,8 +13,8 @@ import ms from "ms";
     enabled: true,
 })
 export class ClientListener extends Listener {
-    _timeoutId: NodeJS.Timeout | undefined = undefined;
-    _leaveAfter: number = envParseString("NODE_ENV") === "production" ? time("mins", 1) : time("sec", 25);
+    private _timeoutId: NodeJS.Timeout | undefined = undefined;
+    private _leaveAfter: number = envParseString("NODE_ENV") === "production" ? time("mins", 1) : time("sec", 25);
 
     public async run(oldState: VoiceState, newState: VoiceState) {
         const { client, kazagumo } = this.container;
@@ -41,7 +41,7 @@ export class ClientListener extends Listener {
         else this.cancelTimeout();
     }
 
-    checkState(oldState: VoiceState, newState: VoiceState) {
+    private checkState(oldState: VoiceState, newState: VoiceState) {
         if (oldState.member?.user.bot || newState.member?.user.bot) return "BOT";
 
         if (isNullish(newState.channel)) return "LEFT";
@@ -49,7 +49,7 @@ export class ClientListener extends Listener {
         else return "MOVED";
     }
 
-    async setupTimeout(guild: Guild | null, player: KazagumoPlayer) {
+    private async setupTimeout(guild: Guild | null, player: KazagumoPlayer) {
         if (typeof this._timeoutId !== "undefined") this.cancelTimeout();
 
         const { client } = this.container;
@@ -73,7 +73,7 @@ export class ClientListener extends Listener {
 
         this._timeoutId = setTimeout(checking, this._leaveAfter);
     }
-    cancelTimeout() {
+    private cancelTimeout() {
         clearTimeout(this._timeoutId);
         this._timeoutId = undefined;
     }
