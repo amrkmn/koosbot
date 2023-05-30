@@ -11,7 +11,7 @@ import { KazagumoPlayer } from "kazagumo";
     preconditions: ["VoiceOnly", "DJ"],
     detailedDescription: {
         usage: [";queue|;song|;off"],
-        examples: ["queue|song|off"],
+        examples: ["", "queue", "off"],
     },
 })
 export class LoopCommand extends KoosCommand {
@@ -21,11 +21,15 @@ export class LoopCommand extends KoosCommand {
                 .setName(this.name)
                 .setDescription(this.description)
                 .addStringOption((option) =>
-                    option
+                    option //
                         .setName("mode")
                         .setDescription("Select a loop mode")
                         .setRequired(true)
-                        .addChoices({ name: "queue", value: "queue" }, { name: "song", value: "song" }, { name: "off", value: "off" })
+                        .addChoices(
+                            { name: "queue", value: "queue" }, //
+                            { name: "song", value: "song" },
+                            { name: "off", value: "off" }
+                        )
                 )
         );
     }
