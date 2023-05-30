@@ -15,7 +15,8 @@ import pluralize from "pluralize";
     aliases: ["pt"],
     preconditions: ["VoiceOnly", "DJ"],
     detailedDescription: {
-        usages: [":query"],
+        usage: [":query"],
+        examples: ["no glory", "https://youtu.be/VwE-tWBrpPs"],
     },
 })
 export class PlayTopCommand extends KoosCommand {

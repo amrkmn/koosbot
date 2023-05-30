@@ -25,7 +25,8 @@ import pluralize from "pluralize";
     aliases: ["p"],
     preconditions: ["VoiceOnly"],
     detailedDescription: {
-        usages: [":query"],
+        usage: [":query"],
+        examples: ["no glory", "https://youtu.be/VwE-tWBrpPs"],
     },
 })
 export class PlayCommand extends KoosCommand {

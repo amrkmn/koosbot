@@ -31,6 +31,7 @@ declare module "@skyra/env-utilities" {
 
 declare module "@sapphire/framework" {
     interface DetailedDescriptionCommandObject {
-        usages?: string[];
+        usage?: string[];
+        examples?: string[];
     }
 }

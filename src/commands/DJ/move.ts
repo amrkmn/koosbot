@@ -13,7 +13,8 @@ import { KazagumoPlayer } from "kazagumo";
     aliases: ["m"],
     preconditions: ["VoiceOnly", "DJ"],
     detailedDescription: {
-        usages: [":from", ":to"],
+        usage: [":from", ":to"],
+        examples: ["1 5", "5 2"],
     },
 })
 export class MoveCommand extends KoosCommand {

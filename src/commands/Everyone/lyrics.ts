@@ -25,7 +25,8 @@ import pluralize from "pluralize";
     description: "Get the lyrics of a song.",
     aliases: ["ly"],
     detailedDescription: {
-        usages: [":query"],
+        usage: [":query"],
+        examples: ["no glory"],
     },
 })
 export class LyricsCommand extends KoosCommand {

@@ -12,7 +12,8 @@ import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
     permissions: [PermissionFlagsBits.ManageGuild],
     aliases: ["req"],
     detailedDescription: {
-        usages: [":enable|:disable"],
+        usage: [":enable|:disable"],
+        examples: ["enable", "disable"],
     },
 })
 export class RequesterCommand extends KoosCommand {

@@ -11,7 +11,7 @@ import { KazagumoPlayer } from "kazagumo";
     description: `Bind the dashboard to current channel`,
     preconditions: ["VoiceOnly", "DJ"],
     detailedDescription: {
-        usages: [";channel"],
+        usage: [";channel"],
     },
 })
 export class BindCommand extends KoosCommand {

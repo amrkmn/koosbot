@@ -10,7 +10,8 @@ import { KazagumoPlayer } from "kazagumo";
     description: `Change the current loop mode (queue, song, off).`,
     preconditions: ["VoiceOnly", "DJ"],
     detailedDescription: {
-        usages: [";queue|;song|;off"],
+        usage: [";queue|;song|;off"],
+        examples: ["queue|song|off"],
     },
 })
 export class LoopCommand extends KoosCommand {

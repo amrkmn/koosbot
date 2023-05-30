@@ -1,17 +1,17 @@
-import { Command, type PreconditionEntryResolvable, SapphireClient, UserPermissionsPrecondition } from "@sapphire/framework";
+import { Command, SapphireClient, UserPermissionsPrecondition, type PreconditionEntryResolvable } from "@sapphire/framework";
 import { Time } from "@sapphire/timestamp";
-import { PermissionFlagsBits, type PermissionResolvable, PermissionsBitField, Message as DiscordMessage } from "discord.js";
+import { Message as DiscordMessage, PermissionFlagsBits, PermissionsBitField, type PermissionResolvable } from "discord.js";
 
 export abstract class KoosCommand extends Command {
     public client: SapphireClient;
     public readonly hidden: boolean;
 
     constructor(ctx: Command.Context, options: KoosCommand.Options) {
-        const resolvedPermissions = new PermissionsBitField(options.requiredClientPermissions ?? options.clientPermissions)
+        const resolvedPermissions = new PermissionsBitField(options.clientPermissions ?? options.requiredClientPermissions)
             .add(PermissionFlagsBits.SendMessages)
             .add(PermissionFlagsBits.ViewChannel)
             .add(PermissionFlagsBits.EmbedLinks);
-        const userResolvedPermissions = new PermissionsBitField(options.requiredUserPermissions ?? options.permissions)
+        const userResolvedPermissions = new PermissionsBitField(options.permissions ?? options.requiredUserPermissions)
             .add(PermissionFlagsBits.SendMessages)
             .add(PermissionFlagsBits.SendMessagesInThreads);
 

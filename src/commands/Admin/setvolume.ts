@@ -12,7 +12,8 @@ import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
     permissions: [PermissionFlagsBits.ManageGuild],
     aliases: ["setvol", "svol"],
     detailedDescription: {
-        usages: [":1-200"],
+        usage: [":1-200"],
+        examples: ["50", "100", "200"],
     },
 })
 export class SetVolumeCommand extends KoosCommand {

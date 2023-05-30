@@ -13,7 +13,8 @@ import pluralize from "pluralize";
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["n", "next"],
     detailedDescription: {
-        usages: [";to"],
+        usage: [";to"],
+        examples: ["", "5"],
     },
 })
 export class SkipCommand extends KoosCommand {

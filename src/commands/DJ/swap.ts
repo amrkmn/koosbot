@@ -12,7 +12,8 @@ import { KazagumoPlayer } from "kazagumo";
     description: "Swap the positions of two tracks in the queue.",
     preconditions: ["VoiceOnly", "DJ"],
     detailedDescription: {
-        usages: [":source", ":destination"],
+        usage: [":source", ":destination"],
+        examples: ["1 5", "5 1"],
     },
 })
 export class SwapCommand extends KoosCommand {

@@ -13,7 +13,8 @@ import { createTitle } from "#utils/functions";
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["rm"],
     detailedDescription: {
-        usages: [":position", ";to"],
+        usage: [":position", ";to"],
+        examples: ["1 5", "3 10"],
     },
 })
 export class RemoveCommand extends KoosCommand {

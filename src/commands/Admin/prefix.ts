@@ -12,7 +12,8 @@ import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
     description: `Lets you set a new prefix.`,
     permissions: [PermissionFlagsBits.ManageGuild],
     detailedDescription: {
-        usages: [";new"],
+        usage: [";new"],
+        examples: ["", "!"],
     },
 })
 export class PrefixCommand extends KoosCommand {

@@ -13,7 +13,8 @@ import { KazagumoPlayer } from "kazagumo";
     preconditions: ["VoiceOnly", "DJ"],
     aliases: ["v", "vol"],
     detailedDescription: {
-        usages: [";1-200"],
+        usage: [";1-200"],
+        examples: ["50", "100", "200"],
     },
 })
 export class VolumeCommand extends KoosCommand {

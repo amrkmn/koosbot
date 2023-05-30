@@ -26,7 +26,8 @@ import pluralize from "pluralize";
     aliases: ["s"],
     preconditions: ["VoiceOnly"],
     detailedDescription: {
-        usages: [":query"],
+        usage: [":query"],
+        examples: ["no glory", "https://youtu.be/VwE-tWBrpPs"],
     },
 })
 export class SearchCommand extends KoosCommand {
