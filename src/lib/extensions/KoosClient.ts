@@ -10,12 +10,11 @@ import { Client as GeniusClient } from "genius-lyrics";
 import { KazagumoPlugin as Spotify } from "#lib/structures";
 
 const NODES: NodeOption[] = [
-    // { name: "lavalink.aytea.ga", url: "lavalink.aytea.ga:443", auth: "maybeiwasboring", secure: true },
-    // { name: "node1", url: "node1.lewdhutao.tech:1183", auth: "lewdhutao", secure: false },
-    { name: "node2", url: "narco.buses.rocks:2269", auth: "glasshost1984", secure: false },
-    { name: "node3", url: "lava2.horizxon.studio:80", auth: "horizxon.studio", secure: false },
-    // { name: "node3", url: "lava3.horizxon.studio:80", auth: "horizxon.studio", secure: false },
-    // { name: "node4", url: "lava4.horizxon.studio:80", auth: "horizxon.studio", secure: false },
+    { name: "node1", url: "narco.buses.rocks:2269", auth: "glasshost1984", secure: false },
+    { name: "node2", url: "ash.lavalink.alexanderof.xyz:2333", auth: "lavalink", secure: false },
+    { name: "node3", url: "mohpoe.alfari.id:4004", auth: "youshallnotpass", secure: false },
+    { name: "node4", url: "fsn.lavalink.alexanderof.xyz:2333", auth: "lavalink", secure: false },
+    { name: "node5", url: "lavalink.cyber-host.eu:2333", auth: "discord.gg/cyberhost", secure: false },
 ];
 
 export class KoosClient extends SapphireClient {
