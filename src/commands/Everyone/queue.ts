@@ -1,13 +1,13 @@
 import { KoosCommand } from "#lib/extensions";
-import { convertTime, createTitle, pagination } from "#utils/functions";
 import { KoosColor } from "#utils/constants";
+import { convertTime, createTitle, pagination } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply } from "@sapphire/plugin-editable-commands";
-import { Message, EmbedBuilder, TextChannel, User } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
-import { stripIndents } from "common-tags";
 import { chunk, isNullishOrEmpty } from "@sapphire/utilities";
+import { stripIndents } from "common-tags";
+import { EmbedBuilder, Message, TextChannel, User } from "discord.js";
+import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Display the current queue.",
@@ -100,7 +100,6 @@ export class QueueCommand extends KoosCommand {
                     .setColor(KoosColor.Default)
             );
         }
-
         return embeds;
     }
 }
