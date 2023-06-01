@@ -18,7 +18,8 @@ export class ClientListener extends Listener<typeof Events.GuildCreate> {
                 create: { id: guild.id, prefix: envParseString("CLIENT_PREFIX") },
             });
         } catch (error) {
-            this.container.logger.error(`Error when trying to insert guild to db.`, error);
+            this.container.logger.error(`Error when trying to insert guild to db.`);
+            this.container.logger.error(error);
         }
     }
 }
