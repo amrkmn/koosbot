@@ -27,6 +27,11 @@ export enum Emoji {
     No = "<:no:926367736794341428>",
     Blank = "<:blank:1020712225616445561> ",
     Loading = "<a:loading:1027594528460386495>",
+    Play = "<:play:1113811613082980492>",
+    Pause = "<:pause:1113811608645406740>",
+    Previous = "<:previous:1113811599858339860>",
+    Skip = "<:skip:1113811604203638856>",
+    Stop = "<:stop:1113811615628931072>",
 }
 
 export enum ButtonId {

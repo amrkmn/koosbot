@@ -53,7 +53,7 @@ export class DashboardCommand extends KoosCommand {
             });
         }
 
-        await this.dashboard(player);
+        await this.dashboard(player).then(async () => await message.react("👍"));
     }
 
     private async dashboard(player: KazagumoPlayer) {

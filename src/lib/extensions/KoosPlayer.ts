@@ -88,22 +88,28 @@ export class KoosPlayer extends KazagumoPlayer {
         }
     }
 
-    private createPlayerComponents() {
+    public createPlayerComponents() {
         const hasPrevious = isNullish(this.history.previousTrack);
         const row = new ActionRowBuilder<ButtonBuilder>();
 
         return row.setComponents([
-            new ButtonBuilder()
+            new ButtonBuilder() //
                 .setLabel(this.paused ? "Resume" : "Pause")
                 .setCustomId(ButtonId.PauseOrResume)
                 .setStyle(ButtonStyle.Success),
-            new ButtonBuilder()
+            new ButtonBuilder() //
+                .setDisabled(hasPrevious)
                 .setLabel("Previous")
                 .setCustomId(ButtonId.Previous)
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(hasPrevious),
-            new ButtonBuilder().setLabel("Skip").setCustomId(ButtonId.Skip).setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setLabel("Stop").setCustomId(ButtonId.Stop).setStyle(ButtonStyle.Danger),
+                .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder() //
+                .setLabel("Skip")
+                .setCustomId(ButtonId.Skip)
+                .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder() //
+                .setLabel("Stop")
+                .setCustomId(ButtonId.Stop)
+                .setStyle(ButtonStyle.Danger),
         ]);
     }
 }
@@ -118,5 +124,6 @@ declare module "kazagumo" {
         newDashboard(): Promise<void>;
         resetDashboard(): void;
         createProgressBar(options?: PlayerProgressbarOptions): string;
+        createPlayerComponents(): ActionRowBuilder<ButtonBuilder>;
     }
 }

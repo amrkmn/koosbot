@@ -1,12 +1,11 @@
-import { ButtonId } from "#lib/utils/constants";
 import { KoosColor } from "#utils/constants";
 import { convertTime, createTitle, cutText } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { isStageChannel } from "@sapphire/discord.js-utilities";
-import { container, Listener } from "@sapphire/framework";
-import { isNullish, isNullishOrEmpty, noop } from "@sapphire/utilities";
+import { Listener, container } from "@sapphire/framework";
+import { isNullish, noop } from "@sapphire/utilities";
 import { oneLine } from "common-tags";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { Events, KazagumoPlayer, KazagumoTrack } from "kazagumo";
 
 @ApplyOptions<Listener.Options>({
@@ -24,8 +23,6 @@ export class ClientListener extends Listener {
             client.channels.cache.get(player.voiceId!) ?? (await client.channels.fetch(player.voiceId!).catch(() => null));
         const guild = client.guilds.cache.get(player.guildId) ?? (await client.guilds.fetch(player.guildId).catch(() => null));
         if (isNullish(channel) || isNullish(guild)) return;
-
-        const previousTrack = player.history.previousTrack
 
         const title = createTitle(track);
         const cleanTitle = createTitle(track, false);
@@ -47,20 +44,9 @@ export class ClientListener extends Listener {
                 `
             )
             .setColor(KoosColor.Default);
-        const playerButtons = [
-            new ButtonBuilder().setLabel("Pause").setCustomId(ButtonId.PauseOrResume).setStyle(ButtonStyle.Success),
-            new ButtonBuilder()
-                .setLabel("Previous")
-                .setCustomId(ButtonId.Previous)
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(isNullishOrEmpty(previousTrack)),
-            new ButtonBuilder().setLabel("Skip").setCustomId(ButtonId.Skip).setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setLabel("Stop").setCustomId(ButtonId.Stop).setStyle(ButtonStyle.Danger),
-        ];
-        const row = new ActionRowBuilder<ButtonBuilder>().setComponents(playerButtons);
 
         if (channel.isTextBased()) {
-            const msg = await channel.send({ embeds: [embed], components: [row] });
+            const msg = await channel.send({ embeds: [embed], components: [player.createPlayerComponents()] });
             player.dashboard(msg);
         }
     }
