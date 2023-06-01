@@ -19,6 +19,8 @@ export class ClientListener extends Listener {
     public async run(oldState: VoiceState, newState: VoiceState) {
         const { client, kazagumo } = this.container;
 
+        this.checkState(oldState, newState);
+
         let clientVc: VoiceBasedChannel | Nullish = null;
         if (oldState.channel?.members.has(`${client.id}`)) clientVc = oldState.channel;
         else if (newState.channel?.members.has(`${client.id}`)) clientVc = newState.channel;
@@ -32,21 +34,28 @@ export class ClientListener extends Listener {
         if (isNullish(channel)) return;
 
         const state = this.checkState(oldState, newState);
-        if (state === "BOT") return;
+        if (state === "BOT" || state === "UNKNOWN") return;
 
         const voiceChannel = clientVc.members.filter((x) => client.user?.id === x.id || !x.user.bot);
 
-        if (state === "LEFT" && voiceChannel.size <= 1) this.setupTimeout(clientVc.guild, player);
+        if (state === "JOINED") this.cancelTimeout();
+        else if (state === "LEFT" && voiceChannel.size <= 1) this.setupTimeout(clientVc.guild, player);
+        else if (state === "MOVED" && voiceChannel.size <= 1) this.setupTimeout(clientVc.guild, player);
         else if (state === "LEFT" && voiceChannel.size > 1) this.cancelTimeout();
+        else if (state === "MOVED" && voiceChannel.size > 1) this.cancelTimeout();
         else this.cancelTimeout();
     }
 
     private checkState(oldState: VoiceState, newState: VoiceState) {
         if (oldState.member?.user.bot || newState.member?.user.bot) return "BOT";
 
-        if (isNullish(newState.channel)) return "LEFT";
-        else if (isNullish(oldState.channel)) return "JOINED";
-        else return "MOVED";
+        const oldChannel = oldState.channel;
+        const newChannel = newState.channel;
+
+        if (isNullish(newChannel)) return "LEFT";
+        else if (isNullish(oldChannel)) return "JOINED";
+        else if (oldChannel.id !== newChannel.id) return "MOVED";
+        else return "UNKNOWN";
     }
 
     private async setupTimeout(guild: Guild | null, player: KazagumoPlayer) {

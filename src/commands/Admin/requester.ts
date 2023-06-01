@@ -8,7 +8,7 @@ import { send } from "@sapphire/plugin-editable-commands";
 import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
-    description: "Enables/disables if the requester is shown on each track.",
+    description: "Enables or disables if the requester is shown on each track.",
     permissions: [PermissionFlagsBits.ManageGuild],
     aliases: ["req"],
     detailedDescription: {
