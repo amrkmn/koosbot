@@ -44,11 +44,8 @@ FROM base
 # Copy built application
 COPY --from=build /app /app
 
-# Adjust entrypoint to be executable on Linux
-RUN chmod +x ./docker-entrypoint
-
-# Entrypoint prepares the database.
-ENTRYPOINT [ "/app/docker-entrypoint" ]
+# Generate prisma
+RUN npx prisma generate
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
