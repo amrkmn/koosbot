@@ -3,14 +3,15 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { container, Listener } from "@sapphire/framework";
 import { EmbedBuilder } from "discord.js";
 import { Events, KazagumoPlayer } from "kazagumo";
+import type { TrackStuckEvent } from "shoukaku";
 
 @ApplyOptions<Listener.Options>({
     emitter: container.kazagumo,
-    name: `kazagumo:${Events.PlayerStuck}`,
-    event: Events.PlayerStuck,
+    name: `kazagumo:${Events.PlayerError}`,
+    event: Events.PlayerError,
 })
 export class ClientListener extends Listener {
-    public async run(player: KazagumoPlayer,) {
+    public async run(player: KazagumoPlayer, _data: TrackStuckEvent) {
         const { client } = this.container;
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
 

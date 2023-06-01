@@ -8,8 +8,8 @@ import { type TrackExceptionEvent } from "shoukaku";
 
 @ApplyOptions<Listener.Options>({
     emitter: container.kazagumo,
-    name: `kazagumo:${Events.PlayerStuck}`,
-    event: Events.PlayerStuck,
+    name: `kazagumo:${Events.PlayerException}`,
+    event: Events.PlayerException,
 })
 export class ClientListener extends Listener {
     public async run(player: KazagumoPlayer, _data: TrackExceptionEvent) {

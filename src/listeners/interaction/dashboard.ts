@@ -7,7 +7,7 @@ import { isNullish, isNullishOrEmpty, noop } from "@sapphire/utilities";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, GuildMember, type Interaction } from "discord.js";
 
 @ApplyOptions<Listener.Options>({
-    name: "dashboard",
+    name: `${Events.InteractionCreate}:dashboard`,
     event: Events.InteractionCreate,
 })
 export class ClientListener extends Listener {

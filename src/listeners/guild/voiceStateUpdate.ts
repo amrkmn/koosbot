@@ -10,7 +10,6 @@ import ms from "ms";
 
 @ApplyOptions<Listener.Options>({
     event: Events.VoiceStateUpdate,
-    enabled: true,
 })
 export class ClientListener extends Listener {
     private _timeoutId: NodeJS.Timeout | undefined = undefined;
