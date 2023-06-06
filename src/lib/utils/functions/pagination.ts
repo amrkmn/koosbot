@@ -1,3 +1,4 @@
+import { ButtonId } from "#utils/constants";
 import {
     User,
     TextChannel,
@@ -23,32 +24,32 @@ interface PaginationOptions {
 
 export const pagination = async (options: PaginationOptions) => {
     const { target, channel, embeds, time = 2 * 60 * 1000, max = 120000, fastSkip = false, page = undefined } = options;
-    const defaultLabels: { [key: string]: any } = {
-        first: "<<",
-        previous: "<",
-        next: ">",
-        last: ">>",
-        stop: "\u200b",
+    const defaultLabels: Record<string, string> = {
+        [ButtonId.First]: "<<",
+        [ButtonId.Back]: "<",
+        [ButtonId.Next]: ">",
+        [ButtonId.Last]: ">>",
+        [ButtonId.Close]: "\u200b",
     };
-    const defaultStyles: { [key: string]: ButtonStyle } = {
-        first: ButtonStyle.Secondary,
-        previous: ButtonStyle.Secondary,
-        next: ButtonStyle.Secondary,
-        last: ButtonStyle.Secondary,
-        stop: ButtonStyle.Danger,
+    const defaultStyles: Record<string, ButtonStyle> = {
+        [ButtonId.First]: ButtonStyle.Secondary,
+        [ButtonId.Back]: ButtonStyle.Secondary,
+        [ButtonId.Next]: ButtonStyle.Secondary,
+        [ButtonId.Last]: ButtonStyle.Secondary,
+        [ButtonId.Close]: ButtonStyle.Danger,
     };
     let currentPage = page ? page : 1;
 
     const generateButtons = (state: boolean) => {
-        const checkState = (name: string) => {
+        const checkState = (name: ButtonId) => {
             if (embeds.length === 1) return true;
-            if (["first", "previous"].includes(name) && currentPage === 1) return true;
-            if (["next", "last"].includes(name) && currentPage === embeds.length) return true;
+            if ([ButtonId.First, ButtonId.Back].includes(name) && currentPage === 1) return true;
+            if ([ButtonId.Next, ButtonId.Last].includes(name) && currentPage === embeds.length) return true;
             return false;
         };
-        let names = ["previous", "next"];
-        if (fastSkip) names = ["first", ...names, "last"];
-        names.push("stop");
+        let names = [ButtonId.Back, ButtonId.Next];
+        if (fastSkip) names = [ButtonId.First, ...names, ButtonId.Last];
+        names.push(ButtonId.Close);
         const buttons = names.reduce((accumulator: ButtonBuilder[], name) => {
             accumulator.push(
                 new ButtonBuilder()
@@ -93,22 +94,24 @@ export const pagination = async (options: PaginationOptions) => {
         try {
             await interaction.deferUpdate();
             const id = interaction.customId;
-            if (id === "first") currentPage = 1;
-            if (id === "previous") currentPage--;
-            if (id === "next") currentPage++;
-            if (id === "last") currentPage = embeds.length;
-            if (id === "stop") {
+            if (id === ButtonId.First) currentPage = 1;
+            if (id === ButtonId.Back) currentPage--;
+            if (id === ButtonId.Next) currentPage++;
+            if (id === ButtonId.Last) currentPage = embeds.length;
+            if (id === ButtonId.Close) {
                 collector.stop("user");
                 initialMessage.edit({ embeds: [changeFooter()], components: components(true) });
                 return;
             }
             collector.resetTimer();
             await initialMessage.edit({ embeds: [changeFooter()], components: components() });
-        } catch (error) {}
+        } catch (error) {
+            collector.stop("error");
+        }
     });
     collector.on("end", (_, reason) => {
         try {
-            if (reason == "user" || reason == "time") initialMessage.edit({ components: components(true) });
+            if (["error", "user", "time"].includes(reason)) initialMessage.edit({ components: components(true) });
             else return;
         } catch (error) {}
     });

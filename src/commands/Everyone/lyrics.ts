@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { KoosColor, userAgent } from "#utils/constants";
+import { ButtonId, KoosColor, SelectMenuId, userAgent } from "#utils/constants";
 import { chunk, cutText, decodeEntities, pagination, sendLoadingMessage } from "#utils/functions";
 import { request } from "@aytea/request";
 import { ApplyOptions } from "@sapphire/decorators";
@@ -126,7 +126,7 @@ export class LyricsCommand extends KoosCommand {
         });
 
         collector.on("collect", async (i) => {
-            if (i.isButton() && i.customId === "cancel") {
+            if (i.isButton() && i.customId === ButtonId.Cancel) {
                 await i.deferUpdate();
                 await send(message, {
                     embeds: [new EmbedBuilder().setDescription(`Canceled the search`).setColor(KoosColor.Default)],
@@ -138,7 +138,7 @@ export class LyricsCommand extends KoosCommand {
             if (!i.isStringSelectMenu()) return;
             await i.deferUpdate();
             const id = i.customId;
-            if (id !== "lyricsOptions") return;
+            if (id !== SelectMenuId.Lyrics) return;
             const input = Number(i.values[0]);
 
             await send(message, {
@@ -250,10 +250,10 @@ export class LyricsCommand extends KoosCommand {
         // options.push({ label: `Cancel`, description: "Cancel this search", value: `cancel` });
 
         const selectMenu = new StringSelectMenuBuilder()
-            .setCustomId("lyricsOptions")
+            .setCustomId(SelectMenuId.Lyrics)
             .setPlaceholder("Make a selection")
             .addOptions(options);
-        const cancelButton = new ButtonBuilder().setCustomId("cancel").setLabel("Cancel").setStyle(ButtonStyle.Danger);
+        const cancelButton = new ButtonBuilder().setCustomId(ButtonId.Cancel).setLabel("Cancel").setStyle(ButtonStyle.Danger);
 
         return {
             embed: new EmbedBuilder()

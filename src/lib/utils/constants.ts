@@ -41,9 +41,18 @@ export enum ButtonId {
     Skip = "buttonSkip",
     Stop = "buttonStop",
 
-    // Settings
-    PlayerSetting = "buttonPlayerSetting",
-    DJSetting = "buttonDJSetting",
-    SongRequestChannelSetting = "buttonSongRequestChannelSetting",
+    // Paginations
+    First = "buttonFirst",
     Back = "buttonBack",
+    Next = "buttonNext",
+    Last = "buttonLast",
+    Close = "buttonClose",
+
+    // Others
+    Cancel = "buttonCancel",
+}
+
+export enum SelectMenuId {
+    Lyrics = "selectMenuLyrics",
+    Search = "selectMenuSearch",
 }
