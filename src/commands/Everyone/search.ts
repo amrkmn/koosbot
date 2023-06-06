@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { KoosColor } from "#utils/constants";
+import { ButtonId, KoosColor, SelectMenuId } from "#utils/constants";
 import { canJoinVoiceChannel, convertTime, createTitle, cutText, mins, sendLoadingMessage } from "#utils/functions";
 import { generateId } from "#utils/snowflake";
 import { ApplyOptions } from "@sapphire/decorators";
@@ -17,6 +17,7 @@ import {
     type Snowflake,
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
+    ChannelType,
 } from "discord.js";
 import { Kazagumo, KazagumoTrack } from "kazagumo";
 import pluralize from "pluralize";
@@ -93,7 +94,7 @@ export class SearchCommand extends KoosCommand {
                 new StringSelectMenuOptionBuilder()
                     .setLabel(cutText(`${playlistName}`, 100))
                     .setDescription(`Duration: ${convertTime(duration)} | Tracks: ${tracks.length}`)
-                    .setLabel(`playlist`)
+                    .setValue(`playlist`)
             );
         } else {
             for (let track of tracks) {
@@ -110,12 +111,12 @@ export class SearchCommand extends KoosCommand {
         }
 
         const selectMenu = new StringSelectMenuBuilder()
-            .setCustomId("searchedTracks")
+            .setCustomId(SelectMenuId.Search)
             .setOptions(options)
             .setPlaceholder("Pick a tracks")
             .setMinValues(1)
             .setMaxValues(options.length);
-        const cancelButton = new ButtonBuilder().setCustomId("cancel").setLabel("Cancel").setStyle(ButtonStyle.Danger);
+        const cancelButton = new ButtonBuilder().setCustomId(ButtonId.Cancel).setLabel("Cancel").setStyle(ButtonStyle.Danger);
 
         const embed = new EmbedBuilder()
             .setDescription(
@@ -135,14 +136,14 @@ export class SearchCommand extends KoosCommand {
         });
 
         collector.on("collect", async (interaction) => {
-            if (interaction.isButton() && interaction.customId === "cancel") {
+            if (interaction.isButton() && interaction.customId === ButtonId.Cancel) {
                 await interaction.deferUpdate();
                 interaction.followUp({
                     embeds: [new EmbedBuilder().setDescription(`Canceled the search`).setColor(KoosColor.Default)],
                 });
                 collector.stop("cancel");
                 return;
-            } else if (interaction.isStringSelectMenu() && interaction.customId === "searchedTracks") {
+            } else if (interaction.isStringSelectMenu() && interaction.customId === SelectMenuId.Search) {
                 const userOptions = interaction.values;
                 await interaction.deferUpdate();
 
@@ -167,6 +168,10 @@ export class SearchCommand extends KoosCommand {
                         deaf: true,
                         volume: isNullish(data) ? 100 : data.volume,
                     });
+
+                    if (member.voice.channel?.type === ChannelType.GuildStageVoice) {
+                        message.guild?.members.me?.voice.setSuppressed(false);
+                    }
                 }
 
                 try {
