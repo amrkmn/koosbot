@@ -168,7 +168,11 @@ export class Paginator {
             return buttons;
         }, [] as ButtonBuilder[]);
         const secondRowButtons = [
-            new ButtonBuilder().setCustomId(closeButton.id).setLabel(closeButton.label).setStyle(closeButton.style).setDisabled(state),
+            new ButtonBuilder()
+                .setCustomId(closeButton.id)
+                .setLabel(closeButton.label)
+                .setStyle(closeButton.style)
+                .setDisabled(this.pages.length === 1 || state),
         ];
 
         return [firstRowButtons, secondRowButtons];
