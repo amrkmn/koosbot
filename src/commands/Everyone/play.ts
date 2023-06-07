@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { type PlayOptions } from "#lib/interfaces";
+import { type PlayOptions } from "#lib/types";
 import { KoosColor } from "#utils/constants";
 import { canJoinVoiceChannel, createTitle, cutText, sendLoadingMessage } from "#utils/functions";
 import { generateId } from "#utils/snowflake";

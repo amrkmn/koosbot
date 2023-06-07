@@ -1,6 +1,7 @@
 import { KoosCommand } from "#lib/extensions";
+import { Paginator } from "#lib/structures";
 import { ButtonId, KoosColor, SelectMenuId, userAgent } from "#utils/constants";
-import { chunk, cutText, decodeEntities, pagination, sendLoadingMessage } from "#utils/functions";
+import { chunk, cutText, decodeEntities, sendLoadingMessage } from "#utils/functions";
 import { request } from "@aytea/request";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
@@ -9,14 +10,14 @@ import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import * as cheerio from "cheerio";
 import {
     ActionRowBuilder,
-    type ApplicationCommandOptionChoiceData,
     ButtonBuilder,
     ButtonStyle,
     EmbedBuilder,
+    GuildMember,
     Message,
-    type SelectMenuComponentOptionData,
     StringSelectMenuBuilder,
-    TextChannel,
+    type ApplicationCommandOptionChoiceData,
+    type SelectMenuComponentOptionData,
 } from "discord.js";
 import ms from "ms";
 import pluralize from "pluralize";
@@ -82,7 +83,8 @@ export class LyricsCommand extends KoosCommand {
             return prev;
         }, []);
 
-        await pagination({ channel: interaction, embeds, target: interaction.user, fastSkip: true });
+        const pagination = new Paginator({ member: interaction.member as GuildMember, message: interaction, pages: embeds });
+        await pagination.run();
     }
     public async messageRun(message: Message, args: Args) {
         await sendLoadingMessage(message);
@@ -174,7 +176,8 @@ export class LyricsCommand extends KoosCommand {
             }, []);
 
             await i.deleteReply();
-            pagination({ channel: message.channel as TextChannel, embeds, target: message.author, fastSkip: true });
+            const pagination = new Paginator({ message, member: message.member!, pages: embeds });
+            await pagination.run();
             collector.stop("selected");
             return;
         });

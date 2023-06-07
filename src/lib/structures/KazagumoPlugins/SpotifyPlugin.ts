@@ -11,7 +11,7 @@ import {
     type SpotifyOptions,
     type Track,
     type TrackResult,
-} from "#lib/interfaces";
+} from "#lib/types";
 import { request } from "@aytea/request";
 import { filterNullish } from "@sapphire/utilities";
 import {

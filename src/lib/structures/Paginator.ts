@@ -1,6 +1,6 @@
 import type { KoosCommand } from "#lib/extensions";
-import type { PaginatorOptions, PaginatorRunOptions } from "#types/Paginator";
-import { ButtonId, TextInputId } from "#utils/constants";
+import type { PaginatorOptions, PaginatorRunOptions } from "#lib/types";
+import { ButtonId, KoosColor, TextInputId } from "#utils/constants";
 import { mins, sec } from "#utils/functions";
 import { container } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
@@ -56,27 +56,28 @@ export class Paginator {
         if (this.message instanceof ChatInputCommandInteraction) {
             if (!this.message.replied && !this.message.deferred) await this.message.deferReply({ ephemeral: anonymous });
 
-            initialMessage = await this.message.editReply({
-                embeds: [this.updateFooter()],
-                components: this.createComponents(),
-            });
+            initialMessage = await this.message.editReply({ embeds: [this.updatePage()], components: [...this.createComponents()] });
         } else {
-            initialMessage = await send(this.message, {
-                embeds: [this.updateFooter()],
-                components: this.createComponents(),
-            });
+            initialMessage = await send(this.message, { embeds: [this.updatePage()], components: [...this.createComponents()] });
         }
 
         const collector = initialMessage.createMessageComponentCollector({
             componentType: ComponentType.Button,
             time: this.collectorTimeout,
-            filter: (i) => i.user.id === this.member.id && i.message.id === initialMessage.id,
+            filter: (i) => {
+                const embed = new EmbedBuilder()
+                    .setDescription(`This buttons can only be used by ${this.member}`)
+                    .setColor(KoosColor.Error);
+                if (i.user.id !== this.member.id) i.reply({ embeds: [embed], ephemeral: true });
+                return i.user.id === this.member.id && i.message.id === initialMessage.id;
+            },
         });
 
         collector.on("collect", async (interaction) => {
             try {
                 const id = interaction.customId;
 
+                // Exclude jump because modal must be run before `deferUpdate`
                 if (id !== ButtonId.Jump) await interaction.deferUpdate();
                 if (id === ButtonId.Close) return collector.stop("stop");
 
@@ -87,7 +88,7 @@ export class Paginator {
                 if (id === ButtonId.Last) this.#currentPage = this.pages.length - 1;
 
                 collector.resetTimer();
-                await interaction.editReply({ embeds: [this.updateFooter()], components: this.createComponents() });
+                await interaction.editReply({ embeds: [this.updatePage()], components: [...this.createComponents()] });
             } catch (error) {
                 collector.stop("error");
             }
@@ -96,7 +97,7 @@ export class Paginator {
         collector.on("end", async (_, reason) => {
             try {
                 if (["error", "stop", "time"].includes(reason) && initialMessage.editable)
-                    await initialMessage.edit({ components: this.createComponents(true) });
+                    await initialMessage.edit({ components: [...this.createComponents(true)] });
             } catch (error) {}
         });
     }
@@ -110,6 +111,7 @@ export class Paginator {
             .setStyle(TextInputStyle.Short)
             .setRequired(true);
         const actionRow = new ActionRowBuilder<ModalActionRowComponentBuilder>().setComponents(pageInput);
+
         modal.setComponents(actionRow);
         await interaction.showModal(modal);
 
@@ -127,12 +129,12 @@ export class Paginator {
         return;
     }
 
-    private updateFooter() {
+    private updatePage() {
         const page = this.pages[this.#currentPage];
         const newPage = EmbedBuilder.from(page);
         if (page.data.footer?.text) {
             return newPage.setFooter({
-                text: `Page ${this.#currentPage + 1}/${this.pages.length} • ${page.data.footer.text}`,
+                text: `Page ${this.#currentPage + 1}/${this.pages.length} | ${page.data.footer.text}`,
                 iconURL: page.data.footer.icon_url,
             });
         }
@@ -173,10 +175,10 @@ export class Paginator {
     }
 
     private createComponents(disabled = false) {
-        const buttons = this.createButtons(disabled);
+        const [first, second] = this.createButtons(disabled);
         return [
-            new ActionRowBuilder<ButtonBuilder>().setComponents(buttons[0]),
-            new ActionRowBuilder<ButtonBuilder>().setComponents(buttons[1]),
+            new ActionRowBuilder<ButtonBuilder>().setComponents(first),
+            new ActionRowBuilder<ButtonBuilder>().setComponents(second),
         ];
     }
 }

@@ -1,5 +1,6 @@
 import type { KoosCommand } from "#lib/extensions";
-import type { EmbedBuilder, GuildMember } from "discord.js";
+import type { Nullish } from "@sapphire/utilities";
+import type { CollectorFilter, EmbedBuilder, GuildMember, MessageComponentInteraction } from "discord.js";
 
 export interface PaginatorOptions {
     pages: EmbedBuilder[];
@@ -7,6 +8,7 @@ export interface PaginatorOptions {
     member: GuildMember;
     jumpTimeout?: number;
     collectorTimeout?: number;
+    filter?: CollectorFilter<[MessageComponentInteraction]> | Nullish;
 }
 
 export interface PaginatorRunOptions {

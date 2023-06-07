@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { type PlayOptions } from "#lib/interfaces";
+import { type PlayOptions } from "#lib/types";
 import { KoosColor } from "#utils/constants";
 import { createTitle, cutText, sendLoadingMessage, canJoinVoiceChannel } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";

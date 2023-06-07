@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { type KoosArgument } from "#lib/interfaces";
+import { type KoosArgument } from "#lib/types";
 import { Argument } from "@sapphire/framework";
 import { envParseArray } from "@skyra/env-utilities";
 import { oneLine } from "common-tags";
