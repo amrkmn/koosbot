@@ -23,7 +23,8 @@
     "#lib/*": "./dist/lib/*.js",
     "#root/*": "./dist/*.js",
     "#utils/functions": "./dist/lib/utils/functions/index.js",
-    "#utils/*": "./dist/lib/utils/*.js"
+    "#utils/*": "./dist/lib/utils/*.js",
+    "#types/*": "./dist/lib/types/*.js"
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.2.5",

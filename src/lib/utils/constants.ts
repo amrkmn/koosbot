@@ -44,6 +44,7 @@ export enum ButtonId {
     // Paginations
     First = "buttonFirst",
     Back = "buttonBack",
+    Jump = "buttonJump",
     Next = "buttonNext",
     Last = "buttonLast",
     Close = "buttonClose",
@@ -55,4 +56,8 @@ export enum ButtonId {
 export enum SelectMenuId {
     Lyrics = "selectMenuLyrics",
     Search = "selectMenuSearch",
+}
+
+export enum TextInputId {
+    PageInput = "textInputPageInput",
 }

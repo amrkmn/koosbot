@@ -1,12 +1,13 @@
 import { KoosCommand } from "#lib/extensions";
+import { Paginator } from "#lib/structures";
 import { KoosColor } from "#utils/constants";
-import { convertTime, createTitle, pagination } from "#utils/functions";
+import { convertTime, createTitle } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply } from "@sapphire/plugin-editable-commands";
 import { chunk, isNullishOrEmpty } from "@sapphire/utilities";
 import { stripIndents } from "common-tags";
-import { EmbedBuilder, Message, TextChannel, User } from "discord.js";
+import { EmbedBuilder, GuildMember, Message } from "discord.js";
 import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
@@ -26,7 +27,7 @@ export class QueueCommand extends KoosCommand {
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${interaction.guildId}`);
-        const target = interaction.member!.user as User;
+        const member = interaction.member! as GuildMember;
 
         if (player) await interaction.deferReply();
         if (!player || (player && !player.queue.current)) {
@@ -36,14 +37,13 @@ export class QueueCommand extends KoosCommand {
             });
         }
 
-        pagination({ target, channel: interaction, fastSkip: true, embeds: await this.queue(player) });
+        const pagination = new Paginator({ member, message: interaction, pages: await this.queue(player) });
+        await pagination.run();
     }
 
     public async messageRun(message: Message, _args: Args) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(`${message.guildId}`);
-        const channel = message.channel as TextChannel;
-        const target = message.author;
 
         if (!player || (player && !player.queue.current)) {
             return reply(message, {
@@ -51,7 +51,8 @@ export class QueueCommand extends KoosCommand {
             });
         }
 
-        pagination({ channel, target, fastSkip: true, embeds: await this.queue(player) });
+        const pagination = new Paginator({ message, member: message.member!, pages: await this.queue(player) });
+        await pagination.run();
     }
 
     private async queue(player: KazagumoPlayer) {

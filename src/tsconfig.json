@@ -10,6 +10,7 @@
             "#utils/*": ["lib/utils/*"],
             "#lib/interfaces": ["lib/types/interfaces/index"],
             "#lib/*": ["lib/*"],
+            "#types/*": ["lib/types/*"],
             "#root/*": ["*"]
         },
         "composite": false
