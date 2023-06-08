@@ -37,8 +37,10 @@ export class QueueCommand extends KoosCommand {
             });
         }
 
-        const pagination = new Paginator({ member, message: interaction, pages: await this.queue(player) });
-        await pagination.run();
+        const pagination = new Paginator({ member, message: interaction });
+        const pages = await this.queue(player);
+
+        await pagination.addPages(pages).run();
     }
 
     public async messageRun(message: Message, _args: Args) {
@@ -51,8 +53,10 @@ export class QueueCommand extends KoosCommand {
             });
         }
 
-        const pagination = new Paginator({ message, member: message.member!, pages: await this.queue(player) });
-        await pagination.run();
+        const pagination = new Paginator({ message, member: message.member! });
+        const pages = await this.queue(player);
+
+        await pagination.addPages(pages).run();
     }
 
     private async queue(player: KazagumoPlayer) {

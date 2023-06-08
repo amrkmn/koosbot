@@ -22,14 +22,16 @@ import {
     type ModalActionRowComponentBuilder,
 } from "discord.js";
 
+type PaginatorId = ButtonId.First | ButtonId.Back | ButtonId.Jump | ButtonId.Next | ButtonId.Last | ButtonId.Close;
+
 export class Paginator {
-    private readonly pages: EmbedBuilder[];
+    private readonly pages: EmbedBuilder[] = [];
     private member: GuildMember;
     private message: KoosCommand.Message | KoosCommand.ChatInputCommandInteraction;
     private jumpTimeout: number;
     private collectorTimeout: number;
 
-    private buttons: Record<string, { id: string; style: ButtonStyle; label: string }> = {
+    private buttons: Record<PaginatorId, { id: PaginatorId; style: ButtonStyle; label: string }> = {
         [ButtonId.First]: { id: ButtonId.First, style: ButtonStyle.Secondary, label: "<<" },
         [ButtonId.Back]: { id: ButtonId.Back, style: ButtonStyle.Secondary, label: "<" },
         [ButtonId.Jump]: { id: ButtonId.Jump, style: ButtonStyle.Secondary, label: "{{currentPage}}" },
@@ -40,12 +42,13 @@ export class Paginator {
 
     #currentPage: number = 0;
 
-    constructor(options: PaginatorOptions) {
-        this.member = options.member;
-        this.message = options.message;
-        this.pages = options.pages;
-        this.jumpTimeout = options.jumpTimeout ?? sec(30);
-        this.collectorTimeout = options.collectorTimeout ?? mins(2);
+    constructor({ message, member, pages, collectorTimeout, jumpTimeout }: PaginatorOptions) {
+        if (pages) this.addPages(pages);
+
+        this.member = member;
+        this.message = message;
+        this.jumpTimeout = jumpTimeout ?? sec(30);
+        this.collectorTimeout = collectorTimeout ?? mins(2);
     }
 
     public async run(options?: PaginatorRunOptions) {
@@ -56,9 +59,9 @@ export class Paginator {
         if (this.message instanceof ChatInputCommandInteraction) {
             if (!this.message.replied && !this.message.deferred) await this.message.deferReply({ ephemeral: anonymous });
 
-            initialMessage = await this.message.editReply({ embeds: [this.updatePage()], components: [...this.createComponents()] });
+            initialMessage = await this.message.editReply({ embeds: [this.getPage()], components: [...this.createComponents()] });
         } else {
-            initialMessage = await send(this.message, { embeds: [this.updatePage()], components: [...this.createComponents()] });
+            initialMessage = await send(this.message, { embeds: [this.getPage()], components: [...this.createComponents()] });
         }
 
         const collector = initialMessage.createMessageComponentCollector({
@@ -82,24 +85,38 @@ export class Paginator {
                 if (id === ButtonId.Close) return collector.stop("stop");
 
                 if (id === ButtonId.First) this.#currentPage = 0;
-                if (id === ButtonId.Back) this.#currentPage--;
-                if (id === ButtonId.Jump) await this.jumpAction(interaction);
-                if (id === ButtonId.Next) this.#currentPage++;
-                if (id === ButtonId.Last) this.#currentPage = this.pages.length - 1;
+                else if (id === ButtonId.Back) this.#currentPage--;
+                else if (id === ButtonId.Jump) await this.jumpAction(interaction);
+                else if (id === ButtonId.Next) this.#currentPage++;
+                else if (id === ButtonId.Last) this.#currentPage = this.pages.length - 1;
+                else return;
 
                 collector.resetTimer();
-                await interaction.editReply({ embeds: [this.updatePage()], components: [...this.createComponents()] });
+                await interaction.editReply({ embeds: [this.getPage()], components: [...this.createComponents()] });
             } catch (error) {
+                container.logger.error(error);
                 collector.stop("error");
             }
         });
 
-        collector.on("end", async (_, reason) => {
+        collector.once("end", async (_, reason) => {
             try {
                 if (["error", "stop", "time"].includes(reason) && initialMessage.editable)
                     await initialMessage.edit({ components: [...this.createComponents(true)] });
-            } catch (error) {}
+            } catch (error) {
+                container.logger.error(error);
+            }
         });
+    }
+
+    public addPages(pages: EmbedBuilder[]) {
+        for (let page of pages) this.addPage(page);
+        return this;
+    }
+
+    public addPage(page: EmbedBuilder) {
+        this.pages.push(page);
+        return this;
     }
 
     private async jumpAction(interaction: ButtonInteraction) {
@@ -129,20 +146,13 @@ export class Paginator {
         return;
     }
 
-    private updatePage() {
+    private getPage() {
         const page = this.pages[this.#currentPage];
-        const newPage = EmbedBuilder.from(page);
-        if (page.data.footer?.text) {
-            return newPage.setFooter({
-                text: `Page ${this.#currentPage + 1}/${this.pages.length} | ${page.data.footer.text}`,
-                iconURL: page.data.footer.icon_url,
-            });
-        }
-        return newPage.setFooter({ text: `Page ${this.#currentPage + 1}/${this.pages.length}`, iconURL: page.data.footer?.icon_url });
+        return page;
     }
 
     private createButtons(state: boolean) {
-        const checkState = (name: ButtonId) => {
+        const checkState = (name: PaginatorId) => {
             if (this.pages.length === 1) return true;
             if ([ButtonId.First, ButtonId.Back].includes(name) && this.#currentPage === 0) return true;
             if ([ButtonId.Next, ButtonId.Last].includes(name) && this.#currentPage === this.pages.length - 1) return true;
@@ -150,8 +160,8 @@ export class Paginator {
         };
         const closeButton = this.buttons[ButtonId.Close];
 
-        const names = [ButtonId.First, ButtonId.Back, ButtonId.Jump, ButtonId.Next, ButtonId.Last];
-        const firstRowButtons = names.reduce((buttons, name) => {
+        const names: PaginatorId[] = [ButtonId.First, ButtonId.Back, ButtonId.Jump, ButtonId.Next, ButtonId.Last];
+        const firstRowButtons = names.reduce((buttons, name: PaginatorId) => {
             const currentButton = this.buttons[name];
             let label = "";
             if (currentButton.id === ButtonId.Jump)
@@ -163,7 +173,7 @@ export class Paginator {
                     .setCustomId(currentButton.id)
                     .setStyle(currentButton.style)
                     .setLabel(label)
-                    .setDisabled(state || checkState(name))
+                    .setDisabled(checkState(name) || state)
             );
             return buttons;
         }, [] as ButtonBuilder[]);
@@ -172,7 +182,7 @@ export class Paginator {
                 .setCustomId(closeButton.id)
                 .setLabel(closeButton.label)
                 .setStyle(closeButton.style)
-                .setDisabled(this.pages.length === 1 || state),
+                .setDisabled(checkState(closeButton.id) || state),
         ];
 
         return [firstRowButtons, secondRowButtons];

@@ -83,8 +83,8 @@ export class LyricsCommand extends KoosCommand {
             return prev;
         }, []);
 
-        const pagination = new Paginator({ member: interaction.member as GuildMember, message: interaction, pages: embeds });
-        await pagination.run();
+        const pagination = new Paginator({ member: interaction.member as GuildMember, message: interaction });
+        await pagination.addPages(embeds).run();
     }
     public async messageRun(message: Message, args: Args) {
         await sendLoadingMessage(message);
@@ -98,6 +98,7 @@ export class LyricsCommand extends KoosCommand {
         });
 
         const { embed, selectMenu, cancelButton } = await this.lyrics(query);
+        const pagination = new Paginator({ message, member: message.member! });
 
         const msg = await send(message, {
             embeds: [embed],
@@ -176,8 +177,8 @@ export class LyricsCommand extends KoosCommand {
             }, []);
 
             await i.deleteReply();
-            const pagination = new Paginator({ message, member: message.member!, pages: embeds });
-            await pagination.run();
+
+            await pagination.addPages(embeds).run();
             collector.stop("selected");
             return;
         });
