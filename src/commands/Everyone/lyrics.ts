@@ -112,37 +112,29 @@ export class LyricsCommand extends KoosCommand {
 
         const collector = msg.createMessageComponentCollector({
             filter: (i) => {
-                if (i.user.id !== message.author.id) {
-                    i.reply({
-                        embeds: [
-                            new EmbedBuilder()
-                                .setDescription(`This select menu can only be use by ${message.author}`)
-                                .setColor(KoosColor.Error),
-                        ],
-                        ephemeral: true,
-                    });
-                    return false;
-                }
-                return true;
+                const embed = new EmbedBuilder()
+                    .setDescription(`This select menu can only be use by ${message.author}`)
+                    .setColor(KoosColor.Error);
+                if (i.user.id !== message.author.id) i.reply({ embeds: [embed], ephemeral: true });
+                return i.user.id === message.author.id && i.message.id === msg.id;
             },
             time: ms("1m"),
         });
 
-        collector.on("collect", async (i) => {
-            if (i.isButton() && i.customId === ButtonId.Cancel) {
-                await i.deferUpdate();
+        collector.on("collect", async (interaction) => {
+            if (interaction.isButton() && interaction.customId === ButtonId.Cancel) {
+                await interaction.deferUpdate();
                 await send(message, {
                     embeds: [new EmbedBuilder().setDescription(`Canceled the search`).setColor(KoosColor.Default)],
                 });
-                collector.stop("cancel");
-                return;
+                return collector.stop("cancel");
             }
 
-            if (!i.isStringSelectMenu()) return;
-            await i.deferUpdate();
-            const id = i.customId;
+            if (!interaction.isStringSelectMenu()) return;
+            await interaction.deferUpdate();
+            const id = interaction.customId;
             if (id !== SelectMenuId.Lyrics) return;
-            const input = Number(i.values[0]);
+            const input = Number(interaction.values[0]);
 
             await send(message, {
                 embeds: [new EmbedBuilder().setDescription("Fetching lyrics...").setColor(KoosColor.Default)],
@@ -176,7 +168,7 @@ export class LyricsCommand extends KoosCommand {
                 return prev;
             }, []);
 
-            await i.deleteReply();
+            await interaction.deleteReply();
 
             await pagination.addPages(embeds).run();
             collector.stop("selected");
@@ -193,9 +185,6 @@ export class LyricsCommand extends KoosCommand {
             }
         });
     }
-    // public async messageRun(message: Message) {
-    //     return send(message, `${Emojis.No} This command can only be used with the slash command.`);
-    // }
 
     public async autocompleteRun(interaction: KoosCommand.AutocompleteInteraction) {
         const { genius } = this.container;
@@ -245,13 +234,11 @@ export class LyricsCommand extends KoosCommand {
 
         if (isNullishOrEmpty(result)) return { embed: new EmbedBuilder().setDescription("No result").setColor(KoosColor.Error) };
 
-        // const description = result.map(({ fullTitle, url }, i) => `**${i + 1}.** [${fullTitle}](${url})`);
         const options: SelectMenuComponentOptionData[] = result.map((song) => ({
             label: cutText(`${song.title}`, 100),
             description: cutText(`by ${song.artist.name}`, 100),
             value: `${song.id}`,
         }));
-        // options.push({ label: `Cancel`, description: "Cancel this search", value: `cancel` });
 
         const selectMenu = new StringSelectMenuBuilder()
             .setCustomId(SelectMenuId.Lyrics)

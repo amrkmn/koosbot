@@ -132,7 +132,7 @@ export class SearchCommand extends KoosCommand {
 
         const collector = msg.createMessageComponentCollector({
             time: mins(1),
-            filter: (i) => i.user.id === message.member?.user.id,
+            filter: (i) => i.user.id === message.member?.user.id && i.message.id === msg.id,
         });
 
         collector.on("collect", async (interaction) => {
