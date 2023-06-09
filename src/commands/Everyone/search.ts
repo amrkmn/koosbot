@@ -127,7 +127,7 @@ export class SearchCommand extends KoosCommand {
         const buttonRow = new ActionRowBuilder<ButtonBuilder>().setComponents(cancelButton);
         const msg =
             message instanceof CommandInteraction
-                ? ((await message.followUp({ embeds: [embed], components: [row, buttonRow] })) as Message)
+                ? await message.followUp({ embeds: [embed], components: [row, buttonRow] })
                 : await send(message, { embeds: [embed], components: [row, buttonRow] });
 
         const collector = msg.createMessageComponentCollector({
@@ -141,8 +141,7 @@ export class SearchCommand extends KoosCommand {
                 interaction.followUp({
                     embeds: [new EmbedBuilder().setDescription(`Canceled the search`).setColor(KoosColor.Default)],
                 });
-                collector.stop("cancel");
-                return;
+                return collector.stop("cancel");
             } else if (interaction.isStringSelectMenu() && interaction.customId === SelectMenuId.Search) {
                 const userOptions = interaction.values;
                 await interaction.deferUpdate();
@@ -150,15 +149,10 @@ export class SearchCommand extends KoosCommand {
                 let player = kazagumo.getPlayer(`${message.guildId}`);
                 if (!player) {
                     if (!canJoinVoiceChannel(member.voice.channel)) {
-                        interaction.followUp({
-                            embeds: [
-                                new EmbedBuilder()
-                                    .setDescription(
-                                        `I cannot join your voice channel. It seem like I don't have the right permissions`
-                                    )
-                                    .setColor(KoosColor.Error),
-                            ],
-                        });
+                        const embed = new EmbedBuilder()
+                            .setDescription(`I cannot join your voice channel. It seem like I don't have the right permissions`)
+                            .setColor(KoosColor.Error);
+                        interaction.followUp({ embeds: [embed] });
                         return;
                     }
                     player ??= await kazagumo.createPlayer({
@@ -176,25 +170,17 @@ export class SearchCommand extends KoosCommand {
 
                 try {
                     if (userOptions.length === 1 && type === "PLAYLIST" && userOptions[0] === "playlist") {
-                        collector.stop("picked");
                         const title = `[${playlistName}](${query})`;
 
                         player.queue.add(tracks);
                         if (!player.playing && !player.paused) player.play();
 
-                        interaction.followUp({
-                            embeds: [
-                                new EmbedBuilder()
-                                    .setDescription(
-                                        `Queued playlist ${title} with ${tracks.length} ${pluralize("track", tracks.length)}`
-                                    )
-                                    .setColor(KoosColor.Default),
-                            ],
-                        });
-
-                        return;
+                        const embed = new EmbedBuilder()
+                            .setDescription(`Queued playlist ${title} with ${tracks.length} ${pluralize("track", tracks.length)}`)
+                            .setColor(KoosColor.Default);
+                        interaction.followUp({ embeds: [embed] });
+                        return collector.stop("picked");
                     } else if (userOptions.length >= 1 && type === "SEARCH") {
-                        collector.stop("picked");
                         let selected = [];
                         let msg = "";
 
@@ -209,23 +195,19 @@ export class SearchCommand extends KoosCommand {
                         interaction.followUp({
                             embeds: [new EmbedBuilder().setDescription(msg).setColor(KoosColor.Default)],
                         });
-                        return;
+                        return collector.stop("picked");
                     } else {
-                        collector.stop("picked");
                         let option = userOptions[0];
                         let selected = this.tracksMap.get(option)!;
 
                         player.queue.add(selected);
                         if (!player.playing && !player.paused) player.play();
 
-                        interaction.followUp({
-                            embeds: [
-                                new EmbedBuilder()
-                                    .setDescription(`Queued ${createTitle(selected)} at position #${player.queue.totalSize ?? 0}`)
-                                    .setColor(KoosColor.Default),
-                            ],
-                        });
-                        return;
+                        const embed = new EmbedBuilder()
+                            .setDescription(`Queued ${createTitle(selected)} at position #${player.queue.totalSize ?? 0}`)
+                            .setColor(KoosColor.Default);
+                        interaction.followUp({ embeds: [embed] });
+                        return collector.stop("picked");
                     }
                 } catch (error) {
                     collector.stop("error");
