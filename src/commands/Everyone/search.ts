@@ -120,15 +120,17 @@ export class SearchCommand extends KoosCommand {
 
         const embed = new EmbedBuilder()
             .setDescription(
-                type === "PLAYLIST" ? `Here is the result` : `There are ${tracks.length} ${pluralize("result", tracks.length)}`
+                type === "PLAYLIST"
+                    ? `Here is the result for that query`
+                    : `There are ${tracks.length} ${pluralize("result", tracks.length)}`
             )
             .setColor(KoosColor.Default);
-        const row = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(selectMenu);
+        const selectMenurow = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(selectMenu);
         const buttonRow = new ActionRowBuilder<ButtonBuilder>().setComponents(cancelButton);
         const msg =
             message instanceof CommandInteraction
-                ? await message.followUp({ embeds: [embed], components: [row, buttonRow] })
-                : await send(message, { embeds: [embed], components: [row, buttonRow] });
+                ? await message.followUp({ embeds: [embed], components: [selectMenurow, buttonRow] })
+                : await send(message, { embeds: [embed], components: [selectMenurow, buttonRow] });
 
         const collector = msg.createMessageComponentCollector({
             time: mins(1),
@@ -136,15 +138,18 @@ export class SearchCommand extends KoosCommand {
         });
 
         collector.on("collect", async (interaction) => {
-            if (interaction.isButton() && interaction.customId === ButtonId.Cancel) {
+            if (
+                (interaction.isButton() && interaction.customId === ButtonId.Cancel) ||
+                (interaction.isStringSelectMenu() && interaction.customId === SelectMenuId.Search)
+            )
                 await interaction.deferUpdate();
-                interaction.followUp({
-                    embeds: [new EmbedBuilder().setDescription(`Canceled the search`).setColor(KoosColor.Default)],
-                });
+
+            if (interaction.isButton() && interaction.customId === ButtonId.Cancel) {
+                const embed = new EmbedBuilder().setDescription(`Canceled the search`).setColor(KoosColor.Default);
+                interaction.editReply({ embeds: [embed], components: [] });
                 return collector.stop("cancel");
             } else if (interaction.isStringSelectMenu() && interaction.customId === SelectMenuId.Search) {
                 const userOptions = interaction.values;
-                await interaction.deferUpdate();
 
                 let player = kazagumo.getPlayer(`${message.guildId}`);
                 if (!player) {
@@ -178,7 +183,7 @@ export class SearchCommand extends KoosCommand {
                         const embed = new EmbedBuilder()
                             .setDescription(`Queued playlist ${title} with ${tracks.length} ${pluralize("track", tracks.length)}`)
                             .setColor(KoosColor.Default);
-                        interaction.followUp({ embeds: [embed] });
+                        interaction.editReply({ embeds: [embed], components: [] });
                         return collector.stop("picked");
                     } else if (userOptions.length >= 1 && type === "SEARCH") {
                         let selected = [];
@@ -192,8 +197,10 @@ export class SearchCommand extends KoosCommand {
                         player.queue.add(selected);
                         if (!player.playing && !player.paused) player.play();
 
-                        interaction.followUp({
-                            embeds: [new EmbedBuilder().setDescription(msg).setColor(KoosColor.Default)],
+                        const embed = new EmbedBuilder().setDescription(msg).setColor(KoosColor.Default);
+                        interaction.editReply({
+                            embeds: [embed],
+                            components: [],
                         });
                         return collector.stop("picked");
                     } else {
@@ -206,7 +213,7 @@ export class SearchCommand extends KoosCommand {
                         const embed = new EmbedBuilder()
                             .setDescription(`Queued ${createTitle(selected)} at position #${player.queue.totalSize ?? 0}`)
                             .setColor(KoosColor.Default);
-                        interaction.followUp({ embeds: [embed] });
+                        interaction.editReply({ embeds: [embed], components: [] });
                         return collector.stop("picked");
                     }
                 } catch (error) {
@@ -220,21 +227,15 @@ export class SearchCommand extends KoosCommand {
             const row = new ActionRowBuilder<StringSelectMenuBuilder>();
 
             switch (reason) {
-                case "cancel":
-                case "picked":
-                    let pickedRow = row.setComponents(selectMenu.setPlaceholder("You already picked a choice").setDisabled(true));
-                    msg.edit({ embeds: [embed], components: [pickedRow] });
-                    break;
                 case "time":
                     let timedOutRow = row.setComponents(selectMenu.setPlaceholder("Timed out").setDisabled(true));
                     msg.edit({ embeds: [embed], components: [timedOutRow] });
                     break;
                 case "error":
-                    let errorRow = row.setComponents(selectMenu.setPlaceholder("Something went wrong").setDisabled(true));
                     let errorEmbed = new EmbedBuilder()
                         .setDescription(`Something went wrong when trying to add track to queue.`)
                         .setColor(KoosColor.Error);
-                    msg.edit({ embeds: [errorEmbed], components: [errorRow] });
+                    msg.edit({ embeds: [errorEmbed], components: [] });
                     break;
             }
         });
