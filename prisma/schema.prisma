@@ -20,22 +20,3 @@ model Guild {
 
   @@map("guild")
 }
-
-model User {
-  id       String     @id @map("_id")
-  playlist Playlist[]
-
-  @@map("user")
-}
-
-model Playlist {
-  id    String   @id @map("_id")
-  name  String
-  tracks String[] @default([])
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
-  @@unique([userId, name])
-  @@map("playlist")
-}

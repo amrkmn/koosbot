@@ -56,6 +56,7 @@ export enum ButtonId {
 export enum SelectMenuId {
     Lyrics = "selectMenuLyrics",
     Search = "selectMenuSearch",
+    Playlist = "selectMenuPlaylist",
 }
 
 export enum TextInputId {

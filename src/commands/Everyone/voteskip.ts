@@ -27,9 +27,9 @@ export class VoteSkipCommand extends KoosCommand {
         const player = kazagumo.getPlayer(interaction.guildId!)!;
 
         if (player) await interaction.deferReply();
-        if (!player || (player && !player.queue.current)) {
+        if (!player || !player.queue.current) {
             return interaction.reply({
-                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
             });
         }
@@ -41,9 +41,9 @@ export class VoteSkipCommand extends KoosCommand {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(message.guildId!)!;
 
-        if (!player || (player && !player.queue.current)) {
+        if (!player || !player.queue.current) {
             return reply(message, {
-                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
         }
 

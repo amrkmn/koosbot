@@ -6,7 +6,7 @@ import { EmbedBuilder } from "discord.js";
 import prettyMs from "pretty-ms";
 
 @ApplyOptions<Listener.Options>({
-    name: Events.MessageCommandDenied,
+    event: Events.MessageCommandDenied,
 })
 export class ClientListener extends Listener<typeof Events.MessageCommandDenied> {
     public override async run(error: UserError, { message, command }: MessageCommandDeniedPayload) {

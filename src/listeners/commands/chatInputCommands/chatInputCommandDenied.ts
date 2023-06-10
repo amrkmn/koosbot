@@ -5,7 +5,7 @@ import { EmbedBuilder } from "discord.js";
 import prettyMs from "pretty-ms";
 
 @ApplyOptions<Listener.Options>({
-    name: Events.ChatInputCommandDenied,
+    event: Events.ChatInputCommandDenied,
 })
 export class ClientListener extends Listener<typeof Events.ChatInputCommandDenied> {
     public override async run(error: UserError, { interaction, command }: ChatInputCommandDeniedPayload) {

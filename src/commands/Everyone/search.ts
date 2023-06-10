@@ -89,12 +89,12 @@ export class SearchCommand extends KoosCommand {
                 : await send(message, { embeds: [embed] });
             return;
         } else if (type === "PLAYLIST") {
-            let duration = tracks.reduce((all, track) => all + Number(track.length), 0);
+            let duration = tracks.reduce((total, track) => total + Number(track.length), 0);
             options.push(
                 new StringSelectMenuOptionBuilder()
                     .setLabel(cutText(`${playlistName}`, 100))
                     .setDescription(`Duration: ${convertTime(duration)} | Tracks: ${tracks.length}`)
-                    .setValue(`playlist`)
+                    .setValue(SelectMenuId.Playlist)
             );
         } else {
             for (let track of tracks) {
@@ -169,7 +169,7 @@ export class SearchCommand extends KoosCommand {
                 }
 
                 try {
-                    if (userOptions.length === 1 && type === "PLAYLIST" && userOptions[0] === "playlist") {
+                    if (userOptions.length === 1 && type === "PLAYLIST" && userOptions[0] === SelectMenuId.Playlist) {
                         const title = `[${playlistName}](${query})`;
 
                         player.queue.add(tracks);
@@ -231,14 +231,10 @@ export class SearchCommand extends KoosCommand {
                     break;
                 case "error":
                     let errorRow = row.setComponents(selectMenu.setPlaceholder("Something went wrong").setDisabled(true));
-                    msg.edit({
-                        embeds: [
-                            new EmbedBuilder()
-                                .setDescription(`Something went wrong when trying to add track to queue.`)
-                                .setColor(KoosColor.Error),
-                        ],
-                        components: [errorRow],
-                    });
+                    let errorEmbed = new EmbedBuilder()
+                        .setDescription(`Something went wrong when trying to add track to queue.`)
+                        .setColor(KoosColor.Error);
+                    msg.edit({ embeds: [errorEmbed], components: [errorRow] });
                     break;
             }
         });

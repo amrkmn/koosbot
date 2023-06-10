@@ -102,7 +102,7 @@ export class Paginator {
         collector.once("end", async (_, reason) => {
             try {
                 if (["error", "stop", "time"].includes(reason) && initialMessage.editable)
-                    await initialMessage.edit({ components: [...this.createComponents(true)] });
+                    await initialMessage.edit({ components: [] });
             } catch (error) {
                 container.logger.error(error);
             }
