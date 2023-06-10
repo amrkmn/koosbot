@@ -34,6 +34,7 @@ export class ClientListener extends Listener {
                 msg.edit({ components: [] });
                 player.resetDashboard();
                 player.history.clear();
+                player.skipVotes.clear();
             }
         }
 

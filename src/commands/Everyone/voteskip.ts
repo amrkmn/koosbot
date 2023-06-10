@@ -9,6 +9,7 @@ import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Lets you vote for skipping the current track.",
+    aliases: ["vs"],
     preconditions: ["VoiceOnly"],
 })
 export class VoteSkipCommand extends KoosCommand {
@@ -65,12 +66,13 @@ export class VoteSkipCommand extends KoosCommand {
                 voted = false;
 
             if (votes.has(member.id)) {
-                msg = `You have already voted`;
-                color = KoosColor.Error;
+                msg = `You have already voted so I removed your's`;
+                color = KoosColor.Default;
                 voted = true;
+                votes.delete(member.id);
             } else {
                 msg = `Skipping`;
-                color = KoosColor.Success;
+                color = KoosColor.Default;
                 voted = false;
                 votes.add(member.id);
             }

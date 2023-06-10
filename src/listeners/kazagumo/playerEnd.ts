@@ -22,6 +22,7 @@ export class ClientListener extends Listener {
 
             if (!isNullish(msg) && msg.editable) {
                 msg.edit({ components: [] });
+                player.skipVotes.clear();
                 player.resetDashboard();
             }
         }
