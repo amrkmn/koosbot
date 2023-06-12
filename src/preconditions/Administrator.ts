@@ -1,24 +1,26 @@
+import type { AnyInteraction } from "@sapphire/discord.js-utilities";
 import { Precondition, type PreconditionResult } from "@sapphire/framework";
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { isNullish } from "@sapphire/utilities";
+import { ChatInputCommandInteraction, GuildMember, Message, PermissionFlagsBits } from "discord.js";
 
 export class AdministratorPrecondition extends Precondition {
     public messageRun(message: Message): PreconditionResult {
-        if (!message.guild) {
-            return this.error({ message: "This cannot be run in dms" });
-        }
-        const member = message.member!;
-        return member.permissions.has(PermissionFlagsBits.Administrator) || member.permissions.has(PermissionFlagsBits.ManageGuild)
-            ? this.ok()
-            : this.error({ message: "This command can only run by Administrators!" });
+        return this.checkMember(message);
     }
 
-    public chatInputRun(interaction: CommandInteraction) {
-        if (!interaction.guild) {
-            return this.error({ message: "This cannot be run in dms" });
-        }
-        const memberPermissions = interaction.memberPermissions!;
-        return memberPermissions.has(PermissionFlagsBits.Administrator) || memberPermissions.has(PermissionFlagsBits.ManageGuild)
+    public chatInputRun(interaction: ChatInputCommandInteraction) {
+        return this.checkMember(interaction);
+    }
+
+    private checkMember(messageOrInteraction: Message | AnyInteraction) {
+        const guild = messageOrInteraction.guild;
+        if (isNullish(guild)) return this.error({ message: "This cannot be run in dms" });
+
+        const member = messageOrInteraction.member as GuildMember;
+
+        const permissions = member.permissions;
+        return permissions.has(PermissionFlagsBits.ManageGuild)
             ? this.ok()
-            : this.error({ message: "This command can only run by Administrators!" });
+            : this.error({ message: "This command can only run by server Administrators!", identifier: "preconditionAdministrator" });
     }
 }

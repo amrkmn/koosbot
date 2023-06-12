@@ -1,20 +1,22 @@
+import type { AnyInteraction } from "@sapphire/discord.js-utilities";
 import { Precondition } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
-import { Message, type Interaction, GuildMember, Guild } from "discord.js";
+import { Message, type Interaction, GuildMember } from "discord.js";
 
 export class UserPrecondition extends Precondition {
     public async messageRun(message: Message) {
-        const { guild, member } = message;
-        return this.checkMember(guild, member as GuildMember);
+        return this.checkMember(message);
     }
 
     public async chatInputRun(interaction: Interaction) {
-        const { guild, member } = interaction;
-        return this.checkMember(guild, member as GuildMember);
+        return this.checkMember(interaction);
     }
 
-    private checkMember(guild: Guild | null, member: GuildMember) {
-        if (!guild) return this.error({ message: "You cannot run this message command in DMs." });
+    private checkMember(messageOrInteraction: Message | AnyInteraction) {
+        const guild = messageOrInteraction.guild;
+        const member = messageOrInteraction.member as GuildMember;
+
+        if (!guild) return this.error({ message: "You cannot run this message command in DMs.", identifier: "preconditionVoiceOnly" });
         if (
             !isNullish(guild.members.me) &&
             !isNullish(member.voice.channel) && //
@@ -22,13 +24,14 @@ export class UserPrecondition extends Precondition {
             member.voice.channelId !== guild.members.me!.voice.channelId
         )
             return this.error({
-                message: `You aren't connected to the same voice channel as I am. I'm currently connected to ${guild.members.me.voice.channel}.`,
+                message: `You are not connected to the same voice channel as I am. I'm currently connected to ${guild.members.me.voice.channel}.`,
                 context: { channel: guild.members.me!.voice.channel },
+                identifier: "preconditionVoiceOnly",
             });
 
         return member.voice.channel !== null //
             ? this.ok()
-            : this.error({ message: "You aren't connected to a voice channel." });
+            : this.error({ message: "You are not connected to a voice channel.", identifier: "preconditionVoiceOnly" });
     }
 }
 

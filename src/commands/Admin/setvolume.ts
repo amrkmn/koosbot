@@ -10,6 +10,7 @@ import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
 @ApplyOptions<KoosCommand.Options>({
     description: "Lets you change the bots default output volume.",
     permissions: [PermissionFlagsBits.ManageGuild],
+    preconditions: ["Administrator"],
     aliases: ["setvol", "svol"],
     detailedDescription: {
         usage: [":1-200"],

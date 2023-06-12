@@ -10,6 +10,7 @@ import { EmbedBuilder, Message, PermissionFlagsBits, Role } from "discord.js";
 @ApplyOptions<KoosCommand.Options>({
     description: "Add or remove a DJ role.",
     permissions: [PermissionFlagsBits.ManageGuild],
+    preconditions: ["Administrator"],
     aliases: ["dj"],
     detailedDescription: {
         usage: [";role"],

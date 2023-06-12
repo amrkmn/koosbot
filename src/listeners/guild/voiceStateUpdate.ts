@@ -33,7 +33,7 @@ export class ClientListener extends Listener {
         if (isNullish(channel)) return;
 
         const state = this.checkState(oldState, newState);
-        if (state === "BOT" || state === "UNKNOWN") return;
+        if (state === "BOT" || state === "OTHERS") return;
 
         const voiceChannel = clientVc.members.filter((x) => client.user?.id === x.id || !x.user.bot);
 
@@ -54,7 +54,7 @@ export class ClientListener extends Listener {
         if (isNullish(newChannel)) return "LEFT";
         else if (isNullish(oldChannel)) return "JOINED";
         else if (oldChannel.id !== newChannel.id) return "MOVED";
-        else return "UNKNOWN";
+        else return "OTHERS";
     }
 
     private async setupTimeout(guild: Guild | null, player: KazagumoPlayer) {

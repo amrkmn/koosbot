@@ -11,6 +11,7 @@ import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
 @ApplyOptions<KoosCommand.Options>({
     description: `Lets you set a new prefix.`,
     permissions: [PermissionFlagsBits.ManageGuild],
+    preconditions: ["Administrator"],
     detailedDescription: {
         usage: [";new"],
     },

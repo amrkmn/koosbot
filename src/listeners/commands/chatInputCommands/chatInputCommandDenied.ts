@@ -24,11 +24,11 @@ export class ClientListener extends Listener<typeof Events.ChatInputCommandDenie
                 embeds: [new EmbedBuilder().setDescription(content).setColor(KoosColor.Error)],
             });
 
-        return interaction.reply({ embeds: [new EmbedBuilder().setDescription(content).setColor(KoosColor.Error)] });
+        return interaction.reply({ embeds: [new EmbedBuilder().setDescription(content).setColor(KoosColor.Error)], ephemeral: true });
     }
 
     private isVoiceOnlyError(error: UserError) {
-        if (error.identifier === "VoiceOnly") return true;
+        if (error.identifier === "preconditionVoiceOnly") return true;
         else return false;
     }
 

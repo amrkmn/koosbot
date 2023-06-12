@@ -10,6 +10,7 @@ import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
 @ApplyOptions<KoosCommand.Options>({
     description: "Enables or disables if the requester is shown on each track.",
     permissions: [PermissionFlagsBits.ManageGuild],
+    preconditions: ["Administrator"],
     aliases: ["req"],
     detailedDescription: {
         usage: [":enable|:disable"],

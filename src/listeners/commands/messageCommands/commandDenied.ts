@@ -12,20 +12,12 @@ export class ClientListener extends Listener<typeof Events.MessageCommandDenied>
     public override async run(error: UserError, { message, command }: MessageCommandDeniedPayload) {
         let content: string = error.message;
         if (Reflect.get(Object(error.context), "silent")) return;
-        if (this.isCooldownError(error) || this.isVoiceOnlyError(error)) {
-            content = error.message;
-            if (this.isCooldownError(error)) {
-                let { remaining } = error.context as { readonly remaining: number };
-                content = `Please wait ${prettyMs(remaining, { verbose: true })} before using \`${command.name}\` again.`;
-            }
+        if (this.isCooldownError(error)) {
+            let { remaining } = error.context as { readonly remaining: number };
+            content = `Please wait ${prettyMs(remaining, { verbose: true })} before using \`${command.name}\` again.`;
         }
 
         reply(message, { embeds: [new EmbedBuilder().setDescription(content).setColor(KoosColor.Error)] });
-    }
-
-    private isVoiceOnlyError(error: UserError) {
-        if (error.identifier === "VoiceOnly") return true;
-        else return false;
     }
 
     private isCooldownError(error: UserError) {
