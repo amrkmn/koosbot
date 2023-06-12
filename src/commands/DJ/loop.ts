@@ -11,7 +11,6 @@ import { KazagumoPlayer } from "kazagumo";
     preconditions: ["VoiceOnly", "DJ"],
     detailedDescription: {
         usage: [";queue|;song|;off"],
-        examples: ["", "queue", "off"],
     },
 })
 export class LoopCommand extends KoosCommand {

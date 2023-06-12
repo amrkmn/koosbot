@@ -13,7 +13,6 @@ import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
     aliases: ["setvol", "svol"],
     detailedDescription: {
         usage: [":1-200"],
-        examples: ["50", "100", "200"],
     },
 })
 export class SetVolumeCommand extends KoosCommand {

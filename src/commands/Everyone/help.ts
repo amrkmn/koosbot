@@ -18,7 +18,6 @@ const categoryLevel: { [key: string]: number } = {
     aliases: ["h", "cmds", "cmd"],
     detailedDescription: {
         usage: [";command"],
-        examples: ["", "play", "skip"],
     },
 })
 export class HelpCommand extends KoosCommand {
@@ -75,17 +74,17 @@ export class HelpCommand extends KoosCommand {
             const aliases = buildedCommand.aliases && buildedCommand.aliases.length ? buildedCommand.aliases.join(", ") : undefined;
 
             const usage = this.parseUsage(command, prefix);
-            const examples = this.parseExamples(command, prefix);
-
-            const fields = [
-                { name: `${buildedCommand.name} ${aliases ? `(${aliases})` : ``}`, value: buildedCommand.description },
-                { name: `• Usage`, value: usage },
-            ];
-            if (!isNullish(examples)) fields.push({ name: `• Examples`, value: examples });
-            fields.push({ name: `• Permission`, value: `\`${buildedCommand.category}\`` });
 
             return interaction.followUp({
-                embeds: [new EmbedBuilder().setFields(fields).setColor(KoosColor.Default)],
+                embeds: [
+                    new EmbedBuilder()
+                        .setFields(
+                            { name: `${buildedCommand.name} ${aliases ? `(${aliases})` : ``}`, value: buildedCommand.description },
+                            { name: `• Usage`, value: usage },
+                            { name: `• Permission`, value: `\`${buildedCommand.category}\`` }
+                        )
+                        .setColor(KoosColor.Default),
+                ],
             });
         }
 
@@ -117,17 +116,17 @@ export class HelpCommand extends KoosCommand {
             const aliases = buildedCommand.aliases && buildedCommand.aliases.length ? buildedCommand.aliases.join(", ") : undefined;
 
             const usage = this.parseUsage(commandSuccess, prefix);
-            const examples = this.parseExamples(commandSuccess, prefix);
-
-            const fields = [
-                { name: `${buildedCommand.name} ${aliases ? `(${aliases})` : ``}`, value: buildedCommand.description },
-                { name: `• Usage`, value: usage },
-            ];
-            if (!isNullish(examples)) fields.push({ name: `• Examples`, value: examples });
-            fields.push({ name: `• Permission`, value: `\`${buildedCommand.category}\`` });
 
             return send(message, {
-                embeds: [new EmbedBuilder().setFields(fields).setColor(KoosColor.Default)],
+                embeds: [
+                    new EmbedBuilder()
+                        .setFields(
+                            { name: `${buildedCommand.name} ${aliases ? `(${aliases})` : ``}`, value: buildedCommand.description },
+                            { name: `• Usage`, value: usage },
+                            { name: `• Permission`, value: `\`${buildedCommand.category}\`` }
+                        )
+                        .setColor(KoosColor.Default),
+                ],
             });
         } else if (command.isErr() && ["commandCannotResolve", "commandNotFound"].includes(command.err().unwrap().identifier))
             return send(message, {
@@ -157,21 +156,6 @@ export class HelpCommand extends KoosCommand {
         const category = `${command.fullCategory.at(-1) ?? command.category}`;
 
         return { name, description, aliases, category };
-    }
-
-    private parseExamples(command: KoosCommand, prefix: SapphirePrefix) {
-        const { detailedDescription } = command;
-
-        if (!isNullish(detailedDescription) && !isObject(detailedDescription)) return null;
-
-        const examples = detailedDescription.examples;
-        if (isNullish(examples)) return null;
-
-        const parsed = examples.map((example) => {
-            return `${prefix}${command.name} ${isNullishOrEmpty(example) ? "" : `*${example}*`}`;
-        });
-
-        return parsed.join("\n");
     }
 
     private parseUsage(command: KoosCommand, prefix: SapphirePrefix) {

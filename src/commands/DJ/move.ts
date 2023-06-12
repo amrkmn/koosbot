@@ -14,7 +14,6 @@ import { KazagumoPlayer } from "kazagumo";
     preconditions: ["VoiceOnly", "DJ"],
     detailedDescription: {
         usage: [":from", ":to"],
-        examples: ["1 5", "5 2"],
     },
 })
 export class MoveCommand extends KoosCommand {

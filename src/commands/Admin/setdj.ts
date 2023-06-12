@@ -13,7 +13,6 @@ import { EmbedBuilder, Message, PermissionFlagsBits, Role } from "discord.js";
     aliases: ["dj"],
     detailedDescription: {
         usage: [";role"],
-        examples: ["", "DJ"],
     },
 })
 export class SetDJCommand extends KoosCommand {

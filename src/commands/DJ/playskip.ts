@@ -17,7 +17,6 @@ import pluralize from "pluralize";
     preconditions: ["VoiceOnly", "DJ"],
     detailedDescription: {
         usage: [":query"],
-        examples: ["no glory", "https://youtu.be/VwE-tWBrpPs"],
     },
 })
 export class PlaySkipCommand extends KoosCommand {

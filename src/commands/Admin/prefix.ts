@@ -13,7 +13,6 @@ import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
     permissions: [PermissionFlagsBits.ManageGuild],
     detailedDescription: {
         usage: [";new"],
-        examples: ["", "!"],
     },
 })
 export class PrefixCommand extends KoosCommand {

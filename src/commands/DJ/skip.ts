@@ -14,7 +14,6 @@ import pluralize from "pluralize";
     aliases: ["n", "next"],
     detailedDescription: {
         usage: [";to"],
-        examples: ["", "5"],
     },
 })
 export class SkipCommand extends KoosCommand {

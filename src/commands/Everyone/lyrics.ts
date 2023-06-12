@@ -27,7 +27,6 @@ import pluralize from "pluralize";
     aliases: ["ly"],
     detailedDescription: {
         usage: [":query"],
-        examples: ["no glory"],
     },
 })
 export class LyricsCommand extends KoosCommand {

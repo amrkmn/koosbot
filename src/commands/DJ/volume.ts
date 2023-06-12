@@ -14,7 +14,6 @@ import { KazagumoPlayer } from "kazagumo";
     aliases: ["v", "vol"],
     detailedDescription: {
         usage: [";1-200"],
-        examples: ["50", "100", "200"],
     },
 })
 export class VolumeCommand extends KoosCommand {

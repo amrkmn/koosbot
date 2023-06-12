@@ -14,7 +14,6 @@ import { createTitle } from "#utils/functions";
     aliases: ["rm"],
     detailedDescription: {
         usage: [":position", ";to"],
-        examples: ["1 5", "3 10"],
     },
 })
 export class RemoveCommand extends KoosCommand {

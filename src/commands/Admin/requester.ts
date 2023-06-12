@@ -13,7 +13,6 @@ import { EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
     aliases: ["req"],
     detailedDescription: {
         usage: [":enable|:disable"],
-        examples: ["enable", "disable"],
     },
 })
 export class RequesterCommand extends KoosCommand {
