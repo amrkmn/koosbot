@@ -3,12 +3,11 @@ import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args, type SapphirePrefix } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
-import { isNullish, isNullishOrEmpty, isObject } from "@sapphire/utilities";
+import { isNullish, isObject } from "@sapphire/utilities";
 import { Collection, EmbedBuilder, Message } from "discord.js";
 
-const categoryLevel: { [key: string]: number } = {
+const CategoryLevel: Record<string, number> = {
     Everyone: 0,
-    Playlist: 2,
     DJ: 3,
     Admin: 6,
 };
@@ -185,7 +184,7 @@ export class HelpCommand extends KoosCommand {
         const commands = await this.fetchChatInputCommands(interaction);
         const helpMessage: { name: string; value: string }[] = [];
 
-        commands.sort((_, __, a, b) => categoryLevel[a] - categoryLevel[b]);
+        commands.sort((_, __, a, b) => CategoryLevel[a] - CategoryLevel[b]);
         for (const [category, list] of commands) {
             list.sort((a, b) => a.name.localeCompare(b.name));
             helpMessage.push({
@@ -200,7 +199,7 @@ export class HelpCommand extends KoosCommand {
         const commands = await this.fetchMessageCommands(message);
         const helpMessage: { name: string; value: string }[] = [];
 
-        commands.sort((_, __, a, b) => categoryLevel[a] - categoryLevel[b]);
+        commands.sort((_, __, a, b) => CategoryLevel[a] - CategoryLevel[b]);
         for (const [category, list] of commands) {
             list.sort((a, b) => a.name.localeCompare(b.name));
             helpMessage.push({
