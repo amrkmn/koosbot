@@ -3,6 +3,7 @@ import { ButtonId, KoosColor, SelectMenuId } from "#utils/constants";
 import { canJoinVoiceChannel, convertTime, createTitle, cutText, mins, sendLoadingMessage } from "#utils/functions";
 import { generateId } from "#utils/snowflake";
 import { ApplyOptions } from "@sapphire/decorators";
+import { isAnyInteraction } from "@sapphire/discord.js-utilities";
 import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { isNullish, isNullishOrEmpty } from "@sapphire/utilities";
@@ -10,14 +11,13 @@ import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    CommandInteraction,
+    ChannelType,
     EmbedBuilder,
     GuildMember,
     Message,
-    type Snowflake,
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
-    ChannelType,
+    type Snowflake,
 } from "discord.js";
 import { Kazagumo, KazagumoTrack } from "kazagumo";
 import pluralize from "pluralize";
@@ -73,7 +73,7 @@ export class SearchCommand extends KoosCommand {
     }
 
     private async search(kazagumo: Kazagumo, message: Message | KoosCommand.ChatInputCommandInteraction, query: string) {
-        if (message instanceof CommandInteraction && !message.deferred) await message.deferReply();
+        if (isAnyInteraction(message) && !message.deferred) await message.deferReply();
         const member = message.member as GuildMember;
         const data = await this.container.db.guild.findUnique({ where: { id: `${message.guildId}` } });
         const options: StringSelectMenuOptionBuilder[] = [];
@@ -83,7 +83,7 @@ export class SearchCommand extends KoosCommand {
 
         if (isNullishOrEmpty(tracks)) {
             const embed = new EmbedBuilder().setDescription(`No result for that query.`).setColor(KoosColor.Error);
-            message instanceof CommandInteraction
+            isAnyInteraction(message) //
                 ? await message.followUp({ embeds: [embed] })
                 : await send(message, { embeds: [embed] });
             return;
@@ -126,10 +126,9 @@ export class SearchCommand extends KoosCommand {
             .setColor(KoosColor.Default);
         const selectMenurow = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(selectMenu);
         const buttonRow = new ActionRowBuilder<ButtonBuilder>().setComponents(cancelButton);
-        const msg =
-            message instanceof CommandInteraction
-                ? await message.followUp({ embeds: [embed], components: [selectMenurow, buttonRow] })
-                : await send(message, { embeds: [embed], components: [selectMenurow, buttonRow] });
+        const msg = isAnyInteraction(message)
+            ? await message.followUp({ embeds: [embed], components: [selectMenurow, buttonRow] })
+            : await send(message, { embeds: [embed], components: [selectMenurow, buttonRow] });
 
         const collector = msg.createMessageComponentCollector({
             time: mins(1),

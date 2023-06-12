@@ -1,10 +1,11 @@
-import { envParseString } from "@skyra/env-utilities";
 import { KoosColor } from "#utils/constants";
 import { time } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
+import { isMessageInstance } from "@sapphire/discord.js-utilities";
 import { container, Listener } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
-import { Guild, Message, EmbedBuilder } from "discord.js";
+import { envParseString } from "@skyra/env-utilities";
+import { EmbedBuilder, Guild } from "discord.js";
 import { Events, KazagumoPlayer } from "kazagumo";
 import ms from "ms";
 
@@ -27,14 +28,14 @@ export class ClientListener extends Listener {
 
         const npMessage = player.dashboard();
 
-        if (channel && channel.isTextBased() && npMessage instanceof Message) {
+        if (channel && channel.isTextBased() && isMessageInstance(npMessage)) {
             const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id).catch(() => null));
 
             if (!isNullish(msg) && msg.editable) {
                 msg.edit({ components: [] });
                 player.resetDashboard();
                 player.history.clear();
-                player.skipVotes.clear();
+                player.votes.clear();
             }
         }
 

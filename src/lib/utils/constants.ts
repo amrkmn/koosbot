@@ -51,6 +51,8 @@ export enum ButtonId {
 
     // Others
     Cancel = "buttonCancel",
+    Votes = "buttonVotes",
+    VotesInfo = "buttonVotesInfo",
 }
 
 export enum SelectMenuId {

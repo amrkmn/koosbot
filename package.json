@@ -9,7 +9,7 @@
     "watch": "tsup --watch",
     "dev": "tsup --watch --onSuccess \"yarn start\"",
     "start": "node --preserve-symlinks --enable-source-maps --no-warnings dist/index.js",
-    "generate": "npx prisma generate",
+    "generate": "yarn prisma generate",
     "clean": "node scripts/clean.mjs"
   },
   "keywords": [],

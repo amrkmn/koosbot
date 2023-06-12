@@ -2,6 +2,7 @@ import type { KoosCommand } from "#lib/extensions";
 import type { PaginatorOptions, PaginatorRunOptions } from "#lib/types";
 import { ButtonId, KoosColor, TextInputId } from "#utils/constants";
 import { mins, sec } from "#utils/functions";
+import { isAnyInteraction } from "@sapphire/discord.js-utilities";
 import { container } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { DiscordSnowflake } from "@sapphire/snowflake";
@@ -11,7 +12,6 @@ import {
     ButtonBuilder,
     ButtonInteraction,
     ButtonStyle,
-    ChatInputCommandInteraction,
     ComponentType,
     EmbedBuilder,
     Message,
@@ -56,7 +56,7 @@ export class Paginator {
         const anonymous = options?.anonymous ?? false;
 
         let initialMessage: Message;
-        if (this.message instanceof ChatInputCommandInteraction) {
+        if (isAnyInteraction(this.message)) {
             if (!this.message.replied && !this.message.deferred) await this.message.deferReply({ ephemeral: anonymous });
 
             initialMessage = await this.message.editReply({ embeds: [this.getPage()], components: [...this.createComponents()] });

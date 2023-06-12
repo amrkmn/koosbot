@@ -1,7 +1,7 @@
 import { ApplyOptions } from "@sapphire/decorators";
+import { isMessageInstance } from "@sapphire/discord.js-utilities";
 import { Listener, container } from "@sapphire/framework";
 import { isNullish } from "@sapphire/utilities";
-import { Message } from "discord.js";
 import { Events, KazagumoPlayer, KazagumoTrack } from "kazagumo";
 
 @ApplyOptions<Listener.Options>({
@@ -17,12 +17,12 @@ export class ClientListener extends Listener {
 
         if (!isNullish(track)) player.history.tracks.add(track);
 
-        if (channel && channel.isTextBased() && npMessage instanceof Message) {
+        if (channel && channel.isTextBased() && isMessageInstance(npMessage)) {
             const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id).catch(() => null));
 
             if (!isNullish(msg) && msg.editable) {
                 msg.edit({ components: [] });
-                player.skipVotes.clear();
+                player.votes.clear();
                 player.resetDashboard();
             }
         }

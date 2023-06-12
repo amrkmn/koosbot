@@ -18,15 +18,24 @@ interface PlayerProgressbarOptions {
 
 export class KoosPlayer extends KazagumoPlayer {
     #dashboard: Message | undefined;
-    public skipVotes: Set<string>;
+    #voting: boolean = false;
+
+    public votes: Set<string>;
     public history: QueueHistory;
 
     constructor(kazagumo: Kazagumo, player: Player, options: KazagumoPlayerOptions, customData: unknown) {
         super(kazagumo, player, options, customData);
 
         this.history = new QueueHistory(this);
-        this.skipVotes = new Set<string>();
+        this.votes = new Set<string>();
         this.#dashboard = undefined;
+    }
+
+    get voting() {
+        return this.#voting;
+    }
+    set voting(value: boolean) {
+        this.#voting = value;
     }
 
     public dashboard(): Message;
@@ -116,8 +125,10 @@ export class KoosPlayer extends KazagumoPlayer {
 
 declare module "kazagumo" {
     interface KazagumoPlayer {
+        get voting(): boolean;
+        set voting(value: boolean);
         history: QueueHistory;
-        skipVotes: Set<string>;
+        votes: Set<string>;
         dashboard(): Message;
         dashboard(message: Message): undefined;
         dashboard(message?: Message): Message | undefined;

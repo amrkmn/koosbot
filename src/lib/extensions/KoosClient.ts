@@ -8,13 +8,14 @@ import { KoosPlayer } from "#lib/extensions/KoosPlayer";
 import { envParseNumber, envParseString } from "@skyra/env-utilities";
 import { Client as GeniusClient } from "genius-lyrics";
 import { KazagumoPlugin as Spotify } from "#lib/structures";
+import { isMessageInstance } from "@sapphire/discord.js-utilities";
 
 const NODES: NodeOption[] = [
     { name: "node1", url: "narco.buses.rocks:2269", auth: "glasshost1984", secure: false },
     { name: "node2", url: "ash.lavalink.alexanderof.xyz:2333", auth: "lavalink", secure: false },
     { name: "node3", url: "mohpoe.alfari.id:4004", auth: "youshallnotpass", secure: false },
     { name: "node4", url: "fsn.lavalink.alexanderof.xyz:2333", auth: "lavalink", secure: false },
-    { name: "node5", url: "lavalink.cyber-host.eu:2333", auth: "discord.gg/cyberhost", secure: false },
+    // { name: "node5", url: "lavalink.cyber-host.eu:2333", auth: "discord.gg/cyberhost", secure: false },
 ];
 
 export class KoosClient extends SapphireClient {
@@ -55,7 +56,7 @@ export class KoosClient extends SapphireClient {
     public async prefix(input: Guild | Message) {
         let guildId: string | null;
         if (input instanceof Guild) guildId = input.id;
-        else if (input instanceof Message) guildId = input.guildId;
+        else if (isMessageInstance(input)) guildId = input.guildId;
         else return [`${envParseString("CLIENT_PREFIX")}`] as SapphirePrefix;
 
         const data = await container.db.guild.findUnique({ where: { id: guildId! } });

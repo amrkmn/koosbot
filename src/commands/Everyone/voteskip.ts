@@ -1,10 +1,12 @@
 import { KoosCommand } from "#lib/extensions";
+import { ButtonId, KoosColor } from "#utils/constants";
+import { createTitle, mins } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
-import { KazagumoPlayer } from "kazagumo";
-import { Message, GuildMember, EmbedBuilder } from "discord.js";
-import { KoosColor } from "#utils/constants";
+import { isAnyInteraction } from "@sapphire/discord.js-utilities";
 import { reply, send } from "@sapphire/plugin-editable-commands";
-import { createTitle } from "#utils/functions";
+import { oneLine } from "common-tags";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, GuildMember, Message } from "discord.js";
+import { KazagumoPlayer } from "kazagumo";
 import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
@@ -13,8 +15,6 @@ import pluralize from "pluralize";
     preconditions: ["VoiceOnly"],
 })
 export class VoteSkipCommand extends KoosCommand {
-    public votes = new Set<string>();
-
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand((builder) =>
             builder //
@@ -34,8 +34,15 @@ export class VoteSkipCommand extends KoosCommand {
                 ephemeral: true,
             });
         }
+        if (player.voting) {
+            const embed = new EmbedBuilder()
+                .setDescription(`There is already an active vote to skip the current track`)
+                .setColor(KoosColor.Default);
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+        player.votes.add(interaction.user.id);
 
-        interaction.followUp({ embeds: [await this.voteSkip(interaction, player)] });
+        await this.voteSkip(interaction, player);
     }
 
     public async messageRun(message: Message) {
@@ -47,8 +54,15 @@ export class VoteSkipCommand extends KoosCommand {
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
         }
+        if (player.voting) {
+            const embed = new EmbedBuilder()
+                .setDescription(`There is already an active vote to skip the current track`)
+                .setColor(KoosColor.Default);
+            return send(message, { embeds: [embed] });
+        }
+        player.votes.add(message.author.id);
 
-        send(message, { embeds: [await this.voteSkip(message, player)] });
+        await this.voteSkip(message, player);
     }
 
     private async voteSkip(messageOrInteraction: Message | KoosCommand.ChatInputCommandInteraction, player: KazagumoPlayer) {
@@ -58,48 +72,99 @@ export class VoteSkipCommand extends KoosCommand {
         const listeners = channel.members.filter((member) => !member.user.bot);
         const current = player.queue.current!;
         const title = createTitle(current);
+        const required = Math.round(listeners.size * 0.4);
 
-        if (listeners.size > 1) {
-            let votes = this.getVotes(player);
-            let msg = "",
-                color = 0,
-                voted = false;
+        const embed = new EmbedBuilder()
+            .setDescription(
+                oneLine`
+                    ${member} requested to skip the current track,
+                    ${player.votes.size}/${required} (${required} ${pluralize("vote", required)} required)
+                `
+            )
+            .setColor(KoosColor.Default);
+        const voteButton = new ButtonBuilder().setCustomId(ButtonId.Votes).setLabel("Vote to skip").setStyle(ButtonStyle.Success);
+        const row = new ActionRowBuilder<ButtonBuilder>().setComponents(voteButton);
 
-            if (votes.has(member.id)) {
-                msg = `You have already voted so I removed your's`;
-                color = KoosColor.Default;
-                voted = true;
-                votes.delete(member.id);
+        const msg = isAnyInteraction(messageOrInteraction)
+            ? await messageOrInteraction.followUp({ embeds: [embed], components: [row] })
+            : await send(messageOrInteraction, { embeds: [embed], components: [row] });
+
+        const collector = msg.createMessageComponentCollector({
+            filter: (i) => {
+                const embed = new EmbedBuilder().setDescription(`Only the listeners can use this button`).setColor(KoosColor.Error);
+                if (!listeners.has(i.user.id)) i.reply({ embeds: [embed], ephemeral: true });
+                return listeners.has(i.user.id) && i.message.id === msg.id;
+            },
+            time: mins(25),
+        });
+
+        player.voting = true;
+
+        collector.on("collect", async (interaction) => {
+            if (!interaction.isButton() || interaction.customId !== ButtonId.Votes) return;
+
+            const userId = interaction.user.id;
+
+            await interaction.deferUpdate();
+
+            if (listeners.size > 2) {
+                const votes = player.votes;
+
+                if (votes.has(userId)) {
+                    interaction.followUp({
+                        embeds: [new EmbedBuilder().setDescription(`You have already voted`).setColor(KoosColor.Error)],
+                        ephemeral: true,
+                    });
+                    return;
+                }
+
+                collector.resetTimer();
+                votes.add(userId);
+
+                const embed = new EmbedBuilder()
+                    .setDescription(
+                        oneLine`
+                            ${member} requested to skip the current track,
+                            ${player.votes.size}/${required} (${required} ${pluralize("vote", required)} required)
+                        `
+                    )
+                    .setColor(KoosColor.Default);
+                await interaction.editReply({ embeds: [embed] });
+
+                const voters = channel.members.filter((member) => votes.has(member.id));
+
+                if (voters.size >= required) {
+                    votes.clear();
+                    player.voting = false;
+                    player.skip();
+
+                    const embed = new EmbedBuilder().setDescription(`${title} has been skipped`).setColor(KoosColor.Success);
+                    await interaction.channel?.send({ embeds: [embed] });
+
+                    await interaction.deleteReply(interaction.message);
+                    return collector.stop("skipped");
+                }
             } else {
-                msg = `Skipping`;
-                color = KoosColor.Default;
-                voted = false;
-                votes.add(member.id);
-            }
-
-            const voters = channel.members.filter((member) => votes.has(member.id));
-            const required = listeners.size;
-
-            msg += voted ? "" : `, ${voters.size}/${required} (${required} ${pluralize("vote", required)} required)`;
-
-            if (voters.size >= required) {
-                votes.clear();
-                msg = `${title} has been skipped`;
-                color = KoosColor.Success;
+                player.votes.clear();
+                player.voting = false;
                 player.skip();
-                return new EmbedBuilder().setDescription(msg).setColor(color);
+
+                const embed = new EmbedBuilder().setDescription(`${title} has been skipped`).setColor(KoosColor.Success);
+                await interaction.channel?.send({ embeds: [embed] });
+
+                await interaction.deleteReply(interaction.message);
+                return collector.stop("skipped");
             }
+        });
 
-            return new EmbedBuilder().setDescription(msg).setColor(color);
-        } else {
-            player.skip();
-            return new EmbedBuilder() //
-                .setDescription(`${title} has been skip`)
-                .setColor(KoosColor.Success);
-        }
-    }
-
-    private getVotes(player: KazagumoPlayer) {
-        return player.skipVotes;
+        collector.on("end", (_, reason) => {
+            if (reason === "time") {
+                player.voting = false;
+                const embed = new EmbedBuilder()
+                    .setDescription(`It seem there is no user has clicked the button, cancelling`)
+                    .setColor(KoosColor.Error);
+                msg.edit({ embeds: [embed], components: [] });
+            }
+        });
     }
 }
