@@ -17,6 +17,8 @@ export abstract class KoosCommand extends Command {
 
         options.typing ??= false;
         options.cooldown ??= Time.Second * 2.5;
+        options.generateDashLessAliases ??= true;
+        options.generateUnderscoreLessAliases ??= true;
 
         super(ctx, {
             ...options,
