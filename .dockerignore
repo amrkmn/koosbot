@@ -4,7 +4,6 @@ node_modules
 dist
 Lavalink.jar
 yarn-error.log
-src/commands/Everyone/playlist.ts
 
 # Yarn files
 .pnp.*
