@@ -93,7 +93,7 @@ export class SearchCommand extends KoosCommand {
                 new StringSelectMenuOptionBuilder()
                     .setLabel(cutText(`${playlistName}`, 100))
                     .setDescription(`Duration: ${convertTime(duration)} | Tracks: ${tracks.length}`)
-                    .setValue(SelectMenuId.Playlist)
+                    .setValue(SelectMenuId.PlaylistManage)
             );
         } else {
             for (let track of tracks) {
@@ -143,9 +143,9 @@ export class SearchCommand extends KoosCommand {
                 await interaction.deferUpdate();
 
             if (interaction.isButton() && interaction.customId === ButtonId.Cancel) {
-                const embed = new EmbedBuilder().setDescription(`Canceled the search`).setColor(KoosColor.Default);
+                const embed = new EmbedBuilder().setDescription(`Cancelled the search`).setColor(KoosColor.Default);
                 interaction.editReply({ embeds: [embed], components: [] });
-                return collector.stop("cancel");
+                return collector.stop("cancelled");
             } else if (interaction.isStringSelectMenu() && interaction.customId === SelectMenuId.Search) {
                 const userOptions = interaction.values;
 
@@ -172,7 +172,7 @@ export class SearchCommand extends KoosCommand {
                 }
 
                 try {
-                    if (userOptions.length === 1 && type === "PLAYLIST" && userOptions[0] === SelectMenuId.Playlist) {
+                    if (userOptions.length === 1 && type === "PLAYLIST" && userOptions[0] === SelectMenuId.PlaylistManage) {
                         const title = `[${playlistName}](${query})`;
 
                         player.queue.add(tracks);

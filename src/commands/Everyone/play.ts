@@ -143,11 +143,10 @@ export class PlayCommand extends KoosCommand {
             return new EmbedBuilder().setDescription(`I couldn't find anything in the query you gave me`).setColor(KoosColor.Error);
 
         if (!player) {
-            if (!canJoinVoiceChannel(channel)) {
+            if (!canJoinVoiceChannel(channel))
                 return new EmbedBuilder()
                     .setDescription(`I cannot join your voice channel. It seem like I don't have the right permissions.`)
                     .setColor(KoosColor.Error);
-            }
             player ??= await kazagumo.createPlayer({
                 guildId: message.guildId!,
                 textId: message.channelId!,

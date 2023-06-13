@@ -7,7 +7,14 @@ import { Args } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { filterNullishAndEmpty, isNullish, isNullishOrEmpty } from "@sapphire/utilities";
 import { oneLine } from "common-tags";
-import { type ApplicationCommandOptionChoiceData, EmbedBuilder, GuildMember, Message, type VoiceBasedChannel } from "discord.js";
+import {
+    type ApplicationCommandOptionChoiceData,
+    EmbedBuilder,
+    GuildMember,
+    Message,
+    type VoiceBasedChannel,
+    ChannelType,
+} from "discord.js";
 import { KazagumoTrack } from "kazagumo";
 import pluralize from "pluralize";
 
@@ -120,7 +127,7 @@ export class PlaySkipCommand extends KoosCommand {
         const { kazagumo } = this.container;
         const result = await kazagumo.search(query, { requester: message.member }).catch(() => undefined);
         if (!result) return new EmbedBuilder().setDescription(`Something went wrong`).setColor(KoosColor.Error);
-        if (isNullishOrEmpty(!result.tracks.length))
+        if (isNullishOrEmpty(result.tracks))
             return new EmbedBuilder().setDescription(`I couldn't find anything in the query you gave me`).setColor(KoosColor.Default);
 
         if (!player) {
@@ -135,6 +142,10 @@ export class PlaySkipCommand extends KoosCommand {
                 deaf: true,
                 volume: isNullish(data) ? 100 : data.volume,
             });
+
+            if (channel.type === ChannelType.GuildStageVoice) {
+                message.guild?.members.me?.voice.setSuppressed(false);
+            }
         }
 
         if (result.type === "PLAYLIST") {

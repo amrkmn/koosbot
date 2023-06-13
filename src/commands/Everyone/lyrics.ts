@@ -124,9 +124,9 @@ export class LyricsCommand extends KoosCommand {
             if (interaction.isButton() && interaction.customId === ButtonId.Cancel) {
                 await interaction.deferUpdate();
 
-                const embed = new EmbedBuilder().setDescription(`Canceled the search`).setColor(KoosColor.Default);
+                const embed = new EmbedBuilder().setDescription(`Cancelled the search`).setColor(KoosColor.Default);
                 await send(message, { embeds: [embed], components: [] });
-                return collector.stop("cancel");
+                return collector.stop("cancelled");
             }
 
             if (!interaction.isStringSelectMenu()) return;

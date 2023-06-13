@@ -72,7 +72,7 @@ export class VoteSkipCommand extends KoosCommand {
         const listeners = channel.members.filter((member) => !member.user.bot);
         const current = player.queue.current!;
         const title = createTitle(current);
-        const required = Math.round(listeners.size * 0.4);
+        const required = Math.ceil(listeners.size * 0.4);
 
         const embed = new EmbedBuilder()
             .setDescription(
@@ -83,7 +83,8 @@ export class VoteSkipCommand extends KoosCommand {
             )
             .setColor(KoosColor.Default);
         const voteButton = new ButtonBuilder().setCustomId(ButtonId.Votes).setLabel("Vote to skip").setStyle(ButtonStyle.Success);
-        const row = new ActionRowBuilder<ButtonBuilder>().setComponents(voteButton);
+        const cancelButton = new ButtonBuilder().setCustomId(ButtonId.Cancel).setLabel("Cancel").setStyle(ButtonStyle.Danger);
+        const row = new ActionRowBuilder<ButtonBuilder>().setComponents(voteButton, cancelButton);
 
         const msg = isAnyInteraction(messageOrInteraction)
             ? await messageOrInteraction.followUp({ embeds: [embed], components: [row] })
@@ -91,9 +92,19 @@ export class VoteSkipCommand extends KoosCommand {
 
         const collector = msg.createMessageComponentCollector({
             filter: (i) => {
-                const embed = new EmbedBuilder().setDescription(`Only the listeners can use this button`).setColor(KoosColor.Error);
-                if (!listeners.has(i.user.id)) i.reply({ embeds: [embed], ephemeral: true });
-                return listeners.has(i.user.id) && i.message.id === msg.id;
+                if (i.customId === ButtonId.Cancel) {
+                    const embed = new EmbedBuilder()
+                        .setDescription(`Only ${msg.author} can use this button`)
+                        .setColor(KoosColor.Error);
+                    if (i.user.id !== member.id) i.reply({ embeds: [embed], ephemeral: true });
+                    return i.user.id === member.id && i.message.id === msg.id;
+                } else {
+                    const embed = new EmbedBuilder()
+                        .setDescription(`Only the listeners can use this button`)
+                        .setColor(KoosColor.Error);
+                    if (!listeners.has(i.user.id)) i.reply({ embeds: [embed], ephemeral: true });
+                    return listeners.has(i.user.id) && i.message.id === msg.id;
+                }
             },
             time: mins(25),
         });
@@ -101,12 +112,14 @@ export class VoteSkipCommand extends KoosCommand {
         player.voting = true;
 
         collector.on("collect", async (interaction) => {
-            if (!interaction.isButton() || interaction.customId !== ButtonId.Votes) return;
+            if (!interaction.isButton()) return;
+            if (![ButtonId.Votes, ButtonId.Cancel].includes(interaction.customId as ButtonId)) return;
 
             const userId = interaction.user.id;
 
             await interaction.deferUpdate();
 
+            if (interaction.customId === ButtonId.Cancel) return collector.stop("cancelled");
             if (listeners.size > 2) {
                 const votes = player.votes;
 
@@ -163,6 +176,11 @@ export class VoteSkipCommand extends KoosCommand {
                 const embed = new EmbedBuilder()
                     .setDescription(`It seem there is no user has clicked the button, cancelling`)
                     .setColor(KoosColor.Error);
+                msg.edit({ embeds: [embed], components: [] });
+            } else if (reason === "cancelled") {
+                player.votes.clear();
+                player.voting = false;
+                const embed = new EmbedBuilder().setDescription(`Vote skip had been cancelled`).setColor(KoosColor.Default);
                 msg.edit({ embeds: [embed], components: [] });
             }
         });
