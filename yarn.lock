@@ -262,7 +262,7 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@prisma/client@^4.15.0":
+"@prisma/client@^4.11.0":
   version "4.15.0"
   resolved "https://registry.yarnpkg.com/@prisma/client/-/client-4.15.0.tgz#f52ec6ca6fbde37395a54b0a9e5da603a9de15f3"
   integrity sha512-xnROvyABcGiwqRNdrObHVZkD9EjkJYHOmVdlKy1yGgI+XOzvMzJ4tRg3dz1pUlsyhKxXGCnjIQjWW+2ur+YXuw==
@@ -379,6 +379,14 @@
   dependencies:
     "@sapphire/timestamp" "^1.0.1"
     colorette "^2.0.20"
+    tslib "^2.5.0"
+
+"@sapphire/plugin-subcommands@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@sapphire/plugin-subcommands/-/plugin-subcommands-4.0.1.tgz#11ce4890e139184efb68e1397c50cd27ca2724c6"
+  integrity sha512-rFEv9WZ5fPvnStExAFrRR2tjg4y2Y2GJNoCl8lfVwQeCQYDmEsj8W430eAGCzM1XH9si8GlxCAIMhjp8OvVbZA==
+  dependencies:
+    "@sapphire/utilities" "^3.11.1"
     tslib "^2.5.0"
 
 "@sapphire/ratelimits@^2.4.6":
@@ -1447,7 +1455,7 @@ pretty-ms@^8.0.0:
   dependencies:
     parse-ms "^3.0.0"
 
-prisma@^4.15.0:
+prisma@^4.11.0:
   version "4.15.0"
   resolved "https://registry.yarnpkg.com/prisma/-/prisma-4.15.0.tgz#4faa94f0d584828b68468953ff0bc88f37912c8c"
   integrity sha512-iKZZpobPl48gTcSZVawLMQ3lEy6BnXwtoMj7hluoGFYu2kQ6F9LBuBrUyF95zRVnNo8/3KzLXJXJ5TEnLSJFiA==

@@ -53,12 +53,13 @@ export enum ButtonId {
     Cancel = "buttonCancel",
     Votes = "buttonVotes",
     VotesInfo = "buttonVotesInfo",
+    Refresh = "buttonRefresh",
 }
 
 export enum SelectMenuId {
     Lyrics = "selectMenuLyrics",
     Search = "selectMenuSearch",
-    Playlist = "selectMenuPlaylist",
+    PlaylistManage = "selectMenuPlaylistManage",
 }
 
 export enum TextInputId {
