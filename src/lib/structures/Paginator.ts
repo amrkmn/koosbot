@@ -94,6 +94,7 @@ export class Paginator {
                 collector.resetTimer();
                 await interaction.editReply({ embeds: [this.getPage()], components: [...this.createComponents()] });
             } catch (error) {
+                container.logger.error("[Paginator Error]");
                 container.logger.error(error);
                 collector.stop("error");
             }
@@ -104,6 +105,7 @@ export class Paginator {
                 if (["error", "stop", "time"].includes(reason) && initialMessage.editable)
                     await initialMessage.edit({ components: [] });
             } catch (error) {
+                container.logger.error("[Paginator Error]");
                 container.logger.error(error);
             }
         });
@@ -134,8 +136,7 @@ export class Paginator {
 
         const response = await interaction.awaitModalSubmit({
             filter: (i) => i.user.id === this.member.id,
-            time: 15000,
-            idle: this.jumpTimeout,
+            time: this.jumpTimeout,
         });
         await response.deferUpdate();
 
@@ -143,7 +144,6 @@ export class Paginator {
         if (isNumber(newPage) && newPage > 0 && newPage <= this.pages.length) {
             this.#currentPage = newPage - 1;
         }
-        return;
     }
 
     private getPage() {
@@ -151,7 +151,7 @@ export class Paginator {
         return page;
     }
 
-    private createButtons(state: boolean) {
+    private createButtons(state: boolean): [ButtonBuilder[], ButtonBuilder[]] {
         const checkState = (name: PaginatorId) => {
             if (this.pages.length === 1) return true;
             if ([ButtonId.First, ButtonId.Back].includes(name) && this.#currentPage === 0) return true;
@@ -163,10 +163,7 @@ export class Paginator {
         const names: PaginatorId[] = [ButtonId.First, ButtonId.Back, ButtonId.Jump, ButtonId.Next, ButtonId.Last];
         const firstRowButtons = names.reduce((buttons, name: PaginatorId) => {
             const currentButton = this.buttons[name];
-            let label = "";
-            if (currentButton.id === ButtonId.Jump)
-                label = currentButton.label.replace("{{currentPage}}", `${this.#currentPage + 1} of ${this.pages.length}`);
-            else label = currentButton.label;
+            let label = currentButton.label.replace("{{currentPage}}", `${this.#currentPage + 1} of ${this.pages.length}`);
 
             buttons.push(
                 new ButtonBuilder()
