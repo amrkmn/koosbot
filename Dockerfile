@@ -1,55 +1,27 @@
-# syntax = docker/dockerfile:1
+# syntax = docker/dockerfile:1.4
 
-# Adjust NODE_VERSION as desired
-ARG NODE_VERSION=18.16.0
-FROM node:${NODE_VERSION}-slim as base
+FROM node:18.16.0-slim as base
 
-LABEL fly_launch_runtime="Node.js/Prisma"
-
-# Node.js/Prisma app lives here
 WORKDIR /app
 
-# Set production environment
 ENV NODE_ENV=production
 
-
-# Throw-away build stage to reduce size of final image
-FROM base as build
-
-# Install packages needed to build node modules
 RUN apt-get update -qq && \
     apt-get install -y python-is-python3 pkg-config build-essential openssl 
 
-# Install node modules
+FROM base as build
+
 COPY --link package.json yarn.lock ./
 RUN yarn install --frozen-lockfile --production=false
-
-# Generate Prisma Client
-COPY --link prisma .
-RUN npx prisma generate
-
-# Copy application code
+COPY --link prisma ./prisma
+RUN yarn prisma generate
 COPY --link . .
+RUN yarn build
 
-# Build application
-RUN yarn run build
-
-# Remove development dependencies
 RUN yarn install --production=true
 
-
-# Final stage for app image
 FROM base
 
-# Copy built application
 COPY --from=build /app /app
-
-# Adjust entrypoint to be executable on Linux
-RUN chmod +x ./docker-entrypoint
-
-# Entrypoint prepares the database.
-ENTRYPOINT [ "/app/docker-entrypoint" ]
-
-# Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
 CMD [ "yarn", "run", "start" ]
