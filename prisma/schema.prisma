@@ -12,19 +12,21 @@ datasource db {
 }
 
 model Guild {
-  id        String   @id @map("_id")
-  prefix    String   @default("NONE")
-  dj        String[] @default([])
-  djOnly    Boolean  @default(false)
-  volume    Int      @default(100)
-  requester Boolean  @default(true)
+  id            String   @id @map("_id")
+  prefix        String   @default("NONE")
+  dj            String[] @default([])
+  djOnly        Boolean  @default(false) @map("dj_only")
+  volume        Int      @default(100)
+  requester     Boolean  @default(true)
+  textChannels  String[] @default([]) @map("text_channels")
+  voiceChannels String[] @default([]) @map("voice_channels")
 
   @@map("guild")
 }
 
 model User {
   id       String     @id @map("_id")
-  playlist Playlist[]
+  playlists Playlist[]
 
   @@map("user")
 }

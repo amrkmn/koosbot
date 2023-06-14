@@ -36,32 +36,49 @@ export enum Emoji {
 
 export enum ButtonId {
     // Dashboard
-    PauseOrResume = "buttonPauseOrResume",
-    Previous = "buttonPrevious",
-    Skip = "buttonSkip",
-    Stop = "buttonStop",
+    PauseOrResume = "bPauseOrResume",
+    Previous = "bPrevious",
+    Skip = "bSkip",
+    Stop = "bStop",
 
     // Paginations
-    First = "buttonFirst",
-    Back = "buttonBack",
-    Jump = "buttonJump",
-    Next = "buttonNext",
-    Last = "buttonLast",
-    Close = "buttonClose",
+    First = "bFirst",
+    Back = "bBack",
+    Jump = "bJump",
+    Next = "bNext",
+    Last = "bLast",
+    Close = "bClose",
+
+    // Playlist
+    Return = "bReturn",
+    PlayPlaylist = "bPlayPlaylist",
+    ManagePlaylist = "bManagePlaylist",
+    Rename = "bRename",
+    Delete = "bDelete",
 
     // Others
-    Cancel = "buttonCancel",
-    Votes = "buttonVotes",
-    VotesInfo = "buttonVotesInfo",
-    Refresh = "buttonRefresh",
+    Cancel = "bCancel",
+    Votes = "bVotes",
+    VotesInfo = "bVotesInfo",
+    Refresh = "bRefresh",
 }
 
 export enum SelectMenuId {
-    Lyrics = "selectMenuLyrics",
-    Search = "selectMenuSearch",
-    PlaylistManage = "selectMenuPlaylistManage",
+    Lyrics = "sMLyrics",
+    Search = "sMSearch",
+    Playlist = "sMPlaylist",
+    PlaylistManage = "sMPlaylistManage",
+    NewPlaylist = "sMNewPlaylist",
+}
+
+export enum SelectMenuValue {
+    PlaylistManage = "sMVPlaylistManage",
+    NewPlaylist = "sMVNewPlaylist",
 }
 
 export enum TextInputId {
-    PageInput = "textInputPageInput",
+    PageInput = "tIPageInput",
+    PlaylistName = "tIPlaylistName",
+    AddTracks = "tIAddTracks",
+    RenamePlaylist = "tIRenamePlaylist",
 }

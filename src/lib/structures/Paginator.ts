@@ -2,6 +2,7 @@ import type { KoosCommand } from "#lib/extensions";
 import type { PaginatorOptions, PaginatorRunOptions } from "#lib/types";
 import { ButtonId, KoosColor, TextInputId } from "#utils/constants";
 import { mins, sec } from "#utils/functions";
+import { generateId } from "#utils/snowflake";
 import { isAnyInteraction } from "@sapphire/discord.js-utilities";
 import { container } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
@@ -122,7 +123,7 @@ export class Paginator {
     }
 
     private async jumpAction(interaction: ButtonInteraction) {
-        const id = DiscordSnowflake.generate();
+        const id = generateId();
         const modal = new ModalBuilder().setCustomId(`${id}`).setTitle(container.client.user!.username);
         const pageInput = new TextInputBuilder()
             .setCustomId(TextInputId.PageInput)

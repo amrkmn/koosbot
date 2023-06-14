@@ -4,6 +4,7 @@ import { send } from "@sapphire/plugin-editable-commands";
 import { isNullish, isObject } from "@sapphire/utilities";
 import { EmbedBuilder, Message } from "discord.js";
 import { KazagumoTrack } from "kazagumo";
+import pluralize from "pluralize";
 
 export async function databasePing() {
     const startTime = process.hrtime.bigint();
@@ -30,6 +31,20 @@ export const convertTime = (duration: number) => {
     if (duration < 3600000) return minutes + ":" + seconds;
     else return hours + ":" + minutes + ":" + seconds;
 };
+
+export function parseDuration(duration: number) {
+    duration = Math.floor(duration / 1000);
+    const hours = Math.floor(duration / 3600);
+    const minutes = Math.floor((duration % 3600) / 60);
+    const seconds = Math.floor(duration % 60);
+
+    const hoursString = `${hours} ${pluralize("hour", hours)}`;
+    const minutesString = `${minutes} ${pluralize("minute", minutes)}`;
+    const secondsString = `${seconds} ${pluralize("second", seconds)}`;
+
+    const parts = [hoursString, minutesString, secondsString].filter((part) => part !== "");
+    return parts.join(", ");
+}
 
 export const progressBar = (value: number, maxValue: number, size = 10, isStream: boolean) => {
     let emptyBar = "▬";

@@ -93,7 +93,7 @@ export class SearchCommand extends KoosCommand {
                 new StringSelectMenuOptionBuilder()
                     .setLabel(cutText(`${playlistName}`, 100))
                     .setDescription(`Duration: ${convertTime(duration)} | Tracks: ${tracks.length}`)
-                    .setValue(SelectMenuId.PlaylistManage)
+                    .setValue(SelectMenuId.Playlist)
             );
         } else {
             for (let track of tracks) {
@@ -172,7 +172,7 @@ export class SearchCommand extends KoosCommand {
                 }
 
                 try {
-                    if (userOptions.length === 1 && type === "PLAYLIST" && userOptions[0] === SelectMenuId.PlaylistManage) {
+                    if (userOptions.length === 1 && type === "PLAYLIST" && userOptions[0] === SelectMenuId.Playlist) {
                         const title = `[${playlistName}](${query})`;
 
                         player.queue.add(tracks);
