@@ -49,13 +49,6 @@ export enum ButtonId {
     Last = "bLast",
     Close = "bClose",
 
-    // Playlist
-    Return = "bReturn",
-    PlayPlaylist = "bPlayPlaylist",
-    ManagePlaylist = "bManagePlaylist",
-    Rename = "bRename",
-    Delete = "bDelete",
-
     // Others
     Cancel = "bCancel",
     Votes = "bVotes",
@@ -67,18 +60,8 @@ export enum SelectMenuId {
     Lyrics = "sMLyrics",
     Search = "sMSearch",
     Playlist = "sMPlaylist",
-    PlaylistManage = "sMPlaylistManage",
-    NewPlaylist = "sMNewPlaylist",
-}
-
-export enum SelectMenuValue {
-    PlaylistManage = "sMVPlaylistManage",
-    NewPlaylist = "sMVNewPlaylist",
 }
 
 export enum TextInputId {
     PageInput = "tIPageInput",
-    PlaylistName = "tIPlaylistName",
-    AddTracks = "tIAddTracks",
-    RenamePlaylist = "tIRenamePlaylist",
 }

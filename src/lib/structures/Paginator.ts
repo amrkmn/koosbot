@@ -1,13 +1,12 @@
 import type { KoosCommand } from "#lib/extensions";
-import type { PaginatorOptions, PaginatorRunOptions } from "#lib/types";
+import type { PaginatorId, PaginatorOptions, PaginatorRunOptions } from "#lib/types";
 import { ButtonId, KoosColor, TextInputId } from "#utils/constants";
 import { mins, sec } from "#utils/functions";
 import { generateId } from "#utils/snowflake";
-import { isAnyInteraction } from "@sapphire/discord.js-utilities";
+import { isAnyInteraction, type AnyInteraction } from "@sapphire/discord.js-utilities";
 import { container } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
-import { DiscordSnowflake } from "@sapphire/snowflake";
-import { isNumber } from "@sapphire/utilities";
+import { isNullish, isNumber } from "@sapphire/utilities";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -21,14 +20,13 @@ import {
     TextInputStyle,
     type GuildMember,
     type ModalActionRowComponentBuilder,
+    type AutocompleteInteraction,
 } from "discord.js";
-
-type PaginatorId = ButtonId.First | ButtonId.Back | ButtonId.Jump | ButtonId.Next | ButtonId.Last | ButtonId.Close;
 
 export class Paginator {
     private readonly pages: EmbedBuilder[] = [];
     private member: GuildMember;
-    private message: KoosCommand.Message | KoosCommand.ChatInputCommandInteraction;
+    private message: KoosCommand.Message | Exclude<AnyInteraction, AutocompleteInteraction>;
     private jumpTimeout: number;
     private collectorTimeout: number;
 
@@ -60,7 +58,11 @@ export class Paginator {
         if (isAnyInteraction(this.message)) {
             if (!this.message.replied && !this.message.deferred) await this.message.deferReply({ ephemeral: anonymous });
 
-            initialMessage = await this.message.editReply({ embeds: [this.getPage()], components: [...this.createComponents()] });
+            initialMessage = await this.message.followUp({
+                embeds: [this.getPage()],
+                components: [...this.createComponents()],
+                ephemeral: anonymous,
+            });
         } else {
             initialMessage = await send(this.message, { embeds: [this.getPage()], components: [...this.createComponents()] });
         }
@@ -93,7 +95,11 @@ export class Paginator {
                 else return;
 
                 collector.resetTimer();
-                await interaction.editReply({ embeds: [this.getPage()], components: [...this.createComponents()] });
+                await interaction.editReply({
+                    embeds: [this.getPage()],
+                    components: [...this.createComponents()],
+                    message: initialMessage,
+                });
             } catch (error) {
                 container.logger.error("[Paginator Error]");
                 container.logger.error(error);
@@ -101,10 +107,13 @@ export class Paginator {
             }
         });
 
-        collector.once("end", async (_, reason) => {
+        collector.once("end", async (collected, reason) => {
+            const interaction = collected.last();
             try {
-                if (["error", "stop", "time"].includes(reason) && initialMessage.editable)
-                    await initialMessage.edit({ components: [] });
+                if (["error", "stop", "time"].includes(reason)) {
+                    if (!isNullish(interaction)) await interaction.editReply({ components: [], message: initialMessage });
+                    else initialMessage.edit({ components: [] });
+                }
             } catch (error) {
                 container.logger.error("[Paginator Error]");
                 container.logger.error(error);
