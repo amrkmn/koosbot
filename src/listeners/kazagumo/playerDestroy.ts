@@ -23,21 +23,21 @@ export class ClientListener extends Listener {
                 - Player has been destroyed in ${guild.name}[${cyan(guild.id)}] on ${cyan(player.shoukaku.node.name)} node`
         );
 
-        const npMessage = player.dashboard();
+        const dashboard = player.dashboard();
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
 
-        if (channel && channel.isTextBased() && isMessageInstance(npMessage)) {
-            const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id).catch(() => null));
-
+        if (channel && channel.isTextBased() && isMessageInstance(dashboard)) {
+            const msg = channel.messages.cache.get(dashboard.id) ?? (await channel.messages.fetch(dashboard.id).catch(() => null));
             if (!isNullish(msg) && msg.editable) {
                 // const row = npMessage.components;
                 // const disabled = row[0].components.map((component) =>
                 //     new ButtonBuilder(component.data).setStyle(ButtonStyle.Secondary).setDisabled(true)
                 // );
 
-                msg.edit({ components: [] });
                 player.resetDashboard();
                 player.history.clear();
+                player.votes.clear();
+                await msg.delete();
             }
         }
     }

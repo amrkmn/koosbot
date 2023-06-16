@@ -26,16 +26,16 @@ export class ClientListener extends Listener {
 
         if (player.queue.current) return;
 
-        const npMessage = player.dashboard();
+        const dashboard = player.dashboard();
 
-        if (channel && channel.isTextBased() && isMessageInstance(npMessage)) {
-            const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id).catch(() => null));
+        if (channel && channel.isTextBased() && isMessageInstance(dashboard)) {
+            const msg = channel.messages.cache.get(dashboard.id) ?? (await channel.messages.fetch(dashboard.id).catch(() => null));
 
-            if (!isNullish(msg) && msg.editable) {
-                msg.edit({ components: [] });
+            if (!isNullish(msg) && msg.deletable) {
                 player.resetDashboard();
                 player.history.clear();
                 player.votes.clear();
+                await msg.delete();
             }
         }
 
@@ -46,8 +46,7 @@ export class ClientListener extends Listener {
         if (typeof this._timeoutId !== "undefined") this.cancelTimeout();
 
         const { client, kazagumo } = this.container;
-        const channel =
-            container.client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
+        const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
         if (isNullish(guild) || isNullish(player) || isNullish(channel)) return this.cancelTimeout();
 
         this._timeoutId = setTimeout(() => {

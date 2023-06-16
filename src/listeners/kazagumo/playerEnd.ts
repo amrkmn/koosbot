@@ -12,18 +12,18 @@ import { Events, KazagumoPlayer, KazagumoTrack } from "kazagumo";
 export class ClientListener extends Listener {
     public async run(player: KazagumoPlayer, track?: KazagumoTrack) {
         const { client } = this.container;
-        const npMessage = player.dashboard();
+        const dashboard = player.dashboard();
         const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
 
         if (!isNullish(track)) player.history.tracks.add(track);
 
-        if (channel && channel.isTextBased() && isMessageInstance(npMessage)) {
-            const msg = channel.messages.cache.get(npMessage.id) ?? (await channel.messages.fetch(npMessage.id).catch(() => null));
+        if (channel && channel.isTextBased() && isMessageInstance(dashboard)) {
+            const msg = channel.messages.cache.get(dashboard.id) ?? (await channel.messages.fetch(dashboard.id).catch(() => null));
 
-            if (!isNullish(msg) && msg.editable) {
-                msg.edit({ components: [] });
-                player.votes.clear();
+            if (!isNullish(msg) && msg.deletable) {
                 player.resetDashboard();
+                player.votes.clear();
+                await msg.delete();
             }
         }
     }

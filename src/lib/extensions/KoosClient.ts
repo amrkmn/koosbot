@@ -13,12 +13,12 @@ import { isMessageInstance } from "@sapphire/discord.js-utilities";
 const NODES: NodeOption[] = [
     { name: "node1", url: "narco.buses.rocks:2269", auth: "glasshost1984", secure: false },
     { name: "node2", url: "ash.lavalink.alexanderof.xyz:2333", auth: "lavalink", secure: false },
-    { name: "node3", url: "mohpoe.alfari.id:4004", auth: "youshallnotpass", secure: false },
-    { name: "node4", url: "fsn.lavalink.alexanderof.xyz:2333", auth: "lavalink", secure: false },
-    // { name: "node5", url: "lavalink.cyber-host.eu:2333", auth: "discord.gg/cyberhost", secure: false },
+    { name: "node3", url: "fsn.lavalink.alexanderof.xyz:2333", auth: "lavalink", secure: false },
 ];
 
 export class KoosClient extends SapphireClient {
+    private quitting: boolean;
+
     constructor() {
         super({
             id: envParseString("CLIENT_ID"),
@@ -47,6 +47,10 @@ export class KoosClient extends SapphireClient {
                 },
             },
         });
+
+        this.quitting = false;
+
+        ["beforeExit", "SIGUSR1", "SIGUSR2", "SIGINT", "SIGTERM"].map((event) => process.once(event, this.exit.bind(this)));
     }
 
     public override fetchPrefix = async (message: Message) => {
@@ -92,6 +96,14 @@ export class KoosClient extends SapphireClient {
 
         await container.db.$connect().then(() => this.logger.info("Successfully connected to database"));
         return super.login(token);
+    }
+
+    private async exit() {
+        if (this.quitting) return;
+        this.quitting = true;
+
+        this.destroy();
+        await container.db.$disconnect();
     }
 }
 

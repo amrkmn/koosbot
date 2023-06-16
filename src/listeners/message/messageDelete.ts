@@ -15,7 +15,7 @@ export class ClientListener extends Listener {
 
         const dashboard = player.dashboard();
         if (isNullish(dashboard)) return;
-        if (dashboard.id !== message.id) return;
+        if (dashboard.id !== message.id && dashboard.author.id !== message.author.id) return;
 
         await player.newDashboard();
     }

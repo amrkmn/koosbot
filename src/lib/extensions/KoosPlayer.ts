@@ -54,6 +54,7 @@ export class KoosPlayer extends KazagumoPlayer {
         if (isNullish(channel)) return;
 
         const track = this.queue.current!;
+        if (isNullish(track)) return;
 
         const title = createTitle(track);
         const duration = track.isStream ? `Live` : convertTime(Number(track.length));
@@ -105,16 +106,16 @@ export class KoosPlayer extends KazagumoPlayer {
             new ButtonBuilder() //
                 .setLabel(this.paused ? "Resume" : "Pause")
                 .setCustomId(ButtonId.PauseOrResume)
-                .setStyle(ButtonStyle.Success),
+                .setStyle(this.paused ? ButtonStyle.Success : ButtonStyle.Secondary),
             new ButtonBuilder() //
                 .setDisabled(hasPrevious)
                 .setLabel("Previous")
                 .setCustomId(ButtonId.Previous)
-                .setStyle(ButtonStyle.Primary),
+                .setStyle(ButtonStyle.Secondary),
             new ButtonBuilder() //
                 .setLabel("Skip")
                 .setCustomId(ButtonId.Skip)
-                .setStyle(ButtonStyle.Primary),
+                .setStyle(ButtonStyle.Secondary),
             new ButtonBuilder() //
                 .setLabel("Stop")
                 .setCustomId(ButtonId.Stop)
