@@ -6,7 +6,7 @@ import { cyan } from "colorette";
     emitter: container.shoukaku,
     name: "shoukaku:debug",
     event: "debug",
-    enabled: process.env.NODE_ENV !== "production" ? true : false,
+    enabled: process.env.NODE_ENV !== "production",
 })
 export class ClientListener extends Listener {
     async run(_node: string, info: string) {
