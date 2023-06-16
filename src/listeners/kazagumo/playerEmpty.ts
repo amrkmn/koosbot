@@ -16,7 +16,7 @@ import ms from "ms";
 })
 export class ClientListener extends Listener {
     _timeoutId: NodeJS.Timeout | undefined;
-    _leaveAfter: number = envParseString("NODE_ENV") === "production" ? time("mins", 3) : time("sec", 25);
+    _leaveAfter: number = envParseString("NODE_ENV") === "production" ? time("mins", 5) : time("sec", 25);
 
     public async run(player: KazagumoPlayer) {
         const { client } = this.container;
