@@ -90,10 +90,10 @@ export class LyricsCommand extends KoosCommand {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(message.guildId!)!;
         const query = await args.rest("string").catch(() => {
-            if (!player || (player && !player.queue.current)) {
+            if (!player || !player.queue.current) {
                 return undefined;
             }
-            return `${player.queue.current?.title}`;
+            return `${player.queue.current.title}`;
         });
 
         const { embed, selectMenu, cancelButton } = await this.lyrics(query);
@@ -101,12 +101,13 @@ export class LyricsCommand extends KoosCommand {
 
         const msg = await send(message, {
             embeds: [embed],
-            components: selectMenu
-                ? [
-                      new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu),
-                      new ActionRowBuilder<ButtonBuilder>().setComponents(cancelButton),
-                  ]
-                : undefined,
+            components:
+                selectMenu && cancelButton
+                    ? [
+                          new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu),
+                          new ActionRowBuilder<ButtonBuilder>().setComponents(cancelButton),
+                      ]
+                    : undefined,
         });
 
         const collector = msg.createMessageComponentCollector({
@@ -166,8 +167,6 @@ export class LyricsCommand extends KoosCommand {
                 );
                 return prev;
             }, []);
-
-            await interaction.deleteReply();
 
             await pagination.addPages(embeds).run();
             collector.stop("selected");
