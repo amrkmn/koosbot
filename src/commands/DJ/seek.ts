@@ -34,7 +34,7 @@ export class SeekCommand extends KoosCommand {
         const player = kazagumo.getPlayer(`${interaction.guildId}`);
         const input = interaction.options.getString("format", true);
 
-        if (!player || (player && !player.queue.current))
+        if (!player || !player.queue.current)
             return interaction.reply({
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
@@ -48,9 +48,9 @@ export class SeekCommand extends KoosCommand {
     public async messageRun(message: Message, args: Args) {
         const { kazagumo } = this.container;
         const player = kazagumo.getPlayer(message.guildId!)!;
-        const input = await args.pick("string").catch(() => undefined);
+        const input = await args.rest("string").catch(() => undefined);
 
-        if (!player || (player && !player.queue.current)) {
+        if (!player || !player.queue.current) {
             return reply(message, {
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
