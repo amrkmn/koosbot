@@ -15,33 +15,28 @@ export class ClientListener extends Listener {
     private _timeoutId: NodeJS.Timeout | undefined = undefined;
     private _leaveAfter: number = envParseString("NODE_ENV") === "production" ? time("mins", 1) : time("sec", 25);
 
-    public async run(oldState: VoiceState, newState: VoiceState) {
+    public async run(old: VoiceState, voiceState: VoiceState) {
         const { client, kazagumo } = this.container;
 
-        this.checkState(oldState, newState);
-
         let clientVc: VoiceBasedChannel | Nullish = null;
-        if (oldState.channel?.members.has(`${client.id}`)) clientVc = oldState.channel;
-        else if (newState.channel?.members.has(`${client.id}`)) clientVc = newState.channel;
+        if (old.channel?.members.has(`${client.id}`)) clientVc = old.channel;
+        else if (voiceState.channel?.members.has(`${client.id}`)) clientVc = voiceState.channel;
 
         if (isNullish(clientVc)) return;
 
         const player = kazagumo.getPlayer(clientVc.guildId);
         if (isNullish(player)) return;
 
-        const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
-        if (isNullish(channel)) return;
-
-        const state = this.checkState(oldState, newState);
+        const state = this.checkState(old, voiceState);
         if (state === "BOT" || state === "OTHERS") return;
 
-        const voiceChannel = clientVc.members.filter((x) => client.user?.id === x.id || !x.user.bot);
+        const listeners = clientVc.members.filter((x) => client.user?.id === x.id || !x.user.bot);
 
         if (state === "JOINED") this.cancelTimeout();
-        else if (state === "LEFT" && voiceChannel.size <= 1) this.setupTimeout(clientVc.guild, player);
-        else if (state === "MOVED" && voiceChannel.size <= 1) this.setupTimeout(clientVc.guild, player);
-        else if (state === "LEFT" && voiceChannel.size > 1) this.cancelTimeout();
-        else if (state === "MOVED" && voiceChannel.size > 1) this.cancelTimeout();
+        else if (state === "LEFT" && listeners.size <= 1) this.setupTimeout(clientVc.guild, player);
+        else if (state === "MOVED" && listeners.size <= 1) this.setupTimeout(clientVc.guild, player);
+        else if (state === "LEFT" && listeners.size > 1) this.cancelTimeout();
+        else if (state === "MOVED" && listeners.size > 1) this.cancelTimeout();
         else this.cancelTimeout();
     }
 
