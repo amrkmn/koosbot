@@ -17,11 +17,10 @@ export class ClientListener extends Listener<typeof Events.MessageCommandDenied>
             content = `Please wait ${prettyMs(remaining, { verbose: true })} before using \`${command.name}\` again.`;
         }
 
-        reply(message, { embeds: [new EmbedBuilder().setDescription(content).setColor(KoosColor.Error)] });
+        return reply(message, { embeds: [new EmbedBuilder().setDescription(content).setColor(KoosColor.Error)] });
     }
 
     private isCooldownError(error: UserError) {
-        if (error.identifier === "preconditionCooldown") return true;
-        else return false;
+        return error.identifier === "preconditionCooldown";
     }
 }

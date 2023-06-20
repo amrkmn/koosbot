@@ -11,12 +11,9 @@ export class ClientListener extends Listener<typeof Events.ChatInputCommandDenie
     public override async run(error: UserError, { interaction, command }: ChatInputCommandDeniedPayload) {
         let content: string = error.message;
         if (Reflect.get(Object(error.context), "silent")) return;
-        if (this.isCooldownError(error) || this.isVoiceOnlyError(error)) {
-            content = error.message;
-            if (this.isCooldownError(error)) {
-                let { remaining } = error.context as { readonly remaining: number };
-                content = `Please wait ${prettyMs(remaining, { verbose: true })} before using \`${command.name}\` again.`;
-            }
+        if (this.isCooldownError(error)) {
+            let { remaining } = error.context as { readonly remaining: number };
+            content = `Please wait ${prettyMs(remaining, { verbose: true })} before using \`${command.name}\` again.`;
         }
 
         if (interaction.deferred)
@@ -27,13 +24,7 @@ export class ClientListener extends Listener<typeof Events.ChatInputCommandDenie
         return interaction.reply({ embeds: [new EmbedBuilder().setDescription(content).setColor(KoosColor.Error)], ephemeral: true });
     }
 
-    private isVoiceOnlyError(error: UserError) {
-        if (error.identifier === "preconditionVoiceOnly") return true;
-        else return false;
-    }
-
     private isCooldownError(error: UserError) {
-        if (error.identifier === "preconditionCooldown") return true;
-        else return false;
+        return error.identifier === "preconditionCooldown";
     }
 }
