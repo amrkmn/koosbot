@@ -33,10 +33,8 @@ export class ClientListener extends Listener {
         const listeners = clientVc.members.filter((x) => client.user?.id === x.id || !x.user.bot);
 
         if (state === "JOINED") this.cancelTimeout();
-        else if (state === "LEFT" && listeners.size <= 1) this.setupTimeout(clientVc.guild, player);
-        else if (state === "MOVED" && listeners.size <= 1) this.setupTimeout(clientVc.guild, player);
-        else if (state === "LEFT" && listeners.size > 1) this.cancelTimeout();
-        else if (state === "MOVED" && listeners.size > 1) this.cancelTimeout();
+        else if (["LEFT", "MOVED"].includes(state) && listeners.size <= 1) this.setupTimeout(clientVc.guild, player);
+        else if (["LEFT", "MOVED"].includes(state) && listeners.size > 1) this.cancelTimeout();
         else this.cancelTimeout();
     }
 
