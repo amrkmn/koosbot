@@ -22,7 +22,13 @@ export class SetVolumeCommand extends KoosCommand {
             builder //
                 .setName(this.name)
                 .setDescription(this.description)
-                .addNumberOption((option) => option.setName("input").setDescription("The new volume.").setMinValue(0).setMaxValue(200))
+                .addNumberOption((option) =>
+                    option //
+                        .setName("input")
+                        .setDescription("The new volume.")
+                        .setMinValue(0)
+                        .setMaxValue(200)
+                )
                 .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         );
     }

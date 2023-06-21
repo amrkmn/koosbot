@@ -29,6 +29,7 @@ export class PrefixCommand extends KoosCommand {
                         .setMinLength(1)
                         .setMaxLength(5)
                 )
+                .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         );
     }
 
