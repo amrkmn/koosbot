@@ -106,8 +106,8 @@ export function formatPerms(string: string) {
 }
 
 export function decodeEntities(encodedString: string) {
-    var translate_re = /&(nbsp|amp|quot|lt|gt);/g;
-    var translate: { [key: string]: string } = {
+    let translateRegex = /&(nbsp|amp|quot|lt|gt);/g;
+    let translate: Record<string, string> = {
         nbsp: " ",
         amp: "&",
         quot: '"',
@@ -115,7 +115,7 @@ export function decodeEntities(encodedString: string) {
         gt: ">",
     };
     return encodedString
-        .replace(translate_re, (_, entity) => translate[entity])
+        .replace(translateRegex, (_, entity) => translate[entity])
         .replace(/&#(\d+);/gi, (_, numStr) => String.fromCharCode(parseInt(numStr, 10)));
 }
 
