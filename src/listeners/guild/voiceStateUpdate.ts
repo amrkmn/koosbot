@@ -28,7 +28,7 @@ export class ClientListener extends Listener {
         if (isNullish(player)) return;
 
         const state = this.checkState(old, voiceState);
-        if (state === "BOT" || state === "OTHERS") return;
+        if (["BOT", "OTHERS"].includes(state)) return;
 
         const listeners = clientVc.members.filter((x) => client.user?.id === x.id || !x.user.bot);
 

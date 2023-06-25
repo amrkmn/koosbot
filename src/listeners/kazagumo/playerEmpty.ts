@@ -31,11 +31,11 @@ export class ClientListener extends Listener {
         if (channel && channel.isTextBased() && isMessageInstance(dashboard)) {
             const msg = channel.messages.cache.get(dashboard.id) ?? (await channel.messages.fetch(dashboard.id).catch(() => null));
 
-            if (!isNullish(msg) && msg.deletable) {
+            if (!isNullish(msg) && msg.editable) {
                 player.resetDashboard();
                 player.history.clear();
                 player.votes.clear();
-                await msg.delete();
+                await msg.edit({ components: [] });
             }
         }
 
@@ -51,6 +51,7 @@ export class ClientListener extends Listener {
 
         this._timeoutId = setTimeout(() => {
             const player = kazagumo.getPlayer(guild.id);
+            const time = ms(this._leaveAfter, { long: true });
             if (isNullish(player)) return this.cancelTimeout();
             if (player.queue.current) return this.cancelTimeout();
             if (!player.queue.isEmpty && isNullish(guild.members.me?.voice.channelId)) return this.cancelTimeout();
@@ -60,7 +61,7 @@ export class ClientListener extends Listener {
             channel.send({
                 embeds: [
                     new EmbedBuilder()
-                        .setDescription(`No tracks have been playing for the past ${ms(this._leaveAfter, { long: true })}, leaving.`)
+                        .setDescription(`No tracks have been playing for the past ${time}, leaving.`)
                         .setColor(KoosColor.Error),
                 ],
             });

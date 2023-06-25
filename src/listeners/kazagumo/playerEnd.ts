@@ -20,10 +20,10 @@ export class ClientListener extends Listener {
         if (channel && channel.isTextBased() && isMessageInstance(dashboard)) {
             const msg = channel.messages.cache.get(dashboard.id) ?? (await channel.messages.fetch(dashboard.id).catch(() => null));
 
-            if (!isNullish(msg) && msg.deletable) {
+            if (!isNullish(msg) && msg.editable) {
                 player.resetDashboard();
                 player.votes.clear();
-                await msg.delete();
+                await msg.edit({ components: [] });
             }
         }
     }

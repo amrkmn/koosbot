@@ -29,15 +29,10 @@ export class ClientListener extends Listener {
         if (channel && channel.isTextBased() && isMessageInstance(dashboard)) {
             const msg = channel.messages.cache.get(dashboard.id) ?? (await channel.messages.fetch(dashboard.id).catch(() => null));
             if (!isNullish(msg) && msg.editable) {
-                // const row = npMessage.components;
-                // const disabled = row[0].components.map((component) =>
-                //     new ButtonBuilder(component.data).setStyle(ButtonStyle.Secondary).setDisabled(true)
-                // );
-
                 player.resetDashboard();
                 player.history.clear();
                 player.votes.clear();
-                await msg.delete();
+                await msg.edit({ components: [] });
             }
         }
     }
