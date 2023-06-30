@@ -9,6 +9,7 @@
         "paths": {
             "#utils/*": ["lib/utils/*"],
             "#lib/*": ["lib/*"],
+            "#lib/audio": ["lib/structures/Audio/index.ts"],
             "#types/*": ["lib/types/*"],
             "#root/*": ["*"]
         },

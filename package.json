@@ -20,6 +20,7 @@
     "#lib/types": "./dist/lib/types/index.js",
     "#lib/utils": "./dist/lib/utils/index.js",
     "#lib/extensions": "./dist/lib/extensions/index.js",
+    "#lib/audio": "./dist/lib/structures/Audio/index.js",
     "#lib/*": "./dist/lib/*.js",
     "#root/*": "./dist/*.js",
     "#utils/functions": "./dist/lib/utils/functions/index.js",
