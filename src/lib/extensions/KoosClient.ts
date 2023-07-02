@@ -3,18 +3,14 @@ import { type Awaitable, container, LogLevel, SapphireClient, type SapphirePrefi
 import { Guild, Message, Partials, GatewayIntentBits } from "discord.js";
 import { resolve } from "path";
 import { Kazagumo, Plugins } from "kazagumo";
-import { Connectors, type NodeOption, Shoukaku } from "shoukaku";
+import { Connectors, Shoukaku } from "shoukaku";
 import { KoosPlayer } from "#lib/extensions/KoosPlayer";
 import { envParseNumber, envParseString } from "@skyra/env-utilities";
 import { Client as GeniusClient } from "genius-lyrics";
 import { KazagumoPlugin as Spotify } from "#lib/structures";
 import { isMessageInstance } from "@sapphire/discord.js-utilities";
-
-const NODES: NodeOption[] = [
-    { name: "node1", url: "narco.buses.rocks:2269", auth: "glasshost1984", secure: false },
-    { name: "node2", url: "ash.lavalink.alexanderof.xyz:2333", auth: "lavalink", secure: false },
-    { name: "node3", url: "fsn.lavalink.alexanderof.xyz:2333", auth: "lavalink", secure: false },
-];
+import { Manager } from "#lib/audio";
+import { NODES } from "#utils/constants";
 
 export class KoosClient extends SapphireClient {
     private quitting: boolean;
@@ -93,6 +89,14 @@ export class KoosClient extends SapphireClient {
             { moveOnDisconnect: true }
         );
         container.shoukaku = container.kazagumo.shoukaku;
+        container.manager = new Manager({
+            connector: new Connectors.DiscordJS(this),
+            nodes: NODES,
+            send: (id, payload) => this.guilds.cache.get(id)?.shard?.send(payload),
+            shoukakuOptions: {
+                moveOnDisconnect: true,
+            },
+        });
 
         await container.db.$connect().then(() => this.logger.info("Successfully connected to database"));
         return super.login(token);
@@ -113,6 +117,7 @@ declare module "@sapphire/pieces" {
         kazagumo: Kazagumo;
         shoukaku: Shoukaku;
         genius: GeniusClient;
+        manager: Manager;
     }
 }
 

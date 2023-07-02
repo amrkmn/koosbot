@@ -1,5 +1,4 @@
-import { Player, Queue } from "#lib/audio";
-import type { Track } from "#lib/audio";
+import { Player, Queue, Track } from "#lib/audio";
 import { isNullish } from "@sapphire/utilities";
 
 export class QueueHistory {
@@ -28,7 +27,6 @@ export class QueueHistory {
 
     public push(track: Track | Track[]) {
         this.tracks.add(track);
-
         return true;
     }
 
@@ -52,7 +50,7 @@ export class QueueHistory {
         }
 
         const current = this.currentTrack;
-        this.player.play(current);
+        this.player.play(track);
         if (current && preserveCurrent) this.player.queue.store.splice(0, 0, current);
     }
 }

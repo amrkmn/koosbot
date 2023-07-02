@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { type PlayOptions } from "#lib/types";
+import { type PlayCommandOptions } from "#lib/types";
 import { KoosColor } from "#utils/constants";
 import { canJoinVoiceChannel, createTitle, cutText, sendLoadingMessage } from "#utils/functions";
 import { generateId } from "#utils/snowflake";
@@ -135,7 +135,7 @@ export class PlayCommand extends KoosCommand {
         }
     }
 
-    private async play(query: string, { message, player, channel, data }: PlayOptions) {
+    private async play(query: string, { message, player, channel, data }: PlayCommandOptions) {
         const { kazagumo } = this.container;
         const result = await kazagumo.search(query, { requester: message.member }).catch(() => undefined);
         if (!result) return new EmbedBuilder().setDescription(`Something went wrong when trying to search`).setColor(KoosColor.Error);

@@ -1,9 +1,29 @@
-import type { Connector, NodeOption, ShoukakuOptions } from "shoukaku";
+import type { Player, Track } from "#lib/audio";
+import type { Nullish } from "@sapphire/utilities";
+import type { User } from "discord.js";
+import type { Connector, LoadType, NodeOption, ShoukakuOptions } from "shoukaku";
+
+export interface PlayOptions {
+    noReplace?: boolean;
+    pause?: boolean;
+    startTime?: number;
+    endTime?: number;
+
+    replaceCurrent?: boolean;
+}
+
+export interface ResolveOptions {
+    overwrite?: boolean;
+    forceResolve?: boolean;
+    player?: Player;
+}
 
 export interface CreatePlayerOptions {
     guildId: string;
     textChannel: string;
     voiceChannel: string;
+    nodeName?: string;
+    loadBalancer?: string;
     volume?: number;
     selfMute?: boolean;
     selfDeafen?: boolean;
@@ -19,11 +39,27 @@ export interface PlayerOptions {
 }
 
 export interface ManagerOptions {
-    searchEngine: SearchEngine;
+    defaultSearchEngine?: SearchEngine;
+    sourceForceResolve?: string[];
     send: (guildId: string, payload: Payload) => void;
     nodes: NodeOption[];
     connector: Connector;
-    shoukaku: ShoukakuOptions;
+    shoukakuOptions: ShoukakuOptions;
+}
+
+export interface SearchOptions {
+    requester?: User | Nullish;
+    engine?: SearchEngine;
+    nodeName?: string;
+}
+
+export interface Result {
+    loadType: LoadType;
+    tracks: Track[];
+    playlistInfo: {
+        name?: string;
+        selectedTrack?: number;
+    };
 }
 
 export interface Payload {
@@ -49,6 +85,13 @@ export const SupportedSources = [
     "vimeo",
     "youtube",
 ];
+
+export enum State {
+    CONNECTING,
+    CONNECTED,
+    DISCONNECTING,
+    DISCONNECTED,
+}
 
 export enum PlayerState {
     CONNECTING,

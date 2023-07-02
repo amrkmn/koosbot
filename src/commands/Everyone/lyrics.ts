@@ -1,6 +1,6 @@
 import { KoosCommand } from "#lib/extensions";
 import { Paginator } from "#lib/structures";
-import { ButtonId, KoosColor, SelectMenuId, userAgent } from "#utils/constants";
+import { ButtonId, KoosColor, SelectMenuId, UserAgent } from "#utils/constants";
 import { chunk, cutText, decodeEntities, sendLoadingMessage } from "#utils/functions";
 import { request } from "@aytea/request";
 import { ApplyOptions } from "@sapphire/decorators";
@@ -203,7 +203,7 @@ export class LyricsCommand extends KoosCommand {
     private async getLyrics(url?: string) {
         if (!url) throw new Error(`Something went wrong!`);
         try {
-            const body = await request(url).agent(userAgent).options({ throwOnError: true }).text();
+            const body = await request(url).agent(UserAgent).options({ throwOnError: true }).text();
 
             const $ = cheerio.load(body);
 

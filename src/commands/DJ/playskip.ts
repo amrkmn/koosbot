@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { type PlayOptions } from "#lib/types";
+import { type PlayCommandOptions } from "#lib/types";
 import { KoosColor } from "#utils/constants";
 import { createTitle, cutText, sendLoadingMessage, canJoinVoiceChannel } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
@@ -123,7 +123,7 @@ export class PlaySkipCommand extends KoosCommand {
         }
     }
 
-    private async playSkip(query: string, { message, player, channel, data }: PlayOptions) {
+    private async playSkip(query: string, { message, player, channel, data }: PlayCommandOptions) {
         const { kazagumo } = this.container;
         const result = await kazagumo.search(query, { requester: message.member }).catch(() => undefined);
         if (!result) return new EmbedBuilder().setDescription(`Something went wrong`).setColor(KoosColor.Error);

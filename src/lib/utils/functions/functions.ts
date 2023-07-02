@@ -174,3 +174,7 @@ export function deepCompare<T extends Record<string, any>>(obj1: T, obj2: T): bo
     // If all keys and values are equal, return true
     return true;
 }
+
+export function escapeRegExp(string: string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}

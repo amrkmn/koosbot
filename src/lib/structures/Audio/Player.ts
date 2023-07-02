@@ -1,14 +1,19 @@
-import { Manager, Queue, Track } from "#lib/audio";
-import { PlayerState, type PlayerOptions, Events } from "#lib/types";
-import { isNullish, type Nullish } from "@sapphire/utilities";
-import { Player as ShoukakuPlayer } from "shoukaku";
+import { Manager, Queue, QueueHistory, Track } from "#lib/audio";
+import { PlayerState, type PlayerOptions, Events, type PlayOptions, type Result, type SearchOptions } from "#lib/types";
+import { isNullish, isNullishOrEmpty, type Nullish } from "@sapphire/utilities";
+import {
+    Player as ShoukakuPlayer,
+    type PlayerUpdate,
+    type TrackExceptionEvent,
+    type WebSocketClosedEvent,
+    type TrackStuckEvent,
+} from "shoukaku";
 
 export class Player {
     public readonly guildId: string;
-    public readonly queue: Queue = new Queue<Track>();
     public readonly options: PlayerOptions;
-    public readonly current: Track | Nullish;
-    // public readonly history:Que
+    public readonly queue = new Queue<Track>();
+    public readonly history = new QueueHistory(this);
 
     public textChannel: string;
     public voiceChannel: string;
@@ -16,9 +21,12 @@ export class Player {
     public loop: "off" | "track" | "queue" = "off";
     public playing: boolean = false;
 
+    public current: Track | Nullish;
     public state: PlayerState = PlayerState.CONNECTING;
     public shoukaku: ShoukakuPlayer;
     public manager: Manager;
+
+    public search: (query: string, options: SearchOptions) => Promise<Result>;
 
     constructor(manager: Manager, shoukaku: ShoukakuPlayer, options: PlayerOptions) {
         this.options = options;
@@ -28,8 +36,60 @@ export class Player {
         this.guildId = options.guildId;
         this.textChannel = options.textChannel;
         this.voiceChannel = options.voiceChannel;
+
+        this.search = this.manager.search.bind(this.manager);
+
+        this.shoukaku
+            .on("start", () => {
+                this.playing = true;
+                this.emit(Events.PlayerStart, this, this.current);
+            })
+            .on("end", (data) => {
+                if (this.state === PlayerState.DESTROYING || this.state === PlayerState.DESTROYED)
+                    return this.emit(Events.Debug, `Player ${this.guildId} destroyed from end event`);
+
+                if (data.reason === "REPLACED") return this.emit(Events.PlayerEnd, this);
+                if (["LOAD_FAILED", "CLEAN_UP"].includes(data.reason)) {
+                    if (!isNullish(this.current)) this.history.push(this.current);
+                    this.playing = false;
+                    if (isNullishOrEmpty(this.queue.store)) return this.emit(Events.PlayerEmpty, this);
+                    this.emit(Events.PlayerEnd, this, this.current);
+                    this.current = null;
+                    return this.play();
+                }
+
+                if (this.loop === "track" && !isNullish(this.current)) this.queue.store.unshift(this.current);
+                if (this.loop === "queue" && !isNullish(this.current)) this.queue.store.push(this.current);
+
+                if (!isNullish(this.current)) this.history.push(this.current);
+
+                const current = this.current;
+                this.current = null;
+
+                if (isNullishOrEmpty(this.queue.store)) {
+                    this.playing = false;
+                    return this.emit(Events.PlayerEmpty, this);
+                }
+
+                this.emit(Events.PlayerEnd, this, current);
+                return this.play();
+            })
+            .on("closed", (data: WebSocketClosedEvent) => {
+                this.playing = false;
+                this.emit(Events.PlayerClosed, this, data);
+            })
+            .on("exception", (data: TrackExceptionEvent) => {
+                this.playing = false;
+                this.emit(Events.PlayerException, this, data);
+            })
+            .on("update", (data: PlayerUpdate) => this.emit(Events.PlayerUpdate, this, data))
+            .on("stuck", (data: TrackStuckEvent) => this.emit(Events.PlayerStuck, this, data))
+            .on("resumed", () => this.emit(Events.PlayerResumed, this));
     }
 
+    get exists() {
+        return this.manager.players.has(this.guildId);
+    }
     public get volume() {
         return this.shoukaku.filters.volume;
     }
@@ -98,7 +158,42 @@ export class Player {
         return this;
     }
 
-    public async play(_track: Track | Nullish) {}
+    public async play(track?: Track | Nullish, options?: PlayOptions) {
+        if (!this.exists || (isNullishOrEmpty(this.queue.store) && isNullish(this.current))) return;
+
+        if (isNullish(options) || typeof options.replaceCurrent !== "boolean") options = { ...options, replaceCurrent: false };
+        if (track) {
+            if (!options.replaceCurrent && !isNullish(this.current)) this.queue.store.unshift(this.current);
+            this.current = track;
+        } else if (isNullish(this.current)) this.current = this.queue.store.shift();
+
+        if (isNullish(this.current)) throw new Error("No track is available to play");
+
+        const current = this.current;
+        current.setManager(this.manager);
+
+        let errorMessage: string | undefined;
+
+        const resolveResult = await current.resolve({ player: this }).catch((e) => {
+            errorMessage = e.message;
+            return null;
+        });
+
+        if (isNullish(resolveResult)) {
+            this.emit(Events.PlayerResolveError, this, current, errorMessage);
+            this.emit(Events.Debug, `Player ${this.guildId} resolve error: ${errorMessage}`);
+            this.current = null;
+            this.queue.size ? await this.play() : this.emit(Events.PlayerEmpty, this);
+            return this;
+        }
+
+        const playOptions = { track: current.track, options: {} };
+        if (options) playOptions.options = { ...options, noReplace: false };
+        else playOptions.options = { noReplace: false };
+
+        this.shoukaku.playTrack(playOptions);
+        return this;
+    }
 
     public skip() {
         this.shoukaku.stopTrack();
