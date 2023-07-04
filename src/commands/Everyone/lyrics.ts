@@ -1,6 +1,6 @@
 import { KoosCommand } from "#lib/extensions";
 import { Paginator } from "#lib/structures";
-import { ButtonId, KoosColor, SelectMenuId, userAgent } from "#utils/constants";
+import { ButtonId, KoosColor, SelectMenuId, UserAgent } from "#utils/constants";
 import { chunk, cutText, decodeEntities, sendLoadingMessage } from "#utils/functions";
 import { request } from "@aytea/request";
 import { ApplyOptions } from "@sapphire/decorators";
@@ -87,13 +87,13 @@ export class LyricsCommand extends KoosCommand {
     }
     public async messageRun(message: Message, args: Args) {
         await sendLoadingMessage(message);
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(message.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(message.guildId!)!;
         const query = await args.rest("string").catch(() => {
-            if (!player || !player.queue.current) {
+            if (!player || !player.current) {
                 return undefined;
             }
-            return `${player.queue.current.title}`;
+            return `${player.current.title}`;
         });
 
         const { embed, selectMenu, cancelButton } = await this.lyrics(query);
@@ -203,7 +203,7 @@ export class LyricsCommand extends KoosCommand {
     private async getLyrics(url?: string) {
         if (!url) throw new Error(`Something went wrong!`);
         try {
-            const body = await request(url).agent(userAgent).options({ throwOnError: true }).text();
+            const body = await request(url).agent(UserAgent).options({ throwOnError: true }).text();
 
             const $ = cheerio.load(body);
 

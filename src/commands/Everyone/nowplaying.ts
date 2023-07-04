@@ -1,10 +1,10 @@
+import type { Player } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
 import { createTitle } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { EmbedBuilder, Message } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Show information about the currently playing track.",
@@ -21,11 +21,11 @@ export class NowPlayingCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(interaction.guildId!);
+        const { manager } = this.container;
+        const player = manager.players.get(interaction.guildId!);
 
         if (player) await interaction.deferReply();
-        if (!player || (player && !player.queue.current)) {
+        if (!player || !player.current) {
             return interaction.reply({
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
@@ -36,10 +36,10 @@ export class NowPlayingCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(message.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(message.guildId!)!;
 
-        if (!player || (player && !player.queue.current)) {
+        if (!player || !player.current) {
             return reply(message, {
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
@@ -48,9 +48,9 @@ export class NowPlayingCommand extends KoosCommand {
         send(message, { embeds: [await this.nowPlaying(player)] });
     }
 
-    private async nowPlaying(player: KazagumoPlayer) {
+    private async nowPlaying(player: Player) {
         const data = await this.container.db.guild.findUnique({ where: { id: player.guildId } });
-        const current = player.queue.current!;
+        const current = player.current!;
         const title = createTitle(current);
 
         const description = `${title}${data?.requester ? ` ~ ${current.requester}` : ``}`;

@@ -1,10 +1,10 @@
+import type { Player } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
-import { ApplyOptions } from "@sapphire/decorators";
-import { KazagumoPlayer } from "kazagumo";
-import { EmbedBuilder, Message } from "discord.js";
 import { KoosColor } from "#utils/constants";
-import { reply, send } from "@sapphire/plugin-editable-commands";
 import { createTitle } from "#utils/functions";
+import { ApplyOptions } from "@sapphire/decorators";
+import { reply, send } from "@sapphire/plugin-editable-commands";
+import { EmbedBuilder, Message } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: `Replay the current song.`,
@@ -21,12 +21,12 @@ export class ReplayCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(`${interaction.guildId}`);
+        const { manager } = this.container;
+        const player = manager.players.get(interaction.guildId!)!;
 
-        if (!player || (player && !player.queue.current))
+        if (!player || !player.current)
             return interaction.reply({
-                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
             });
 
@@ -36,23 +36,23 @@ export class ReplayCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(message.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(message.guildId!)!;
 
-        if (!player || (player && !player.queue.current)) {
+        if (!player || !player.current) {
             return reply(message, {
-                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
         }
 
         send(message, { embeds: [this.replay(player)] });
     }
 
-    private replay(player: KazagumoPlayer) {
-        const current = player.queue.current!;
+    private replay(player: Player) {
+        const current = player.current!;
         const title = createTitle(current);
 
-        player.shoukaku.seekTo(0);
+        player.seek(0);
 
         return new EmbedBuilder().setDescription(`Starting over ${title}`).setColor(KoosColor.Default);
     }

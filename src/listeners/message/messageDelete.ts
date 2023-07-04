@@ -8,9 +8,9 @@ import { Message } from "discord.js";
 })
 export class ClientListener extends Listener {
     public async run(message: Message) {
-        const { kazagumo } = this.container;
+        const { manager } = this.container;
 
-        const player = kazagumo.getPlayer(message.guildId!);
+        const player = manager.players.get(message.guildId!);
         if (isNullish(player)) return;
 
         const dashboard = player.dashboard();

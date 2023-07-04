@@ -1,12 +1,15 @@
+import type { Track } from "#lib/audio";
+import { remove, swap } from "#utils/array";
+import { isNullishOrEmpty } from "@sapphire/utilities";
 import { inspect } from "util";
 
 export type QueueStrategy = "LIFO" | "FIFO";
 
 export type QueueItemFilter<T, R = boolean> = (value: T, idx: number, array: T[]) => R;
 
-export class Queue<T = unknown> {
-    public store: T[];
-    public constructor(public strategy: QueueStrategy = "FIFO", initializer: T[] = []) {
+export class Queue {
+    public store: Track[];
+    public constructor(public strategy: QueueStrategy = "FIFO", initializer: Track[] = []) {
         if (!["FIFO", "LIFO"].includes(strategy)) throw new TypeError(`Invalid queue strategy "${strategy}"!`);
         this.store = Array.isArray(initializer) ? initializer : [];
 
@@ -17,12 +20,24 @@ export class Queue<T = unknown> {
         });
     }
 
+    public get empty() {
+        return isNullishOrEmpty(this.data);
+    }
+
     public get data() {
         return this.toArray();
     }
 
-    public static from<T>(data: T[], strategy: QueueStrategy = "FIFO") {
-        return new Queue<T>(strategy, data);
+    public get duration() {
+        return this.store.reduce((acc, cur) => acc + cur.length, 0);
+    }
+
+    public get size() {
+        return this.store.length;
+    }
+
+    public static from(data: Track[], strategy: QueueStrategy = "FIFO") {
+        return new Queue(strategy, data);
     }
 
     public isFIFO() {
@@ -33,7 +48,7 @@ export class Queue<T = unknown> {
         return this.strategy === "LIFO";
     }
 
-    public add(item: T | T[]) {
+    public add(item: Track | Track[]) {
         if (this.strategy === "FIFO") {
             if (Array.isArray(item)) this.store.push(...item);
             else this.store.push(item);
@@ -41,6 +56,23 @@ export class Queue<T = unknown> {
             if (Array.isArray(item)) this.store.unshift(...item);
             else this.store.unshift(item);
         }
+    }
+
+    public shift() {
+        return this.store.shift();
+    }
+
+    public unshift(...items: Track[]) {
+        return this.store.unshift(...items);
+    }
+
+    public reverse() {
+        return this.store.reverse();
+    }
+
+    public splice(start: number, deleteCount?: number, ...items: Track[]) {
+        if (isNullishOrEmpty(items) && deleteCount) return this.store.splice(start, deleteCount, ...items);
+        else return this.store.splice(start, deleteCount);
     }
 
     public clear() {
@@ -54,33 +86,31 @@ export class Queue<T = unknown> {
         }
     }
 
-    public remove(itemFilter: QueueItemFilter<T>) {
-        const items = this.store.filter(itemFilter);
-        if (items.length) this.store = this.store.filter((res) => !items.includes(res));
+    public swap(source: number, destination: number) {
+        return swap(this.store, source, destination);
     }
 
-    public removeOne(itemFilter: QueueItemFilter<T>) {
-        const item = this.store.find(itemFilter);
-        if (item) this.store = this.store.filter((res) => res !== item);
+    public remove(position: number, to?: number) {
+        return remove(this.store, position, to);
     }
 
-    public find(itemFilter: QueueItemFilter<T>) {
+    public find(itemFilter: QueueItemFilter<Track>) {
         return this.store.find(itemFilter);
     }
 
-    public filter(itemFilter: QueueItemFilter<T>) {
+    public filter(itemFilter: QueueItemFilter<Track>) {
         return this.store.filter(itemFilter);
     }
 
-    public some(itemFilter: QueueItemFilter<T>) {
+    public some(itemFilter: QueueItemFilter<Track>) {
         return this.store.some(itemFilter);
     }
 
-    public every(itemFilter: QueueItemFilter<T>) {
+    public every(itemFilter: QueueItemFilter<Track>) {
         return this.store.every(itemFilter);
     }
 
-    public map<R = T>(itemFilter: QueueItemFilter<T, R>) {
+    public map<R = Track>(itemFilter: QueueItemFilter<Track, R>) {
         const arr = this.toArray();
         return arr.map(itemFilter);
     }
@@ -96,10 +126,6 @@ export class Queue<T = unknown> {
 
     public clone() {
         return new Queue(this.strategy, this.store.slice());
-    }
-
-    public get size() {
-        return this.store.length;
     }
 
     public toString() {

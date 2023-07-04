@@ -1,3 +1,4 @@
+import type { Player } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
 import { sendLoadingMessage } from "#utils/functions";
@@ -5,8 +6,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { isNullish } from "@sapphire/utilities";
-import { Message, EmbedBuilder } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
+import { EmbedBuilder, Message } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Lets you change the bots output volume.",
@@ -29,11 +29,11 @@ export class VolumeCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(`${interaction.guildId}`);
+        const { manager } = this.container;
+        const player = manager.players.get(`${interaction.guildId}`);
         const input = interaction.options.getNumber("input");
 
-        if (!player || (player && !player.queue.current))
+        if (!player || !player.current)
             return interaction.reply({
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
@@ -53,11 +53,11 @@ export class VolumeCommand extends KoosCommand {
 
     public async messageRun(message: Message, args: Args) {
         await sendLoadingMessage(message);
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(`${message.guildId}`);
+        const { manager } = this.container;
+        const player = manager.players.get(`${message.guildId}`);
         const input = await args.pick("number").catch(() => undefined);
 
-        if (!player || (player && !player.queue.current)) {
+        if (!player || !player.current) {
             return reply(message, {
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
@@ -72,7 +72,7 @@ export class VolumeCommand extends KoosCommand {
         send(message, { embeds: [await this.volume(player, input)] });
     }
 
-    private async volume(player: KazagumoPlayer, input?: number | null) {
+    private async volume(player: Player, input?: number | null) {
         const { db } = this.container;
 
         if (isNullish(input) || typeof input === "undefined") {

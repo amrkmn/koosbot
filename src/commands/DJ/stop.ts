@@ -1,9 +1,9 @@
+import type { Player } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
-import { Message, EmbedBuilder } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
+import { EmbedBuilder, Message } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Stops the player and clear the queue.",
@@ -19,12 +19,12 @@ export class StopCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(`${interaction.guildId}`);
+        const { manager } = this.container;
+        const player = manager.players.get(`${interaction.guildId}`);
 
-        if (!player || (player && !player.queue.current))
+        if (!player || !player.current)
             return interaction.reply({
-                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
             });
 
@@ -34,20 +34,21 @@ export class StopCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(`${message.guildId}`);
+        const { manager } = this.container;
+        const player = manager.players.get(`${message.guildId}`);
 
-        if (!player) {
+        if (!player || !player.current) {
             return reply(message, {
-                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn),],
+                embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
         }
 
         send(message, { embeds: [await this.stop(player)] });
     }
 
-    private async stop(player: KazagumoPlayer) {
+    private async stop(player: Player) {
         player.queue.clear();
+        player.history.clear();
         player.shoukaku.stopTrack();
 
         return new EmbedBuilder().setDescription("Stopped playback and cleared the queue").setColor(KoosColor.Default);

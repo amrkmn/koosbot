@@ -1,3 +1,4 @@
+import type { Player } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
 import { ButtonId, KoosColor } from "#utils/constants";
 import { createTitle, mins } from "#utils/functions";
@@ -6,7 +7,6 @@ import { isAnyInteraction } from "@sapphire/discord.js-utilities";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { oneLine } from "common-tags";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, GuildMember, Message } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
 import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
@@ -24,11 +24,11 @@ export class VoteSkipCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(interaction.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(interaction.guildId!)!;
 
         if (player) await interaction.deferReply();
-        if (!player || !player.queue.current) {
+        if (!player || !player.current) {
             return interaction.reply({
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
@@ -46,10 +46,10 @@ export class VoteSkipCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(message.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(message.guildId!)!;
 
-        if (!player || !player.queue.current) {
+        if (!player || !player.current) {
             return reply(message, {
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
@@ -65,12 +65,12 @@ export class VoteSkipCommand extends KoosCommand {
         await this.voteSkip(message, player);
     }
 
-    private async voteSkip(messageOrInteraction: Message | KoosCommand.ChatInputCommandInteraction, player: KazagumoPlayer) {
+    private async voteSkip(messageOrInteraction: Message | KoosCommand.ChatInputCommandInteraction, player: Player) {
         const member = messageOrInteraction.member as GuildMember;
         const channel = member.voice.channel!;
 
         const listeners = channel.members.filter((member) => !member.user.bot);
-        const current = player.queue.current!;
+        const current = player.current!;
         const title = createTitle(current);
         const required = Math.ceil(listeners.size * 0.4);
 

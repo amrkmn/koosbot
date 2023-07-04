@@ -1,5 +1,5 @@
 import { KoosCommand } from "#lib/extensions";
-import { type PlayOptions } from "#lib/types";
+import { SearchEngine, type PlayCommandOptions } from "#lib/types";
 import { KoosColor } from "#utils/constants";
 import { createTitle, cutText, sendLoadingMessage, canJoinVoiceChannel } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
@@ -46,7 +46,7 @@ export class PlayTopCommand extends KoosCommand {
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
         await interaction.deferReply();
 
-        const { kazagumo, db } = this.container;
+        const { manager, db } = this.container;
         const guildId = `${interaction.guildId}`;
         const query = interaction.options.getString("query", true)!;
 
@@ -56,7 +56,7 @@ export class PlayTopCommand extends KoosCommand {
         const channel = member.voice.channel as VoiceBasedChannel;
 
         let index = Number(query.split(":").filter(filterNullishAndEmpty)[1]);
-        let player = kazagumo.getPlayer(interaction.guildId!);
+        let player = manager.players.get(interaction.guildId!);
         let tracks = this.tracks.get(`${guildId}:${member.id}`) ?? [];
         let selected = query.startsWith("a:") ? tracks[index] : query;
         this.tracks.delete(`${guildId}:${member.id}`);
@@ -69,7 +69,7 @@ export class PlayTopCommand extends KoosCommand {
 
     public async messageRun(message: Message, args: Args) {
         await sendLoadingMessage(message);
-        const { kazagumo, db } = this.container;
+        const { manager, db } = this.container;
         const data = await db.guild.findUnique({ where: { id: `${message.guildId}` } });
         const attachment = message.attachments.first();
         const query = attachment ? attachment.proxyURL : await args.rest("string").catch(() => undefined);
@@ -79,28 +79,28 @@ export class PlayTopCommand extends KoosCommand {
             });
 
         const channel = message.member?.voice.channel as VoiceBasedChannel;
-        let player = kazagumo.getPlayer(message.guildId!);
+        let player = manager.players.get(message.guildId!);
 
         // await this.playSkip(query, { message, player, channel, data });
         await send(message, { embeds: [await this.playTop(query, { message, player, channel, data })] });
     }
 
     public async autocompleteRun(interaction: KoosCommand.AutocompleteInteraction) {
-        const { kazagumo } = this.container;
+        const { manager } = this.container;
         const query = interaction.options.getFocused(true);
         const guildId = `${interaction.guildId}`;
         const memberId = (interaction.member as GuildMember).id;
 
         if (!query.value) return interaction.respond([]);
-        let { tracks, type, playlistName } = await kazagumo.search(query.value, {
-            requester: interaction.member,
-            engine: "youtube_music",
+        let { tracks, loadType, playlistInfo } = await manager.search(query.value, {
+            requester: interaction.member as GuildMember,
+            engine: SearchEngine.YoutubeMusic,
         });
 
-        if (type === "PLAYLIST") {
+        if (loadType === "PLAYLIST_LOADED") {
             let tracks = [query.value];
             this.tracks.set(`${guildId}:${memberId}`, tracks);
-            return interaction.respond([{ name: cutText(`${playlistName}`, 100), value: `a:${tracks.length - 1}` }]);
+            return interaction.respond([{ name: cutText(`${playlistInfo.name}`, 100), value: `a:${tracks.length - 1}` }]);
         } else {
             tracks = tracks.slice(0, 10);
 
@@ -120,9 +120,9 @@ export class PlayTopCommand extends KoosCommand {
         }
     }
 
-    private async playTop(query: string, { message, player, channel, data }: PlayOptions) {
-        const { kazagumo } = this.container;
-        const result = await kazagumo.search(query, { requester: message.member }).catch(() => undefined);
+    private async playTop(query: string, { message, player, channel, data }: PlayCommandOptions) {
+        const { manager } = this.container;
+        const result = await manager.search(query, { requester: message.member as GuildMember }).catch(() => undefined);
         if (!result) return new EmbedBuilder().setDescription(`Something went wrong`).setColor(KoosColor.Error);
         if (isNullishOrEmpty(result.tracks))
             return new EmbedBuilder().setDescription(`I couldn't find anything in the query you gave me`).setColor(KoosColor.Default);
@@ -132,11 +132,11 @@ export class PlayTopCommand extends KoosCommand {
                 return new EmbedBuilder()
                     .setDescription(`I cannot join your voice channel. It seem like I don't have the right permissions.`)
                     .setColor(KoosColor.Error);
-            player ??= await kazagumo.createPlayer({
+            player ??= await manager.createPlayer({
                 guildId: message.guildId!,
-                textId: message.channelId!,
-                voiceId: channel!.id,
-                deaf: true,
+                textChannel: message.channelId!,
+                voiceChannel: channel!.id,
+                selfDeafen: true,
                 volume: isNullish(data) ? 100 : data.volume,
             });
 
@@ -146,17 +146,17 @@ export class PlayTopCommand extends KoosCommand {
         }
 
         let msg: string = "";
-        switch (result.type) {
-            case "PLAYLIST":
+        switch (result.loadType) {
+            case "PLAYLIST_LOADED":
                 for (let track of result.tracks.reverse()) player.queue.unshift(track);
                 const playlistLength = result.tracks.length;
                 msg = oneLine`
-                    Queued playlist [${result.playlistName}](${query}) with
+                    Queued playlist [${result.playlistInfo.name}](${query}) with
                     ${playlistLength} ${pluralize("track", playlistLength)}
                 `;
                 break;
-            case "SEARCH":
-            case "TRACK":
+            case "SEARCH_RESULT":
+            case "TRACK_LOADED":
                 let [track] = result.tracks;
                 let title = createTitle(track);
 

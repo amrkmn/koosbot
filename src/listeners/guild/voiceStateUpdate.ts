@@ -1,3 +1,4 @@
+import type { Player } from "#lib/audio";
 import { KoosColor } from "#utils/constants";
 import { time } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
@@ -5,7 +6,6 @@ import { Events, Listener } from "@sapphire/framework";
 import { isNullish, type Nullish } from "@sapphire/utilities";
 import { envParseString } from "@skyra/env-utilities";
 import { EmbedBuilder, Guild, type VoiceBasedChannel, VoiceState } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
 import ms from "ms";
 
 @ApplyOptions<Listener.Options>({
@@ -16,7 +16,7 @@ export class ClientListener extends Listener {
     private _leaveAfter: number = envParseString("NODE_ENV") === "production" ? time("mins", 1) : time("sec", 25);
 
     public async run(old: VoiceState, voiceState: VoiceState) {
-        const { client, kazagumo } = this.container;
+        const { client, manager } = this.container;
 
         let clientVc: VoiceBasedChannel | Nullish = null;
         if (old.channel?.members.has(`${client.id}`)) clientVc = old.channel;
@@ -24,7 +24,7 @@ export class ClientListener extends Listener {
 
         if (isNullish(clientVc)) return;
 
-        const player = kazagumo.getPlayer(clientVc.guildId);
+        const player = manager.players.get(clientVc.guildId);
         if (isNullish(player)) return;
 
         const state = this.checkState(old, voiceState);
@@ -50,11 +50,12 @@ export class ClientListener extends Listener {
         else return "OTHERS";
     }
 
-    private async setupTimeout(guild: Guild | null, player: KazagumoPlayer) {
+    private async setupTimeout(guild: Guild | null, player: Player) {
         if (typeof this._timeoutId !== "undefined") this.cancelTimeout();
 
         const { client } = this.container;
-        const channel = client.channels.cache.get(player.textId) ?? (await client.channels.fetch(player.textId).catch(() => null));
+        const channel =
+            client.channels.cache.get(player.textChannel) ?? (await client.channels.fetch(player.textChannel).catch(() => null));
         if (isNullish(guild) || isNullish(player) || isNullish(channel)) return this.cancelTimeout();
         const time = ms(this._leaveAfter, { long: true });
 

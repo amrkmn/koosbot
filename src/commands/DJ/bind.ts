@@ -1,3 +1,4 @@
+import type { Player } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
@@ -5,7 +6,6 @@ import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { isNullish } from "@sapphire/utilities";
 import { ChannelType, EmbedBuilder, Message, type TextBasedChannel } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
     description: `Bind the dashboard to current channel`,
@@ -30,11 +30,11 @@ export class BindCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(`${interaction.guildId}`);
+        const { manager } = this.container;
+        const player = manager.players.get(`${interaction.guildId}`);
         const channel = (interaction.options.getChannel("channel") ?? interaction.channel ?? null) as TextBasedChannel | null;
 
-        if (!player || (player && !player.queue.current))
+        if (isNullish(player) || isNullish(player.current))
             return interaction.reply({
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
@@ -51,15 +51,14 @@ export class BindCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message, args: Args) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(message.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(message.guildId!)!;
         const channel = await args.pick("channel").catch(() => message.channel ?? null);
 
-        if (!player || (player && !player.queue.current)) {
+        if (isNullish(player) || isNullish(player.current))
             return reply(message, {
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
-        }
         if (isNullish(channel) || !channel.isTextBased())
             return reply(message, {
                 embeds: [new EmbedBuilder().setDescription(`Cannot find the provided channel`).setColor(KoosColor.Error)],
@@ -68,7 +67,7 @@ export class BindCommand extends KoosCommand {
         send(message, { embeds: [this.bind(player, channel)] });
     }
 
-    private bind(player: KazagumoPlayer, channel: TextBasedChannel) {
+    private bind(player: Player, channel: TextBasedChannel) {
         player.setTextChannel(channel.id);
         return new EmbedBuilder().setDescription(`The dashboard has been bound to ${channel}`).setColor(KoosColor.Default);
     }

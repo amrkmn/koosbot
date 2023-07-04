@@ -1,5 +1,3 @@
-import { KazagumoTrack } from "kazagumo";
-
 export interface SpotifyOptions {
     /** The client ID of your Spotify application. */
     clientId: string;
@@ -17,11 +15,6 @@ export interface SpotifyOptions {
 
 export interface SearchResult {
     tracks: Tracks;
-}
-
-export interface Result {
-    tracks: KazagumoTrack[];
-    name?: string;
 }
 
 export interface TrackResult {

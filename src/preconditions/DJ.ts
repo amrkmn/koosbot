@@ -22,8 +22,8 @@ export class DJPrecondition extends Precondition<PreconditionOptions> {
         const data = await this.container.db.guild.findUnique({ where: { id: guild.id } });
         if (isNullish(data) || isNullishOrEmpty(data.dj)) return this.ok();
 
-        const player = this.container.kazagumo.players.get(guild.id);
-        if (isNullish(player) || isNullish(player.queue.current)) return this.ok();
+        const player = this.container.manager.players.get(guild.id);
+        if (isNullish(player) || isNullish(player.current)) return this.ok();
 
         return checkDJ(member, data.dj)
             ? this.ok()

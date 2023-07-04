@@ -1,3 +1,4 @@
+import type { Manager, Track } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
 import { ButtonId, KoosColor, SelectMenuId } from "#utils/constants";
 import { canJoinVoiceChannel, convertTime, createTitle, cutText, mins, sendLoadingMessage } from "#utils/functions";
@@ -19,7 +20,6 @@ import {
     StringSelectMenuOptionBuilder,
     type Snowflake,
 } from "discord.js";
-import { Kazagumo, KazagumoTrack } from "kazagumo";
 import pluralize from "pluralize";
 
 @ApplyOptions<KoosCommand.Options>({
@@ -31,7 +31,7 @@ import pluralize from "pluralize";
     },
 })
 export class SearchCommand extends KoosCommand {
-    private tracksMap: Map<Snowflake, KazagumoTrack> = new Map<Snowflake, KazagumoTrack>();
+    private tracksMap: Map<Snowflake, Track> = new Map<Snowflake, Track>();
 
     public override registerApplicationCommands(registery: KoosCommand.Registry) {
         registery.registerChatInputCommand((builder) =>
@@ -48,7 +48,7 @@ export class SearchCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
+        const { manager } = this.container;
         const query = interaction.options.getString("query");
 
         if (!query)
@@ -57,29 +57,29 @@ export class SearchCommand extends KoosCommand {
                 ephemeral: true,
             });
 
-        await this.search(kazagumo, interaction, query);
+        await this.search(manager, interaction, query);
     }
 
     public async messageRun(message: Message, args: Args) {
         await sendLoadingMessage(message);
-        const { kazagumo } = this.container;
+        const { manager } = this.container;
         const query = await args.rest("string").catch(() => undefined);
         if (!query)
             return send(message, {
                 embeds: [new EmbedBuilder().setDescription("Please provide a URL or search query").setColor(KoosColor.Error)],
             });
 
-        await this.search(kazagumo, message, query);
+        await this.search(manager, message, query);
     }
 
-    private async search(kazagumo: Kazagumo, message: Message | KoosCommand.ChatInputCommandInteraction, query: string) {
+    private async search(manager: Manager, message: Message | KoosCommand.ChatInputCommandInteraction, query: string) {
         if (isAnyInteraction(message) && !message.deferred) await message.deferReply();
         const member = message.member as GuildMember;
         const data = await this.container.db.guild.findUnique({ where: { id: `${message.guildId}` } });
         const options: StringSelectMenuOptionBuilder[] = [];
 
-        let { tracks, type, playlistName } = await kazagumo.search(query, { requester: message.member });
-        tracks = type === "PLAYLIST" ? tracks : tracks.slice(0, 15);
+        let { tracks, loadType, playlistInfo } = await manager.search(query, { requester: message.member as GuildMember });
+        tracks = loadType === "PLAYLIST_LOADED" ? tracks : tracks.slice(0, 15);
 
         if (isNullishOrEmpty(tracks)) {
             const embed = new EmbedBuilder().setDescription(`No result for that query.`).setColor(KoosColor.Error);
@@ -87,11 +87,11 @@ export class SearchCommand extends KoosCommand {
                 ? await message.followUp({ embeds: [embed] })
                 : await send(message, { embeds: [embed] });
             return;
-        } else if (type === "PLAYLIST") {
+        } else if (loadType === "PLAYLIST_LOADED") {
             let duration = tracks.reduce((total, track) => total + Number(track.length), 0);
             options.push(
                 new StringSelectMenuOptionBuilder()
-                    .setLabel(cutText(`${playlistName}`, 100))
+                    .setLabel(cutText(`${playlistInfo.name}`, 100))
                     .setDescription(`Duration: ${convertTime(duration)} | Tracks: ${tracks.length}`)
                     .setValue(SelectMenuId.Playlist)
             );
@@ -119,7 +119,7 @@ export class SearchCommand extends KoosCommand {
 
         const embed = new EmbedBuilder()
             .setDescription(
-                type === "PLAYLIST"
+                loadType === "PLAYLIST_LOADED"
                     ? `Here is the result for that query`
                     : `There are ${tracks.length} ${pluralize("result", tracks.length)}`
             )
@@ -149,7 +149,7 @@ export class SearchCommand extends KoosCommand {
             } else if (interaction.isStringSelectMenu() && interaction.customId === SelectMenuId.Search) {
                 const userOptions = interaction.values;
 
-                let player = kazagumo.getPlayer(`${message.guildId}`);
+                let player = manager.players.get(`${message.guildId}`);
                 if (!player) {
                     if (!canJoinVoiceChannel(member.voice.channel)) {
                         const embed = new EmbedBuilder()
@@ -158,11 +158,11 @@ export class SearchCommand extends KoosCommand {
                         interaction.followUp({ embeds: [embed] });
                         return;
                     }
-                    player ??= await kazagumo.createPlayer({
+                    player ??= await manager.createPlayer({
                         guildId: `${message.guildId}`,
-                        textId: `${message.channelId}`,
-                        voiceId: `${member.voice.channelId}`,
-                        deaf: true,
+                        textChannel: `${message.channelId}`,
+                        voiceChannel: `${member.voice.channelId}`,
+                        selfDeafen: true,
                         volume: isNullish(data) ? 100 : data.volume,
                     });
 
@@ -172,8 +172,8 @@ export class SearchCommand extends KoosCommand {
                 }
 
                 try {
-                    if (userOptions.length === 1 && type === "PLAYLIST" && userOptions[0] === SelectMenuId.Playlist) {
-                        const title = `[${playlistName}](${query})`;
+                    if (userOptions.length === 1 && loadType === "PLAYLIST_LOADED" && userOptions[0] === SelectMenuId.Playlist) {
+                        const title = `[${playlistInfo.name}](${query})`;
 
                         player.queue.add(tracks);
                         if (!player.playing && !player.paused) player.play();
@@ -183,14 +183,14 @@ export class SearchCommand extends KoosCommand {
                             .setColor(KoosColor.Default);
                         interaction.editReply({ embeds: [embed], components: [] });
                         return collector.stop("picked");
-                    } else if (userOptions.length >= 1 && type === "SEARCH") {
+                    } else if (userOptions.length >= 1 && loadType === "SEARCH_RESULT") {
                         let selected = [];
                         let msg = "";
 
                         for (let id of userOptions) selected.push(this.tracksMap.get(id)!);
 
                         if (selected.length > 1) msg = `Queued ${selected.length} ${pluralize("track", selected.length)}`;
-                        else msg = `Queued ${createTitle(selected[0])} at position #${player.queue.totalSize ?? 0}`;
+                        else msg = `Queued ${createTitle(selected[0])} at position #${player.queueTotal}`;
 
                         player.queue.add(selected);
                         if (!player.playing && !player.paused) player.play();
@@ -209,7 +209,7 @@ export class SearchCommand extends KoosCommand {
                         if (!player.playing && !player.paused) player.play();
 
                         const embed = new EmbedBuilder()
-                            .setDescription(`Queued ${createTitle(selected)} at position #${player.queue.totalSize ?? 0}`)
+                            .setDescription(`Queued ${createTitle(selected)} at position #${player.queueTotal}`)
                             .setColor(KoosColor.Default);
                         interaction.editReply({ embeds: [embed], components: [] });
                         return collector.stop("picked");

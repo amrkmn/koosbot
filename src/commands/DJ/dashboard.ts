@@ -1,10 +1,11 @@
+import type { Player } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
 import { Emoji, KoosColor } from "#utils/constants";
 import { sec } from "#utils/functions";
 import { EmbedBuilder } from "@discordjs/builders";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply } from "@sapphire/plugin-editable-commands";
-import { KazagumoPlayer } from "kazagumo";
+import { isNullish } from "@sapphire/utilities";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Move the dashboard to the bottom.",
@@ -22,10 +23,10 @@ export class DashboardCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(`${interaction.guildId}`);
+        const { manager } = this.container;
+        const player = manager.players.get(`${interaction.guildId}`);
 
-        if (!player || (player && !player.queue.current))
+        if (isNullish(player) || isNullish(player.current))
             return interaction.reply({
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
@@ -44,19 +45,18 @@ export class DashboardCommand extends KoosCommand {
     }
 
     public async messageRun(message: KoosCommand.Message) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(message.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(`${message.guildId}`);
 
-        if (!player || (player && !player.queue.current)) {
+        if (isNullish(player) || isNullish(player.current))
             return reply(message, {
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
-        }
 
         await this.dashboard(player).then(async () => await message.react("👍"));
     }
 
-    private async dashboard(player: KazagumoPlayer) {
+    private async dashboard(player: Player) {
         const dashboard = player.dashboard();
 
         if (dashboard.deletable) {

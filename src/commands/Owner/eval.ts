@@ -72,7 +72,7 @@ export class EvalCommand extends KoosCommand {
 
         const { container } = this;
         // @ts-ignore
-        const { client, db, genius, kazagumo, shoukaku, stores } = container;
+        const { client, db, genius, manager, shoukaku, stores } = container;
         // @ts-ignore
         const msg = message;
         // @ts-ignore

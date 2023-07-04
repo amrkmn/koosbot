@@ -1,9 +1,9 @@
+import type { Player } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
-import { Message, EmbedBuilder } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
+import { EmbedBuilder, Message } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Resume the current queue.",
@@ -20,10 +20,10 @@ export class ResumeCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(`${interaction.guildId}`);
+        const { manager } = this.container;
+        const player = manager.players.get(`${interaction.guildId}`);
 
-        if (!player || (player && !player.queue.current))
+        if (!player || !player.current)
             return interaction.reply({
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
@@ -35,10 +35,10 @@ export class ResumeCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(message.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(message.guildId!)!;
 
-        if (!player || (player && !player.queue.current)) {
+        if (!player || !player.current) {
             return reply(message, {
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
@@ -47,7 +47,7 @@ export class ResumeCommand extends KoosCommand {
         send(message, { embeds: [this.resume(player)] });
     }
 
-    private resume(player: KazagumoPlayer) {
+    private resume(player: Player) {
         if (!player.paused) return new EmbedBuilder().setDescription(`The song is not paused.`).setColor(KoosColor.Warn);
 
         player.pause(false);

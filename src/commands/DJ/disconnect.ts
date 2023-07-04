@@ -1,10 +1,10 @@
+import type { Player } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { isNullish } from "@sapphire/utilities";
 import { Message, EmbedBuilder } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Disconnects the bot from its current voice channel.",
@@ -21,8 +21,8 @@ export class DisconnectCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(`${interaction.guildId}`);
+        const { manager } = this.container;
+        const player = manager.players.get(`${interaction.guildId}`);
 
         if (isNullish(player)) {
             if (!isNullish(interaction.guild?.members.me?.voice)) {
@@ -44,8 +44,8 @@ export class DisconnectCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(`${message.guildId}`);
+        const { manager } = this.container;
+        const player = manager.players.get(`${message.guildId}`);
 
         if (isNullish(player)) {
             if (!isNullish(message.guild?.members.me?.voice)) {
@@ -62,7 +62,7 @@ export class DisconnectCommand extends KoosCommand {
         send(message, { embeds: [this.disconnect(player)] });
     }
 
-    private disconnect(player: KazagumoPlayer) {
+    private disconnect(player: Player) {
         player.destroy();
         return new EmbedBuilder().setDescription(`Destroyed the player and left the voice channel`).setColor(KoosColor.Default);
     }
