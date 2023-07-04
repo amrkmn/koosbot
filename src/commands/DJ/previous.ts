@@ -1,9 +1,10 @@
+import type { Player } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
 import { ApplyOptions } from "@sapphire/decorators";
 import { reply, send } from "@sapphire/plugin-editable-commands";
+import { isNullish } from "@sapphire/utilities";
 import { EmbedBuilder, Message } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Goes back to the first track in listening history",
@@ -19,15 +20,14 @@ export class PreviousCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(interaction.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(interaction.guildId!)!;
 
-        if (!player || (player && !player.queue.current)) {
+        if (isNullish(player) || isNullish(player.current))
             return interaction.reply({
                 embeds: [new EmbedBuilder().setDescription("There's nothing playing in this server").setColor(KoosColor.Warn)],
                 ephemeral: true,
             });
-        }
 
         interaction.reply({
             embeds: [this.previous(player)],
@@ -35,21 +35,20 @@ export class PreviousCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(message.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(message.guildId!)!;
 
-        if (!player || (player && !player.queue.current)) {
+        if (isNullish(player) || isNullish(player.current))
             return reply(message, {
                 embeds: [new EmbedBuilder().setDescription("There's nothing playing in this server").setColor(KoosColor.Warn)],
             });
-        }
 
         send(message, {
             embeds: [this.previous(player)],
         });
     }
 
-    private previous(player: KazagumoPlayer) {
+    private previous(player: Player) {
         try {
             player.history.previous();
             return new EmbedBuilder().setDescription(`Playing the previous track`).setColor(KoosColor.Success);

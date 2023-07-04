@@ -2,7 +2,7 @@ import { Player, Queue, Track } from "#lib/audio";
 import { isNullish } from "@sapphire/utilities";
 
 export class QueueHistory {
-    public tracks = new Queue<Track>("LIFO");
+    public tracks = new Queue("LIFO");
     public constructor(public player: Player) {}
 
     public get currentTrack() {
@@ -44,13 +44,13 @@ export class QueueHistory {
     }
 
     public async previous(preserveCurrent = true) {
-        const track = this.previousTrack;
+        const track = this.tracks.dispatch();
         if (isNullish(track)) {
             throw new Error("No previous track in the queue");
         }
 
-        const current = this.currentTrack;
         this.player.play(track);
-        if (current && preserveCurrent) this.player.queue.store.splice(0, 0, current);
+        const current = this.currentTrack;
+        if (current && preserveCurrent) this.player.queue.splice(0, 0, current);
     }
 }

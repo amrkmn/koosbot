@@ -13,7 +13,7 @@ import { EmbedBuilder, GuildMember, type Interaction } from "discord.js";
 export class ClientListener extends Listener {
     public async run(interaction: Interaction) {
         if (!interaction.isButton()) return;
-        const player = this.container.kazagumo.getPlayer(interaction.guildId!);
+        const player = this.container.manager.players.get(interaction.guildId!);
         const data = await this.container.db.guild.findUnique({ where: { id: interaction.guildId! } });
         if (isNullish(player) || isNullish(data)) return;
 

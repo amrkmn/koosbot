@@ -87,13 +87,13 @@ export class LyricsCommand extends KoosCommand {
     }
     public async messageRun(message: Message, args: Args) {
         await sendLoadingMessage(message);
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(message.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(message.guildId!)!;
         const query = await args.rest("string").catch(() => {
-            if (!player || !player.queue.current) {
+            if (!player || !player.current) {
                 return undefined;
             }
-            return `${player.queue.current.title}`;
+            return `${player.current.title}`;
         });
 
         const { embed, selectMenu, cancelButton } = await this.lyrics(query);

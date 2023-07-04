@@ -1,3 +1,4 @@
+import type { Player } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
 import { Paginator } from "#lib/structures";
 import { KoosColor } from "#utils/constants";
@@ -8,7 +9,6 @@ import { reply } from "@sapphire/plugin-editable-commands";
 import { chunk, isNullishOrEmpty } from "@sapphire/utilities";
 import { stripIndents } from "common-tags";
 import { EmbedBuilder, GuildMember, Message } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Display the current queue.",
@@ -25,12 +25,12 @@ export class QueueCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(`${interaction.guildId}`);
+        const { manager } = this.container;
+        const player = manager.players.get(`${interaction.guildId}`);
         const member = interaction.member! as GuildMember;
 
         if (player) await interaction.deferReply();
-        if (!player || (player && !player.queue.current)) {
+        if (!player || !player.current) {
             return interaction.reply({
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
@@ -44,10 +44,10 @@ export class QueueCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message, _args: Args) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(`${message.guildId}`);
+        const { manager } = this.container;
+        const player = manager.players.get(`${message.guildId}`);
 
-        if (!player || (player && !player.queue.current)) {
+        if (!player || !player.current) {
             return reply(message, {
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
@@ -59,13 +59,13 @@ export class QueueCommand extends KoosCommand {
         await pagination.addPages(pages).run();
     }
 
-    private async queue(player: KazagumoPlayer) {
+    private async queue(player: Player) {
         const data = await this.container.db.guild.findUnique({ where: { id: player.guildId } });
-        const current = player.queue.current!;
+        const current = player.current!;
         let timeLeft = current.isStream //
             ? "Live"
             : `${convertTime(Number(current.length) - player.shoukaku.position)} left`;
-        let duration = player.queue.isEmpty ? current.length : player.queue.durationLength + Number(current.length);
+        let duration = player.queue.empty ? current.length : player.queue.duration + Number(current.length);
         let totalDuration =
             player.queue.some((track) => track.isStream) || current.isStream
                 ? "Live"

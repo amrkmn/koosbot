@@ -1,16 +1,13 @@
-import { PrismaClient } from "@prisma/client";
-import { type Awaitable, container, LogLevel, SapphireClient, type SapphirePrefix } from "@sapphire/framework";
-import { Guild, Message, Partials, GatewayIntentBits } from "discord.js";
-import { resolve } from "path";
-import { Kazagumo, Plugins } from "kazagumo";
-import { Connectors, Shoukaku } from "shoukaku";
-import { KoosPlayer } from "#lib/extensions/KoosPlayer";
-import { envParseNumber, envParseString } from "@skyra/env-utilities";
-import { Client as GeniusClient } from "genius-lyrics";
-import { KazagumoPlugin as Spotify } from "#lib/structures";
-import { isMessageInstance } from "@sapphire/discord.js-utilities";
 import { Manager } from "#lib/audio";
 import { NODES } from "#utils/constants";
+import { PrismaClient } from "@prisma/client";
+import { isMessageInstance } from "@sapphire/discord.js-utilities";
+import { LogLevel, SapphireClient, container, type Awaitable, type SapphirePrefix } from "@sapphire/framework";
+import { envParseNumber, envParseString } from "@skyra/env-utilities";
+import { GatewayIntentBits, Guild, Message, Partials } from "discord.js";
+import { Client as GeniusClient } from "genius-lyrics";
+import { resolve } from "path";
+import { Connectors, Shoukaku } from "shoukaku";
 
 export class KoosClient extends SapphireClient {
     private quitting: boolean;
@@ -70,25 +67,6 @@ export class KoosClient extends SapphireClient {
     public override async login(token?: string | undefined): Promise<string> {
         container.genius = new GeniusClient(envParseString("GENIUS_TOKEN"));
         container.db = new PrismaClient();
-        container.kazagumo = new Kazagumo(
-            {
-                plugins: [
-                    new Spotify({
-                        clientId: `${envParseString("SPOTIFY_ID")}`,
-                        clientSecret: `${envParseString("SPOTIFY_SECRET")}`,
-                    }),
-                    new Plugins.PlayerMoved(this),
-                ],
-                defaultSearchEngine: "youtube_music",
-                extends: { player: KoosPlayer },
-                defaultYoutubeThumbnail: "maxresdefault",
-                send: (id, payload) => this.guilds.cache.get(id)?.shard?.send(payload),
-            },
-            new Connectors.DiscordJS(this),
-            NODES,
-            { moveOnDisconnect: true }
-        );
-        container.shoukaku = container.kazagumo.shoukaku;
         container.manager = new Manager({
             connector: new Connectors.DiscordJS(this),
             nodes: NODES,
@@ -97,6 +75,7 @@ export class KoosClient extends SapphireClient {
                 moveOnDisconnect: true,
             },
         });
+        container.shoukaku = container.manager.shoukaku;
 
         await container.db.$connect().then(() => this.logger.info("Successfully connected to database"));
         return super.login(token);
@@ -114,7 +93,6 @@ export class KoosClient extends SapphireClient {
 declare module "@sapphire/pieces" {
     interface Container {
         db: PrismaClient;
-        kazagumo: Kazagumo;
         shoukaku: Shoukaku;
         genius: GeniusClient;
         manager: Manager;

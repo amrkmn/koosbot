@@ -1,3 +1,4 @@
+import type { Player } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
 import { createTitle } from "#utils/functions";
@@ -6,7 +7,6 @@ import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { isNullish } from "@sapphire/utilities";
 import { EmbedBuilder } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Swap the positions of two tracks in the queue.",
@@ -37,12 +37,12 @@ export class SwapCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(interaction.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(interaction.guildId!);
         const source = interaction.options.getNumber("source", true);
         const destination = interaction.options.getNumber("destination", true);
 
-        if (!player || (player && !player.queue.current))
+        if (!player || !player.current)
             return interaction.reply({
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
@@ -56,8 +56,8 @@ export class SwapCommand extends KoosCommand {
     }
 
     public async messageRun(message: KoosCommand.Message, args: Args) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(message.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(message.guildId!);
         const source = await args.pick("number").catch(() => undefined);
         const destination = await args.pick("number").catch(() => undefined);
 
@@ -74,7 +74,7 @@ export class SwapCommand extends KoosCommand {
                 ],
             });
         }
-        if (!player || (player && !player.queue.current)) {
+        if (!player || !player.current) {
             return reply(message, {
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
@@ -83,7 +83,7 @@ export class SwapCommand extends KoosCommand {
         send(message, { embeds: [this.swap(player, source, destination)] });
     }
 
-    private swap(player: KazagumoPlayer, source: number, destination: number) {
+    private swap(player: Player, source: number, destination: number) {
         const queue = player.queue;
 
         if (source > queue.size || destination > queue.size)
@@ -92,14 +92,13 @@ export class SwapCommand extends KoosCommand {
                 .setColor(KoosColor.Error);
         if (source < 1 || destination < 1)
             return new EmbedBuilder()
-                .setDescription(`The position number must be from 1 to ${player.queue.size}`)
+                .setDescription(`The ${source < 1 ? "source" : "destination"} number must be from 1 to ${player.queue.size}`)
                 .setColor(KoosColor.Error);
 
-        const sourceTrack = queue[source - 1];
-        const destinationTrack = queue[destination - 1];
+        const sourceTrack = queue.data[source - 1];
+        const destinationTrack = queue.data[destination - 1];
 
-        queue[source - 1] = destinationTrack;
-        queue[destination - 1] = sourceTrack;
+        player.queue.swap(source, destination);
 
         return new EmbedBuilder()
             .setDescription(

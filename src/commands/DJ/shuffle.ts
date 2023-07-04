@@ -1,9 +1,9 @@
-import { ApplyOptions } from "@sapphire/decorators";
-import { KazagumoPlayer } from "kazagumo";
-import { EmbedBuilder, Message } from "discord.js";
-import { KoosColor } from "#utils/constants";
-import { reply, send } from "@sapphire/plugin-editable-commands";
+import type { Player } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
+import { KoosColor } from "#utils/constants";
+import { ApplyOptions } from "@sapphire/decorators";
+import { reply, send } from "@sapphire/plugin-editable-commands";
+import { EmbedBuilder, Message } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Shuffle the queue.",
@@ -20,10 +20,10 @@ export class ShuffleCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(`${interaction.guildId}`);
+        const { manager } = this.container;
+        const player = manager.players.get(`${interaction.guildId}`);
 
-        if (!player || (player && !player.queue.current))
+        if (!player || !player.current)
             return interaction.reply({
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
@@ -35,10 +35,10 @@ export class ShuffleCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(message.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(message.guildId!)!;
 
-        if (!player || (player && !player.queue.current)) {
+        if (!player || !player.current) {
             return reply(message, {
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
@@ -47,7 +47,7 @@ export class ShuffleCommand extends KoosCommand {
         return send(message, { embeds: [this.shuffle(player)] });
     }
 
-    private shuffle(player: KazagumoPlayer) {
+    private shuffle(player: Player) {
         player.queue.shuffle();
 
         return new EmbedBuilder().setDescription(`Shuffled the queue`).setColor(KoosColor.Default);

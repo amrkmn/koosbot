@@ -1,12 +1,12 @@
+import type { Player } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
-import { ApplyOptions } from "@sapphire/decorators";
-import { Duration } from "@sapphire/duration";
-import { reply, send } from "@sapphire/plugin-editable-commands";
-import { Args } from "@sapphire/framework";
-import { EmbedBuilder, Message } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
 import { KoosColor } from "#utils/constants";
 import { convertTime, createTitle, timeToMs } from "#utils/functions";
+import { ApplyOptions } from "@sapphire/decorators";
+import { Duration } from "@sapphire/duration";
+import { Args } from "@sapphire/framework";
+import { reply, send } from "@sapphire/plugin-editable-commands";
+import { EmbedBuilder, Message } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Seek to a specific time in the currently playing track",
@@ -30,11 +30,11 @@ export class SeekCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(`${interaction.guildId}`);
+        const { manager } = this.container;
+        const player = manager.players.get(`${interaction.guildId}`);
         const input = interaction.options.getString("format", true);
 
-        if (!player || !player.queue.current)
+        if (!player || !player.current)
             return interaction.reply({
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
@@ -46,11 +46,11 @@ export class SeekCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message, args: Args) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(message.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(message.guildId!)!;
         const input = await args.rest("string").catch(() => undefined);
 
-        if (!player || !player.queue.current) {
+        if (!player || !player.current) {
             return reply(message, {
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
@@ -67,8 +67,8 @@ export class SeekCommand extends KoosCommand {
         send(message, { embeds: [this.seek(player, input)] });
     }
 
-    private seek(player: KazagumoPlayer, input: string) {
-        const current = player.queue.current!;
+    private seek(player: Player, input: string) {
+        const current = player.current!;
         const title = createTitle(current);
 
         let position: number;

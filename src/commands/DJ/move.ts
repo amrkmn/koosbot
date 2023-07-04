@@ -1,3 +1,4 @@
+import type { Player } from "#lib/audio";
 import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
 import { createTitle } from "#utils/functions";
@@ -6,7 +7,6 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
 import { isNullish } from "@sapphire/utilities";
-import { KazagumoPlayer } from "kazagumo";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Move a track in the queue.",
@@ -38,12 +38,12 @@ export class MoveCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(interaction.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(interaction.guildId!)!;
         const from = interaction.options.getNumber("from", true);
         const to = interaction.options.getNumber("to", true);
 
-        if (!player || (player && !player.queue.current))
+        if (isNullish(player) || isNullish(player.current))
             return interaction.reply({
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
@@ -57,8 +57,8 @@ export class MoveCommand extends KoosCommand {
     }
 
     public async messageRun(message: KoosCommand.Message, args: Args) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(message.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(message.guildId!)!;
         const from = await args.pick("number").catch(() => undefined);
         const to = await args.pick("number").catch(() => undefined);
 
@@ -75,7 +75,7 @@ export class MoveCommand extends KoosCommand {
                 ],
             });
         }
-        if (!player || (player && !player.queue.current)) {
+        if (isNullish(player) || isNullish(player.current)) {
             return reply(message, {
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
@@ -84,7 +84,7 @@ export class MoveCommand extends KoosCommand {
         send(message, { embeds: [this.move(player, from, to)] });
     }
 
-    private move(player: KazagumoPlayer, from: number, to: number) {
+    private move(player: Player, from: number, to: number) {
         const queue = player.queue;
 
         if (from > player.queue.size || to > player.queue.size)
@@ -97,7 +97,7 @@ export class MoveCommand extends KoosCommand {
                 .setColor(KoosColor.Error);
 
         let removed = null;
-        if (from >= 0 && from < queue.length) removed = queue.splice(from - 1, 1)[0];
+        if (from >= 0 && from < queue.size) removed = queue.splice(from - 1, 1)[0];
 
         if (isNullish(removed))
             return new EmbedBuilder().setDescription(`There is no track at that position`).setColor(KoosColor.Error);

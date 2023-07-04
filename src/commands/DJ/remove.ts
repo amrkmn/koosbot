@@ -1,12 +1,12 @@
+import type { Player } from "#lib/audio";
+import { KoosCommand } from "#lib/extensions";
 import { KoosColor } from "#utils/constants";
+import { createTitle } from "#utils/functions";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Args } from "@sapphire/framework";
 import { reply, send } from "@sapphire/plugin-editable-commands";
-import { Message, EmbedBuilder } from "discord.js";
-import { KazagumoPlayer } from "kazagumo";
 import { isNullish } from "@sapphire/utilities";
-import { KoosCommand } from "#lib/extensions";
-import { createTitle } from "#utils/functions";
+import { EmbedBuilder, Message } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Remove one or multiple tracks from the queue.",
@@ -38,8 +38,8 @@ export class RemoveCommand extends KoosCommand {
     }
 
     public async chatInputRun(interaction: KoosCommand.ChatInputCommandInteraction) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(interaction.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(interaction.guildId!)!;
         const position = interaction.options.getNumber("position");
         const to = interaction.options.getNumber("to") ?? undefined;
 
@@ -48,7 +48,7 @@ export class RemoveCommand extends KoosCommand {
                 embeds: [new EmbedBuilder().setDescription("Please specify the song positions to remove.").setColor(KoosColor.Error)],
                 ephemeral: true,
             });
-        if (!player || (player && !player.queue.current))
+        if (!player || !player.current)
             return interaction.reply({
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
                 ephemeral: true,
@@ -60,8 +60,8 @@ export class RemoveCommand extends KoosCommand {
     }
 
     public async messageRun(message: Message, args: Args) {
-        const { kazagumo } = this.container;
-        const player = kazagumo.getPlayer(message.guildId!)!;
+        const { manager } = this.container;
+        const player = manager.players.get(message.guildId!)!;
         const position = await args.pick("number").catch(() => undefined);
         const to = await args.pick("number").catch(() => undefined);
 
@@ -70,7 +70,7 @@ export class RemoveCommand extends KoosCommand {
                 embeds: [new EmbedBuilder().setDescription("Please specify the song positions to remove.").setColor(KoosColor.Error)],
             });
         }
-        if (!player || (player && !player.queue.current)) {
+        if (!player || !player.current) {
             return reply(message, {
                 embeds: [new EmbedBuilder().setDescription(`There's nothing playing in this server`).setColor(KoosColor.Warn)],
             });
@@ -79,7 +79,7 @@ export class RemoveCommand extends KoosCommand {
         return send(message, { embeds: [await this.remove(player, position, to)] });
     }
 
-    private async remove(player: KazagumoPlayer, position: number, to?: number) {
+    private async remove(player: Player, position: number, to?: number) {
         if (position === to) to = undefined;
         if (to && to < position) to = undefined;
 
@@ -92,12 +92,12 @@ export class RemoveCommand extends KoosCommand {
                 .setDescription(`The position number must be from 1 to ${player.queue.size}`)
                 .setColor(KoosColor.Error);
         if (to && to <= player.queue.size && to > position) {
-            player.queue.splice(position - 1, to - position + 1);
+            player.queue.remove(position - 1, to - 1);
 
             return new EmbedBuilder().setDescription(`Removed song from index ${position} to ${to}`).setColor(KoosColor.Default);
         }
 
-        const track = player.queue[position - 1];
+        const track = player.queue.data[position - 1];
         const title = createTitle(track);
         player.queue.remove(position - 1);
 

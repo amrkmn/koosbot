@@ -13,7 +13,7 @@ import {
 } from "#lib/types";
 import { request } from "@aytea/request";
 import { filterNullish, type Nullish } from "@sapphire/utilities";
-import type { User } from "discord.js";
+import type { GuildMember } from "discord.js";
 
 export class Spotify {
     /**
@@ -28,7 +28,7 @@ export class Spotify {
         this.requestManager = new RequestManager(spotifyOptions);
     }
 
-    public async searchTrack(query: string, requester: User | Nullish): Promise<Result> {
+    public async searchTrack(query: string, requester: GuildMember | Nullish): Promise<Result> {
         const limit =
             this.options.searchLimit && this.options.searchLimit > 0 && this.options.searchLimit < 50 ? this.options.searchLimit : 10;
         const tracks = await this.requestManager.makeRequest<SearchResult>(
@@ -41,7 +41,7 @@ export class Spotify {
         };
     }
 
-    public async getTrack(id: string, requester: User | Nullish): Promise<Result> {
+    public async getTrack(id: string, requester: GuildMember | Nullish): Promise<Result> {
         const track = await this.requestManager.makeRequest<TrackResult>(`/tracks/${id}`);
         return {
             tracks: [this.buildTrack(track, requester)],
@@ -50,7 +50,7 @@ export class Spotify {
         };
     }
 
-    public async getAlbum(id: string, requester: User | Nullish): Promise<Result> {
+    public async getAlbum(id: string, requester: GuildMember | Nullish): Promise<Result> {
         const album = await this.requestManager.makeRequest<AlbumResult>(`/albums/${id}?market=${this.options.searchMarket ?? "US"}`);
         const tracks = album.tracks.items
             .filter(filterNullish)
@@ -85,7 +85,7 @@ export class Spotify {
         };
     }
 
-    public async getPlaylist(id: string, requester: User | Nullish): Promise<Result> {
+    public async getPlaylist(id: string, requester: GuildMember | Nullish): Promise<Result> {
         const playlist = await this.requestManager.makeRequest<PlaylistResult>(
             `/playlists/${id}?market=${this.options.searchMarket ?? "US"}`
         );
@@ -121,7 +121,7 @@ export class Spotify {
         };
     }
 
-    private buildTrack(spotifyTrack: SpotifyTrack, requester: User | Nullish, _thumbnail?: string) {
+    private buildTrack(spotifyTrack: SpotifyTrack, requester: GuildMember | Nullish, thumbnail?: string) {
         return new Track(
             {
                 track: "",
@@ -135,7 +135,7 @@ export class Spotify {
                     position: 0,
                     title: spotifyTrack.name,
                     uri: `https://open.spotify.com/track/${spotifyTrack.id}`,
-                    // thumbnail: thumbnail ? thumbnail : spotifyTrack.album?.images[0]?.url,
+                    thumbnail: thumbnail ? thumbnail : spotifyTrack.album?.images[0]?.url,
                 },
             },
             requester

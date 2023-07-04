@@ -1,9 +1,9 @@
+import type { Track } from "#lib/audio";
 import { Emoji, KoosColor } from "#utils/constants";
 import { container } from "@sapphire/framework";
 import { send } from "@sapphire/plugin-editable-commands";
 import { isNullish, isObject } from "@sapphire/utilities";
 import { EmbedBuilder, Message } from "discord.js";
-import { KazagumoTrack } from "kazagumo";
 import pluralize from "pluralize";
 
 export async function databasePing() {
@@ -125,7 +125,7 @@ export function sendLoadingMessage(message: Message) {
     });
 }
 
-export function createTitle(track: KazagumoTrack, withUrl = true) {
+export function createTitle(track: Track, withUrl = true) {
     let author = track?.author;
     if (isNullish(author)) author = "Unknown artist";
 

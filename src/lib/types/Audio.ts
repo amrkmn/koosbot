@@ -1,6 +1,6 @@
 import type { Player, Track } from "#lib/audio";
 import type { Nullish } from "@sapphire/utilities";
-import type { User } from "discord.js";
+import type { GuildMember } from "discord.js";
 import type { Connector, LoadType, NodeOption, ShoukakuOptions } from "shoukaku";
 
 export interface PlayOptions {
@@ -48,7 +48,7 @@ export interface ManagerOptions {
 }
 
 export interface SearchOptions {
-    requester?: User | Nullish;
+    requester?: GuildMember | Nullish;
     engine?: SearchEngine;
     nodeName?: string;
 }
@@ -62,6 +62,22 @@ export interface Result {
     };
 }
 
+export interface RawTrack {
+    track: string;
+    info: {
+        identifier: string;
+        isSeekable: boolean;
+        author: string;
+        length: number;
+        isStream: boolean;
+        position: number;
+        title: string;
+        uri: string;
+        sourceName: string;
+        thumbnail?: string | Nullish;
+    };
+}
+
 export interface Payload {
     op: number;
     d: {
@@ -70,6 +86,14 @@ export interface Payload {
         self_mute: boolean;
         self_deaf: boolean;
     };
+}
+
+export interface PlayerProgressbarOptions {
+    timecodes?: boolean;
+    length?: number;
+    line?: string;
+    indicator?: string;
+    queue?: boolean;
 }
 
 export const SupportedSources = [

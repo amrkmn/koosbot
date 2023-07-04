@@ -8,7 +8,7 @@ import { isNullish } from "@sapphire/utilities";
 import { ChannelType, EmbedBuilder, type Message, type VoiceBasedChannel } from "discord.js";
 
 @ApplyOptions<KoosCommand.Options>({
-    preconditions: ["OwnerOnly"],
+    preconditions: ["OwnerOnly", "VoiceOnly"],
     hidden: true,
 })
 export class TestCommand extends KoosCommand {
@@ -43,7 +43,7 @@ export class TestCommand extends KoosCommand {
             }
         }
 
-        const result = await player.search(query, { requester: message.author });
+        const result = await player.search(query, { requester: message.member });
 
         player.queue.add(result.tracks);
         player.play();

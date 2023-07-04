@@ -1,16 +1,14 @@
-import { SupportedSources, type ResolveOptions, SearchEngine } from "#lib/types";
-import { filterNullishAndEmpty, isNullish, isNullishOrEmpty, type Nullish } from "@sapphire/utilities";
-import type { User } from "discord.js";
-import type { Track as ShoukakuTrack } from "shoukaku";
 import type { Manager } from "#lib/audio";
-import { Events } from "kazagumo";
+import { SearchEngine, SupportedSources, type RawTrack, type ResolveOptions, Events } from "#lib/types";
 import { escapeRegExp } from "#utils/functions";
+import { filterNullishAndEmpty, isNullish, isNullishOrEmpty, type Nullish } from "@sapphire/utilities";
+import type { GuildMember } from "discord.js";
 
 export class Track {
-    #raw: ShoukakuTrack;
+    #raw: RawTrack;
 
     public manager: Manager | Nullish;
-    public requester: User | Nullish;
+    public requester: GuildMember | Nullish;
 
     public track: string;
     public sourceName: string;
@@ -23,10 +21,11 @@ export class Track {
     public length: number;
     public position: number;
     public realUri: string | Nullish;
+    public thumbnail: string | Nullish;
 
     public resolvedBySource: boolean = false;
 
-    constructor(raw: ShoukakuTrack, requester: User | Nullish) {
+    constructor(raw: RawTrack, requester: GuildMember | Nullish) {
         this.manager = null;
 
         this.#raw = raw;
@@ -41,8 +40,12 @@ export class Track {
         this.author = raw.info.author;
         this.length = raw.info.length;
         this.position = raw.info.position;
+        this.thumbnail = null;
         this.realUri = SupportedSources.includes(this.sourceName) ? this.uri : null;
         this.requester = requester;
+
+        if (this.sourceName === "youtube" && this.identifier)
+            this.thumbnail = `https://img.youtube.com/vi/${this.identifier}/hqdefault.jpg`;
     }
 
     public get raw() {
@@ -65,6 +68,11 @@ export class Track {
 
     public setManager(manager: Manager) {
         this.manager = manager;
+
+        if (this.sourceName === "youtube" && this.identifier)
+            this.thumbnail = `https://img.youtube.com/vi/${this.identifier}/hqdefault.jpg`;
+
+        return this;
     }
 
     public async resolve(options?: ResolveOptions) {

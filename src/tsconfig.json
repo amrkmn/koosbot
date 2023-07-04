@@ -7,9 +7,9 @@
         "baseUrl": ".",
         "skipLibCheck": true,
         "paths": {
+            "#lib/audio": ["lib/structures/Audio/index.ts"],
             "#utils/*": ["lib/utils/*"],
             "#lib/*": ["lib/*"],
-            "#lib/audio": ["lib/structures/Audio/index.ts"],
             "#types/*": ["lib/types/*"],
             "#root/*": ["*"]
         },
