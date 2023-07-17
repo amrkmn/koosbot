@@ -1,5 +1,5 @@
 import { Manager } from "#lib/audio";
-import { NODES } from "#utils/constants";
+import { Nodes } from "#utils/constants";
 import { PrismaClient } from "@prisma/client";
 import { isMessageInstance } from "@sapphire/discord.js-utilities";
 import { LogLevel, SapphireClient, container, type Awaitable, type SapphirePrefix } from "@sapphire/framework";
@@ -69,7 +69,7 @@ export class KoosClient extends SapphireClient {
         container.db = new PrismaClient();
         container.manager = new Manager({
             connector: new Connectors.DiscordJS(this),
-            nodes: NODES,
+            nodes: Nodes,
             send: (id, payload) => this.guilds.cache.get(id)?.shard?.send(payload),
             shoukakuOptions: {
                 moveOnDisconnect: true,

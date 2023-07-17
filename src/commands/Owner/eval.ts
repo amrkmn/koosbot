@@ -9,6 +9,7 @@ import { Stopwatch } from "@sapphire/stopwatch";
 import Type from "@sapphire/type";
 import { codeBlock, isThenable } from "@sapphire/utilities";
 import { envParseString } from "@skyra/env-utilities";
+import { stripIndents } from "common-tags";
 import type { Message } from "discord.js";
 import { inspect } from "util";
 
@@ -54,9 +55,12 @@ export class EvalCommand extends KoosCommand {
                     .post()
                     .json<HasteBinResponse>();
                 return send(message, {
-                    content: `**Output**:\nOutput was too long... sent the result to hastebin: ${envParseString("HASTEBIN_GET_URL")}/${
-                        data.key
-                    }.txt\n\n${typeFooter}`,
+                    content: stripIndents`
+                        **Output**:
+                        Output was too long... sent the result to hastebin: ${envParseString("HASTEBIN_GET_URL")}/${data.key}.txt
+                        
+                        ${typeFooter}
+                    `,
                 });
             } catch (error: unknown) {
                 const content = `${codeBlock("bash", (error as HasteBinResponse)?.message ?? `${error}`)}`;
