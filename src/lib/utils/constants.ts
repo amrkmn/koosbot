@@ -8,7 +8,7 @@ export const Nodes: NodeOption[] = [
     // { name: "node1", url: "narco.buses.rocks:2269", auth: "glasshost1984", secure: false },
     { name: "node1", url: "lava1.horizxon.studio:80", auth: "horizxon.studio", secure: false },
     { name: "node2", url: "lava2.horizxon.studio:80", auth: "horizxon.studio", secure: false },
-    { name: "node3", url: "lava3.horizxon.studio:80", auth: "horizxon.studio", secure: false },
+    { name: "node3", url: "node1.lewdhutao.tech:1183", auth: "lewdhutao", secure: false },
     { name: "node4", url: "lava4.horizxon.studio:80", auth: "horizxon.studio", secure: false },
     // { name: "node1", url: "ash.lavalink.alexanderof.xyz:2333", auth: "lavalink", secure: false },
     // { name: "node2", url: "fsn.lavalink.alexanderof.xyz:2333", auth: "lavalink", secure: false },

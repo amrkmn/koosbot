@@ -18,13 +18,22 @@ export class ClientListener extends Listener {
         const { client } = this.container;
         const channel =
             client.channels.cache.get(player.textChannel) ?? (await client.channels.fetch(player.textChannel).catch(() => null));
+        const dashboard = player.dashboard();
+        if (isNullish(player.current)) return;
 
         if (channel && channel.isTextBased()) {
-            if (isNullish(player.current)) return;
             const title = createTitle(player.current);
             channel.send({
                 embeds: [new EmbedBuilder().setDescription(`Player stuck when playing ${title}`).setColor(KoosColor.Error)],
             });
+
+            if (isNullish(dashboard)) return;
+            const msg = channel.messages.cache.get(dashboard.id) ?? (await channel.messages.fetch(dashboard.id).catch(() => null));
+            if (!isNullish(msg) && msg.editable) {
+                player.resetDashboard();
+                player.votes.clear();
+                msg.edit({ components: [] });
+            }
         }
     }
 }

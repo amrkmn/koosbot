@@ -141,7 +141,6 @@ export enum Events {
     PlayerClosed = "playerClosed",
     PlayerUpdate = "playerUpdate",
     PlayerException = "playerException",
-    PlayerError = "playerError",
     PlayerResumed = "playerResumed",
     PlayerStuck = "playerStuck",
     PlayerResolveError = "playerResolveError",
