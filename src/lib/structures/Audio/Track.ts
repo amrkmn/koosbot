@@ -6,6 +6,7 @@ import type { GuildMember } from "discord.js";
 
 export class Track {
     #raw: RawTrack;
+    #sources = ["youtube", "bandcamp", "souncloud", "twitch", "vimeo", "http"];
 
     public manager: Manager | Nullish;
     public requester: GuildMember | Nullish;
@@ -86,6 +87,8 @@ export class Track {
             this.resolvedBySource = true;
             return this;
         }
+
+        if (this.#sources.includes(this.sourceName)) return this;
 
         this.manager.emit(Events.Debug, `Resolving ${this.sourceName} track ${this.title}; Source: ${this.sourceName}`);
 
