@@ -25,7 +25,7 @@ model Guild {
 }
 
 model User {
-  id       String     @id @map("_id")
+  id        String     @id @map("_id")
   playlists Playlist[]
 
   @@map("user")
