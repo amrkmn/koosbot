@@ -21,7 +21,6 @@ export class ClientListener extends Listener {
         const dashboard = player.dashboard();
         if (isNullish(player.current)) return;
 
-        console.log("exeption");
         if (channel && channel.isTextBased()) {
             const title = createTitle(player.current);
             channel.send({
@@ -35,7 +34,7 @@ export class ClientListener extends Listener {
             if (!isNullish(msg) && msg.editable) {
                 player.resetDashboard();
                 player.votes.clear();
-                msg.edit({ components: [] });
+                await msg.edit({ components: [] });
             }
         }
     }

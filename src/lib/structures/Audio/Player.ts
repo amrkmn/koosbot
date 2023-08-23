@@ -36,6 +36,7 @@ export class Player {
     public paused: boolean = false;
     public loop: "off" | "track" | "queue" = "off";
     public playing: boolean = false;
+    public exeption: boolean = false;
 
     public votes: Set<string>;
     public current: Track | Nullish;
@@ -79,8 +80,8 @@ export class Player {
                     return this.play();
                 }
 
-                if (this.loop === "track" && !isNullish(this.current)) this.queue.store.unshift(this.current);
-                if (this.loop === "queue" && !isNullish(this.current)) this.queue.store.push(this.current);
+                if (this.loop === "track" && !isNullish(this.current)) this.queue.unshift(this.current);
+                if (this.loop === "queue" && !isNullish(this.current)) this.queue.add(this.current);
 
                 if (!isNullish(this.current)) this.history.push(this.current);
 
@@ -101,6 +102,7 @@ export class Player {
             })
             .on("exception", (data: TrackExceptionEvent) => {
                 this.playing = false;
+                this.exeption = true;
                 this.emit(Events.PlayerException, this, data);
             })
             .on("update", (data: PlayerUpdate) => this.emit(Events.PlayerUpdate, this, data))
