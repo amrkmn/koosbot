@@ -46,7 +46,7 @@ export class Track {
         this.requester = requester;
 
         if (this.sourceName === "youtube" && this.identifier)
-            this.thumbnail = `https://img.youtube.com/vi/${this.identifier}/hqdefault.jpg`;
+            this.thumbnail = `https://img.youtube.com/vi/${this.identifier}/maxresdefault.jpg`;
     }
 
     public get raw() {
@@ -71,7 +71,7 @@ export class Track {
         this.manager = manager;
 
         if (this.sourceName === "youtube" && this.identifier)
-            this.thumbnail = `https://img.youtube.com/vi/${this.identifier}/hqdefault.jpg`;
+            this.thumbnail = `https://img.youtube.com/vi/${this.identifier}/maxresdefault.jpg`;
 
         return this;
     }
