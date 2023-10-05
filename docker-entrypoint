@@ -2,7 +2,7 @@
 
 # If running the web server then migrate existing database
 if [ "${*}" == "yarn run start" ]; then
-  yarn prisma generate
+  yarn run generate
 fi
 
 exec "${@}"
