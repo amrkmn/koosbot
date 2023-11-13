@@ -16,9 +16,7 @@ import { type TrackExceptionEvent } from "shoukaku";
 export class ClientListener extends Listener {
     public async run(player: Player, _data: TrackExceptionEvent) {
         const { client } = this.container;
-        const channel =
-            client.channels.cache.get(player.textChannel) ?? (await client.channels.fetch(player.textChannel).catch(() => null));
-        const dashboard = player.dashboard();
+        const channel = await client.channels.fetch(player.textChannel).catch(() => null);
         if (isNullish(player.current)) return;
 
         if (channel && channel.isTextBased()) {
@@ -29,13 +27,29 @@ export class ClientListener extends Listener {
                 ],
             });
 
-            if (isNullish(dashboard)) return;
-            const msg = channel.messages.cache.get(dashboard.id) ?? (await channel.messages.fetch(dashboard.id).catch(() => null));
-            if (!isNullish(msg) && msg.editable) {
-                player.resetDashboard();
-                player.votes.clear();
-                await msg.edit({ components: [] });
-            }
+            await this.checkDashboad(player);
         }
+    }
+
+    async checkDashboad(player: Player) {
+        const { client } = this.container;
+        const channel = await client.channels.fetch(player.textChannel).catch(() => null);
+        const interval = setInterval(async () => {
+            const dashboard = player.dashboard();
+            console.log(dashboard);
+            if (isNullish(dashboard)) {
+                clearInterval(interval);
+            } else {
+                if (channel && channel.isTextBased()) {
+                    const msg =
+                        channel.messages.cache.get(dashboard.id) ?? (await channel.messages.fetch(dashboard.id).catch(() => null));
+                    if (!isNullish(msg) && msg.editable) {
+                        player.resetDashboard();
+                        player.votes.clear();
+                        await msg.edit({ components: [] });
+                    }
+                }
+            }
+        }, 500);
     }
 }
