@@ -5,10 +5,9 @@ export const UserAgent =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36";
 
 export const Nodes: NodeOption[] = [
-    { name: "node1", url: "n1.ll.darrennathanael.com:2269", auth: "glasshost1984", secure: false },
-    // { name: "node2", url: "ssl.horizxon.studio:443", auth: "horizxon.studio", secure: true },
-    // { name: "node3", url: "oce-lavalink.lexnet.cc:443", auth: "lexn3tl@val!nk", secure: true },
-    // { name: "node4", url: "lava1.horizxon.studio:80", auth: "horizxon.studio", secure: false },
+    { name: "node1", url: "lavalink.micium-hosting.com:80", auth: "micium-hosting.com", secure: false },
+    { name: "node2", url: "localnet-sg2.ajiehost.rf.gd:50243", auth: "https://dsc.gg/ajidevserver", secure: false },
+    // { name: "node1", url: "lavalink.jirayu.pw:2343", auth: "youshallnotpass", secure: false },
     // { name: "node3", url: "eu.lavalink.alexanderof.xyz:2333", auth: "lavalink", secure: false },
     // { name: "node4", url: "us.lavalink.alexanderof.xyz:2333", auth: "lavalink", secure: false },
 ];
