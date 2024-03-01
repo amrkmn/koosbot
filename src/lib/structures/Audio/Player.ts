@@ -70,8 +70,8 @@ export class Player {
                 if (this.state === PlayerState.DESTROYING || this.state === PlayerState.DESTROYED)
                     return this.emit(Events.Debug, `Player ${this.guildId} destroyed from end event`);
 
-                if (data.reason === "REPLACED") return this.emit(Events.PlayerEnd, this);
-                if (["LOAD_FAILED", "CLEAN_UP"].includes(data.reason)) {
+                if (data.reason === "replaced") return this.emit(Events.PlayerEnd, this);
+                if (["loadFailed", "cleanup"].includes(data.reason)) {
                     if (!isNullish(this.current)) this.history.push(this.current);
                     this.playing = false;
                     if (isNullishOrEmpty(this.queue.store)) return this.emit(Events.PlayerEmpty, this);
@@ -133,10 +133,6 @@ export class Player {
     }
     public get node() {
         return this.shoukaku.node;
-    }
-
-    private send(...args: any) {
-        this.node.queue.add(...args);
     }
 
     public setPause(input: boolean) {
@@ -253,11 +249,7 @@ export class Player {
         if (position < 0 || position > this.current.length) position = Math.max(Math.min(position, this.current.length), 0);
 
         this.current.position = position;
-        this.send({
-            op: "seek",
-            guildId: this.guildId,
-            position,
-        });
+        this.shoukaku.seekTo(position);
 
         return this;
     }
@@ -265,13 +257,7 @@ export class Player {
     public setVolume(volume: number) {
         if (!isNumber(volume)) return;
 
-        this.shoukaku.filters.volume = volume / 100;
-
-        this.send({
-            op: "volume",
-            guildId: this.guildId,
-            volume: this.shoukaku.filters.volume * 100,
-        });
+        this.shoukaku.setFilterVolume(volume / 100);
 
         return this;
     }
@@ -327,7 +313,9 @@ export class Player {
 
         this.disconnect();
         this.state = PlayerState.DESTROYING;
-        this.shoukaku.connection.disconnect();
+        this.shoukaku.clean();
+        this.manager.shoukaku.leaveVoiceChannel(this.guildId);
+        this.shoukaku.destroy();
         this.shoukaku.removeAllListeners();
         this.manager.players.delete(this.guildId);
         this.state = PlayerState.DESTROYED;

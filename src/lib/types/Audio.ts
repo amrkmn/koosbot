@@ -56,14 +56,11 @@ export interface SearchOptions {
 export interface Result {
     loadType: LoadType;
     tracks: Track[];
-    playlistInfo: {
-        name?: string;
-        selectedTrack?: number;
-    };
+    playlistName?: string;
 }
 
 export interface RawTrack {
-    track: string;
+    encoded: string;
     info: {
         identifier: string;
         isSeekable: boolean;
@@ -72,10 +69,12 @@ export interface RawTrack {
         isStream: boolean;
         position: number;
         title: string;
-        uri: string;
+        uri?: string;
+        artworkUrl?: string;
+        isrc?: string;
         sourceName: string;
-        thumbnail?: string | Nullish;
     };
+    pluginInfo: unknown;
 }
 
 export interface Payload {

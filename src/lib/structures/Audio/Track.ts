@@ -1,8 +1,9 @@
 import type { Manager } from "#lib/audio";
 import { SearchEngine, SupportedSources, type RawTrack, type ResolveOptions, Events } from "#lib/types";
-import { escapeRegExp } from "#utils/functions";
+import { escapeRegExp, transform } from "#utils/functions";
 import { filterNullishAndEmpty, isNullish, isNullishOrEmpty, type Nullish } from "@sapphire/utilities";
 import type { GuildMember } from "discord.js";
+import { container } from "@sapphire/framework";
 
 export class Track {
     #raw: RawTrack;
@@ -31,22 +32,19 @@ export class Track {
 
         this.#raw = raw;
 
-        this.track = raw.track;
+        this.track = raw.encoded;
         this.sourceName = raw.info.sourceName;
         this.title = raw.info.title;
-        this.uri = raw.info.uri;
+        this.uri = raw.info.uri ?? "";
         this.identifier = raw.info.identifier;
         this.isSeekable = raw.info.isSeekable;
         this.isStream = raw.info.isStream;
         this.author = raw.info.author;
         this.length = raw.info.length;
         this.position = raw.info.position;
-        this.thumbnail = null;
+        this.thumbnail = raw.info.artworkUrl;
         this.realUri = SupportedSources.includes(this.sourceName) ? this.uri : null;
         this.requester = requester;
-
-        if (this.sourceName === "youtube" && this.identifier)
-            this.thumbnail = `https://img.youtube.com/vi/${this.identifier}/maxresdefault.jpg`;
     }
 
     public get raw() {
@@ -69,10 +67,6 @@ export class Track {
 
     public setManager(manager: Manager) {
         this.manager = manager;
-
-        if (this.sourceName === "youtube" && this.identifier)
-            this.thumbnail = `https://img.youtube.com/vi/${this.identifier}/maxresdefault.jpg`;
-
         return this;
     }
 
@@ -95,19 +89,19 @@ export class Track {
         const result = await this.getTrack();
         if (!result) throw new Error("No results found");
 
-        this.#raw = result;
-        this.track = result.track;
-        this.realUri = result.info.uri;
-        this.length = result.info.length;
+        this.#raw = result.#raw;
+        this.track = result.#raw.encoded;
+        this.realUri = result.#raw.info.uri;
+        this.length = result.#raw.info.length;
 
         if (overwrite || resolveSource) {
-            this.title = result.info.title;
-            this.identifier = result.info.identifier;
-            this.isSeekable = result.info.isSeekable;
-            this.author = result.info.author;
-            this.length = result.info.length;
-            this.isStream = result.info.isStream;
-            this.uri = result.info.uri;
+            this.title = result.#raw.info.title;
+            this.identifier = result.#raw.info.identifier;
+            this.isSeekable = result.#raw.info.isSeekable;
+            this.author = result.#raw.info.author;
+            this.length = result.#raw.info.length;
+            this.isStream = result.#raw.info.isStream;
+            this.uri = result.#raw.info.uri ?? "";
         }
 
         return this;
@@ -118,29 +112,30 @@ export class Track {
 
         const source = this.manager.options.defaultSearchEngine ?? SearchEngine.Youtube;
         const query = [this.author, this.title].filter(filterNullishAndEmpty).join(" - ");
-        const node = this.manager.getLeastUsedNode();
+        const node = container.shoukaku.options.nodeResolver(container.shoukaku.nodes);
 
         if (isNullish(node)) throw new Error("No node available");
 
         const result = await node.rest.resolve(`${source}:${query}`);
-        if (isNullish(result) || isNullishOrEmpty(result.tracks)) throw new Error("No result found");
+        if (isNullish(result) || isNullishOrEmpty(result.data)) throw new Error("No result found");
 
+        const transformed = transform(result);
         if (this.author) {
             const author = [this.author, `${this.author} - Topic`];
-            const officialTrack = result.tracks.find(
+            const officialTrack = transformed.tracks.find(
                 (track) =>
-                    author.some((name) => new RegExp(`^${escapeRegExp(name)}$`, "i").test(track.info.author)) ||
-                    new RegExp(`^${escapeRegExp(this.title)}$`, "i").test(track.info.title)
+                    author.some((name) => new RegExp(`^${escapeRegExp(name)}$`, "i").test(track.author)) ||
+                    new RegExp(`^${escapeRegExp(this.title)}$`, "i").test(track.title)
             );
             if (officialTrack) return officialTrack;
         }
         if (this.length) {
-            const sameDuration = result.tracks.find(
-                (track) => track.info.length >= this.length - 2000 && track.info.length <= this.length + 2000
+            const sameDuration = transformed.tracks.find(
+                (track) => track.length >= this.length - 2000 && track.length <= this.length + 2000
             );
             if (sameDuration) return sameDuration;
         }
 
-        return result.tracks[0];
+        return transformed.tracks[0];
     }
 }

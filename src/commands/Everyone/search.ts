@@ -21,6 +21,7 @@ import {
     type Snowflake,
 } from "discord.js";
 import pluralize from "pluralize";
+import { LoadType } from "shoukaku";
 
 @ApplyOptions<KoosCommand.Options>({
     description: `Searches and lets you choose a track.`,
@@ -78,8 +79,8 @@ export class SearchCommand extends KoosCommand {
         const data = await this.container.db.guild.findUnique({ where: { id: `${message.guildId}` } });
         const options: StringSelectMenuOptionBuilder[] = [];
 
-        let { tracks, loadType, playlistInfo } = await manager.search(query, { requester: message.member as GuildMember });
-        tracks = loadType === "PLAYLIST_LOADED" ? tracks : tracks.slice(0, 15);
+        let { tracks, loadType, playlistName } = await manager.search(query, { requester: message.member as GuildMember });
+        tracks = loadType === LoadType.PLAYLIST ? tracks : tracks.slice(0, 15);
 
         if (isNullishOrEmpty(tracks)) {
             const embed = new EmbedBuilder().setDescription(`No result for that query.`).setColor(KoosColor.Error);
@@ -87,11 +88,11 @@ export class SearchCommand extends KoosCommand {
                 ? await message.followUp({ embeds: [embed] })
                 : await send(message, { embeds: [embed] });
             return;
-        } else if (loadType === "PLAYLIST_LOADED") {
+        } else if (loadType === LoadType.PLAYLIST) {
             let duration = tracks.reduce((total, track) => total + Number(track.length), 0);
             options.push(
                 new StringSelectMenuOptionBuilder()
-                    .setLabel(cutText(`${playlistInfo.name}`, 100))
+                    .setLabel(cutText(`${playlistName}`, 100))
                     .setDescription(`Duration: ${convertTime(duration)} | Tracks: ${tracks.length}`)
                     .setValue(SelectMenuId.Playlist)
             );
@@ -119,7 +120,7 @@ export class SearchCommand extends KoosCommand {
 
         const embed = new EmbedBuilder()
             .setDescription(
-                loadType === "PLAYLIST_LOADED"
+                loadType === LoadType.PLAYLIST
                     ? `Here is the result for that query`
                     : `There are ${tracks.length} ${pluralize("result", tracks.length)}`
             )
@@ -172,8 +173,8 @@ export class SearchCommand extends KoosCommand {
                 }
 
                 try {
-                    if (userOptions.length === 1 && loadType === "PLAYLIST_LOADED" && userOptions[0] === SelectMenuId.Playlist) {
-                        const title = `[${playlistInfo.name}](${query})`;
+                    if (userOptions.length === 1 && loadType === LoadType.PLAYLIST && userOptions[0] === SelectMenuId.Playlist) {
+                        const title = `[${playlistName}](${query})`;
 
                         player.queue.add(tracks);
                         if (!player.playing && !player.paused) player.play();
@@ -183,7 +184,7 @@ export class SearchCommand extends KoosCommand {
                             .setColor(KoosColor.Default);
                         interaction.editReply({ embeds: [embed], components: [] });
                         return collector.stop("picked");
-                    } else if (userOptions.length >= 1 && loadType === "SEARCH_RESULT") {
+                    } else if (userOptions.length >= 1 && loadType === LoadType.PLAYLIST) {
                         let selected = [];
                         let msg = "";
 

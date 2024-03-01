@@ -14,6 +14,7 @@ import {
 import { request } from "@aytea/request";
 import { filterNullish, type Nullish } from "@sapphire/utilities";
 import type { GuildMember } from "discord.js";
+import { LoadType } from "shoukaku";
 
 export class Spotify {
     /**
@@ -36,8 +37,7 @@ export class Spotify {
         );
         return {
             tracks: tracks.tracks.items.map((track) => this.buildTrack(track, requester)),
-            loadType: "SEARCH_RESULT",
-            playlistInfo: {},
+            loadType: LoadType.SEARCH,
         };
     }
 
@@ -45,8 +45,7 @@ export class Spotify {
         const track = await this.requestManager.makeRequest<TrackResult>(`/tracks/${id}`);
         return {
             tracks: [this.buildTrack(track, requester)],
-            loadType: "TRACK_LOADED",
-            playlistInfo: {},
+            loadType: LoadType.TRACK,
         };
     }
 
@@ -77,11 +76,8 @@ export class Spotify {
 
         return {
             tracks,
-            loadType: "PLAYLIST_LOADED",
-            playlistInfo: {
-                name: album.name,
-                selectedTrack: -1,
-            },
+            loadType: LoadType.PLAYLIST,
+            playlistName: album.name,
         };
     }
 
@@ -113,18 +109,15 @@ export class Spotify {
         }
         return {
             tracks,
-            loadType: "PLAYLIST_LOADED",
-            playlistInfo: {
-                name: playlist.name,
-                selectedTrack: -1,
-            },
+            loadType: LoadType.PLAYLIST,
+            playlistName: playlist.name,
         };
     }
 
     private buildTrack(spotifyTrack: SpotifyTrack, requester: GuildMember | Nullish, thumbnail?: string) {
         return new Track(
             {
-                track: "",
+                encoded: "",
                 info: {
                     sourceName: "spotify",
                     identifier: spotifyTrack.id,
@@ -135,8 +128,10 @@ export class Spotify {
                     position: 0,
                     title: spotifyTrack.name,
                     uri: `https://open.spotify.com/track/${spotifyTrack.id}`,
-                    thumbnail: thumbnail ? thumbnail : spotifyTrack.album?.images[0]?.url,
+                    artworkUrl: thumbnail ? thumbnail : spotifyTrack.album?.images[0]?.url,
+                    isrc: "",
                 },
+                pluginInfo: {},
             },
             requester
         );

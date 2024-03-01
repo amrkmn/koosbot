@@ -5,9 +5,10 @@ export const UserAgent =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36";
 
 export const Nodes: NodeOption[] = [
-    { name: "node1", url: "lavalink.micium-hosting.com:80", auth: "micium-hosting.com", secure: false },
-    { name: "node2", url: "localnet-sg2.ajiehost.rf.gd:50243", auth: "https://dsc.gg/ajidevserver", secure: false },
-    { name: "node3", url: "borneo.alfari.id:39038", auth: "youshallnotpass", secure: false },
+    { name: "node1", url: "lavalink.amar.kim:443", auth: "youshallnotpass", secure: true },
+    // { name: "node1", url: "lavalink.micium-hosting.com:80", auth: "micium-hosting.com", secure: false },
+    // { name: "node2", url: "localnet-sg2.ajiehost.rf.gd:50243", auth: "https://dsc.gg/ajidevserver", secure: false },
+    // { name: "node3", url: "borneo.alfari.id:39038", auth: "youshallnotpass", secure: false },
     // { name: "node3", url: "eu.lavalink.alexanderof.xyz:2333", auth: "lavalink", secure: false },
     // { name: "node4", url: "us.lavalink.alexanderof.xyz:2333", auth: "lavalink", secure: false },
 ];

@@ -1,19 +1,12 @@
-import { Player, Track } from "#lib/audio";
+import { Player } from "#lib/audio";
 import { Spotify } from "#lib/structures";
-import {
-    Events,
-    SearchEngine,
-    State,
-    type CreatePlayerOptions,
-    type ManagerOptions,
-    type SearchOptions,
-    type Result,
-} from "#lib/types";
+import { Events, SearchEngine, type CreatePlayerOptions, type ManagerOptions, type Result, type SearchOptions } from "#lib/types";
 import { Regex } from "#utils/constants";
-import { isNullish, isNullishOrEmpty, isNumber, type Nullish } from "@sapphire/utilities";
+import { transform } from "#utils/functions";
+import { isNullish, isNullishOrEmpty, isNumber } from "@sapphire/utilities";
 import { envParseString } from "@skyra/env-utilities";
 import { EventEmitter } from "events";
-import { Node, Shoukaku } from "shoukaku";
+import { Shoukaku } from "shoukaku";
 
 export class Manager extends EventEmitter {
     public shoukaku: Shoukaku;
@@ -29,14 +22,10 @@ export class Manager extends EventEmitter {
         const cached = this.players.get(options.guildId);
         if (cached) return cached;
 
-        let node: Node | Nullish;
-        if (options.loadBalancer) node = this.getLeastUsedNode();
-        else if (options.nodeName) node = this.shoukaku.getNode(options.nodeName);
-        else node = this.shoukaku.getNode("auto");
-
+        let node = this.shoukaku.options.nodeResolver(this.shoukaku.nodes);
         if (isNullish(node)) throw new Error("No node found");
 
-        const shoukakuPlayer = await node.joinChannel({
+        const shoukakuPlayer = await this.shoukaku.joinVoiceChannel({
             guildId: options.guildId,
             channelId: options.voiceChannel,
             shardId: isNumber(options.shardId) ? options.shardId : 0,
@@ -57,20 +46,12 @@ export class Manager extends EventEmitter {
         return player;
     }
 
-    public getLeastUsedNode(): Node {
-        const nodes: Node[] = [...this.shoukaku.nodes.values()];
-
-        const onlineNodes = nodes.filter((node) => node.state === State.CONNECTED);
-        if (!onlineNodes.length) throw new Error("No nodes are online");
-
-        return onlineNodes.reduce((a, b) => (a.players.size < b.players.size ? a : b));
-    }
-
     public async search(query: string, options: SearchOptions) {
-        const node = options?.nodeName ? this.shoukaku.getNode(options.nodeName) : this.getLeastUsedNode();
+        const node = this.shoukaku.options.nodeResolver(this.shoukaku.nodes);
         if (isNullish(node)) throw new Error("No available node");
 
         let result: Result;
+
         if (Regex.Spotify.test(query)) {
             Regex.Spotify.lastIndex = 0;
 
@@ -88,22 +69,13 @@ export class Manager extends EventEmitter {
             else result = await spotify.searchTrack(query, options.requester);
         } else if (Regex.Youtube.test(query)) {
             const res = await node.rest.resolve(query);
-            if (isNullish(res)) result = { loadType: "LOAD_FAILED", playlistInfo: {}, tracks: [] };
-            else {
-                const tracks = res.tracks.map((track) => new Track(track, options.requester)) ?? [];
-                result = { ...res, tracks };
-            }
+            result = transform(res, options.requester);
         } else {
             const isHttp = /^https?:\/\//.test(query);
             const res = await node.rest.resolve(
                 isHttp ? query : `${isNullish(options.engine) ? SearchEngine.YoutubeMusic : options.engine}:${query}`
             );
-
-            if (isNullish(res)) result = { loadType: "LOAD_FAILED", playlistInfo: {}, tracks: [] };
-            else {
-                const tracks = res.tracks.map((track) => new Track(track, options.requester)) ?? [];
-                result = { ...res, tracks };
-            }
+            result = transform(res, options.requester);
         }
 
         return result;

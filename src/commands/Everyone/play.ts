@@ -19,6 +19,7 @@ import {
     type VoiceBasedChannel,
 } from "discord.js";
 import pluralize from "pluralize";
+import { LoadType } from "shoukaku";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Add a track to queue.",
@@ -97,7 +98,7 @@ export class PlayCommand extends KoosCommand {
         const options: ApplicationCommandOptionChoiceData[] = [];
 
         if (isNullishOrEmpty(query.value)) return interaction.respond([]);
-        let { tracks, loadType, playlistInfo } = await manager.search(query.value, {
+        let { tracks, loadType, playlistName } = await manager.search(query.value, {
             requester: interaction.member as GuildMember,
             engine: SearchEngine.YoutubeMusic,
         });
@@ -105,12 +106,12 @@ export class PlayCommand extends KoosCommand {
         tracksMap.set(queryId, query.value);
         options.push({ name: cutText(`${query.value}`, 100), value: queryId });
 
-        if (loadType === "PLAYLIST_LOADED") {
+        if (loadType === LoadType.PLAYLIST) {
             const id = generateId();
             const tracks = tracksMap.set(id, query.value);
 
             this.tracks.set(`${guildId}:${memberId}`, tracks);
-            options.push({ name: cutText(`${playlistInfo.name}`, 100), value: id });
+            options.push({ name: cutText(`${playlistName}`, 100), value: id });
 
             return interaction.respond(options);
         } else {
@@ -137,7 +138,8 @@ export class PlayCommand extends KoosCommand {
 
     private async play(query: string, { message, player, channel, data }: PlayCommandOptions) {
         const { manager } = this.container;
-        const result = await manager.search(query, { requester: message.member as GuildMember }).catch(() => undefined);
+        const result = await manager.search(query, { requester: message.member as GuildMember }).catch((e) => console.log(e));
+        // console.log(result);
         if (!result) return new EmbedBuilder().setDescription(`Something went wrong when trying to search`).setColor(KoosColor.Error);
         if (isNullishOrEmpty(result.tracks))
             return new EmbedBuilder().setDescription(`I couldn't find anything in the query you gave me`).setColor(KoosColor.Error);
@@ -164,16 +166,16 @@ export class PlayCommand extends KoosCommand {
         let queue: Track[] = [];
 
         switch (result.loadType) {
-            case "PLAYLIST_LOADED":
+            case LoadType.PLAYLIST:
                 for (let track of result.tracks) queue.push(track);
                 const playlistLength = result.tracks.length;
                 msg = oneLine`
-                    Queued playlist [${result.playlistInfo.name}](${query}) with
+                    Queued playlist [${result.playlistName}](${query}) with
                     ${playlistLength} ${pluralize("track", playlistLength)}
                 `;
                 break;
-            case "SEARCH_RESULT":
-            case "TRACK_LOADED":
+            case LoadType.SEARCH:
+            case LoadType.TRACK:
                 let [track] = result.tracks;
                 let title = createTitle(track);
 

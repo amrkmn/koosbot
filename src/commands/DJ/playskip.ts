@@ -17,6 +17,7 @@ import {
     type VoiceBasedChannel,
 } from "discord.js";
 import pluralize from "pluralize";
+import { LoadType } from "shoukaku";
 
 @ApplyOptions<KoosCommand.Options>({
     description: "Play the tracks right away.",
@@ -95,15 +96,15 @@ export class PlaySkipCommand extends KoosCommand {
         const memberId = (interaction.member as GuildMember).id;
 
         if (!query.value) return interaction.respond([]);
-        let { tracks, loadType, playlistInfo } = await manager.search(query.value, {
+        let { tracks, loadType, playlistName } = await manager.search(query.value, {
             requester: interaction.member as GuildMember,
             engine: SearchEngine.YoutubeMusic,
         });
 
-        if (loadType === "PLAYLIST_LOADED") {
+        if (loadType === LoadType.PLAYLIST) {
             let tracks = [query.value];
             this.tracks.set(`${guildId}:${memberId}`, tracks);
-            return interaction.respond([{ name: cutText(`${playlistInfo.name}`, 100), value: `a:${tracks.length - 1}` }]);
+            return interaction.respond([{ name: cutText(`${playlistName}`, 100), value: `a:${tracks.length - 1}` }]);
         } else {
             tracks = tracks.slice(0, 10);
 
@@ -148,7 +149,7 @@ export class PlaySkipCommand extends KoosCommand {
             }
         }
 
-        if (result.loadType === "PLAYLIST_LOADED") {
+        if (result.loadType === LoadType.PLAYLIST) {
             const newQueue = new Queue();
             const currentQueue = player.queue.data;
             player.queue.clear();
@@ -157,7 +158,7 @@ export class PlaySkipCommand extends KoosCommand {
 
             const playlistLength = result.tracks.length;
             const msg = oneLine`
-                Queued playlist [${result.playlistInfo.name}](${query}) with
+                Queued playlist [${result.playlistName}](${query}) with
                 ${playlistLength} ${pluralize("track", playlistLength)}
             `;
 

@@ -76,12 +76,14 @@ export class VolumeCommand extends KoosCommand {
         const { db } = this.container;
 
         if (isNullish(input) || typeof input === "undefined") {
-            let volume = player.volume * 100;
+            let volume = (player.volume ?? 0) * 100;
             return new EmbedBuilder().setDescription(`Current volume is \`${volume}%\``).setColor(KoosColor.Default);
         }
 
         player.setVolume(input);
         await db.guild.update({ where: { id: player.guildId }, data: { volume: input } });
-        return new EmbedBuilder().setDescription(`Changed the volume to \`${player.volume * 100}%\``).setColor(KoosColor.Default);
+        return new EmbedBuilder()
+            .setDescription(`Changed the volume to \`${(player.volume ?? 0) * 100}%\``)
+            .setColor(KoosColor.Default);
     }
 }

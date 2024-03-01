@@ -11,7 +11,7 @@ import { Player } from "shoukaku";
 export class ClientListener extends Listener {
     async run(node: string, players: Array<Player>, moved: boolean) {
         if (moved) return;
-        players.map((player) => player.connection.disconnect());
+        players.map((player) => player.destroy());
         this.container.logger.warn(`Node ${cyan(node)} disconnected.`);
     }
 }
