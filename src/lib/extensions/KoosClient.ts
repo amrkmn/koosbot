@@ -1,4 +1,5 @@
 import { Manager } from "#lib/audio";
+import { SearchEngine } from "#lib/types";
 import { Nodes } from "#utils/constants";
 import { PrismaClient } from "@prisma/client";
 import { isMessageInstance } from "@sapphire/discord.js-utilities";
@@ -74,6 +75,7 @@ export class KoosClient extends SapphireClient {
             shoukakuOptions: {
                 moveOnDisconnect: true,
             },
+            defaultSearchEngine: SearchEngine.YoutubeMusic,
         });
         container.shoukaku = container.manager.shoukaku;
 
