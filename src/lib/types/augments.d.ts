@@ -7,8 +7,7 @@ declare module "@skyra/env-utilities" {
         CLIENT_OWNERS?: ArrayString;
         CLIENT_ID?: string;
 
-        HASTEBIN_POST_URL?: string;
-        HASTEBIN_GET_URL?: string;
+        WASTEBIN_URL?: string;
 
         DISCORD_TOKEN?: string;
         DATABASE_URL_SECRET?: string;

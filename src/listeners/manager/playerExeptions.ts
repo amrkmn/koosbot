@@ -36,7 +36,6 @@ export class ClientListener extends Listener {
         const channel = await client.channels.fetch(player.textChannel).catch(() => null);
         const interval = setInterval(async () => {
             const dashboard = player.dashboard();
-            console.log(dashboard);
             if (isNullish(dashboard)) {
                 clearInterval(interval);
             } else {

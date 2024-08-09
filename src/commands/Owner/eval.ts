@@ -49,15 +49,15 @@ export class EvalCommand extends KoosCommand {
 
         if (result.length > 1800) {
             try {
-                const data = await this.request(envParseString("HASTEBIN_POST_URL") as string)
-                    .body(result)
+                const data = await this.request(envParseString("WASTEBIN_URL"))
+                    .body({ text: result, extension: "txt" })
                     .options("throwOnError", true)
                     .post()
-                    .json<HasteBinResponse>();
+                    .json<{ path: string }>();
                 return send(message, {
                     content: stripIndents`
                         **Output**:
-                        Output was too long... sent the result to hastebin: ${envParseString("HASTEBIN_GET_URL")}/${data.key}.txt
+                        Output was too long... sent the result to hastebin: ${envParseString("WASTEBIN_URL")}${data.path}
                         
                         ${typeFooter}
                     `,

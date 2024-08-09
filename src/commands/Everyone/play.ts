@@ -139,7 +139,6 @@ export class PlayCommand extends KoosCommand {
     private async play(query: string, { message, player, channel, data }: PlayCommandOptions) {
         const { manager } = this.container;
         const result = await manager.search(query, { requester: message.member as GuildMember }).catch((e) => console.log(e));
-        // console.log(result);
         if (!result) return new EmbedBuilder().setDescription(`Something went wrong when trying to search`).setColor(KoosColor.Error);
         if (isNullishOrEmpty(result.tracks))
             return new EmbedBuilder().setDescription(`I couldn't find anything in the query you gave me`).setColor(KoosColor.Error);
