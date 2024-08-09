@@ -4,6 +4,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Listener, Store } from "@sapphire/framework";
 import { blue, yellow } from "colorette";
 import { OAuth2Scopes, ActivityType } from "discord.js";
+import { noop } from "@sapphire/utilities";
 
 const dev = envParseString("NODE_ENV") !== "production";
 
@@ -44,7 +45,7 @@ export class ClientListener extends Listener {
                     update: { prefix: envParseString("CLIENT_PREFIX") },
                     create: { id: guild.id, prefix: envParseString("CLIENT_PREFIX") },
                 })
-                .catch((e) => client.logger.error(e));
+                .catch(noop);
         });
     }
 
