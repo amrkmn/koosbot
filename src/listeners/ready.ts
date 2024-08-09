@@ -37,7 +37,6 @@ export class ClientListener extends Listener {
         client.logger.info(`Logged in as ${client.user?.tag}`);
         this.printStoreDebugInformation();
 
-        client.logger.info(envParseString("DATABASE_URL_SECRET"))
         client.guilds.cache.map(async (guild) => {
             await this.container.db.guild
                 .upsert({
