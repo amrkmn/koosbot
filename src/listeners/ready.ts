@@ -36,6 +36,7 @@ export class ClientListener extends Listener {
         client.logger.info(`Logged in as ${client.user?.tag}`);
         this.printStoreDebugInformation();
 
+        client.logger.info(envParseString("DATABASE_URL_SECRET"))
         client.guilds.cache.map(async (guild) => {
             await this.container.db.guild
                 .upsert({
@@ -43,7 +44,7 @@ export class ClientListener extends Listener {
                     update: { prefix: envParseString("CLIENT_PREFIX") },
                     create: { id: guild.id, prefix: envParseString("CLIENT_PREFIX") },
                 })
-                .catch(() => undefined);
+                .catch((e) => client.logger.error(e));
         });
     }
 
