@@ -2,7 +2,6 @@ import type { BooleanString, IntegerString, NumberString, ArrayString } from "@s
 
 declare module "@skyra/env-utilities" {
     interface Env {
-        CLIENT_NAME?: string;
         CLIENT_PREFIX?: string;
         CLIENT_OWNERS?: ArrayString;
         CLIENT_ID?: string;

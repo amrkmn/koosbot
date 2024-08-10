@@ -1,0 +1,18 @@
+services:
+  koosbot:
+    container_name: koosbot
+    image: ujol/koosbot
+    environment:
+      PORT: "8888"
+      DISCORD_TOKEN: ""
+      DATABASE_URL_SECRET: ""
+      CLIENT_PREFIX: "k."
+      CLIENT_OWNERS: ""
+      CLIENT_ID: ""
+      SPOTIFY_ID: ""
+      SPOTIFY_SECRET: ""
+      GENIUS_TOKEN: ""
+      WASTEBIN_URL: "https://waste.ujol.dev"
+    ports:
+      - 8888:8888
+    restart: unless-stopped
