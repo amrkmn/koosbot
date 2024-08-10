@@ -2,7 +2,7 @@
 
 # Adjust NODE_VERSION as desired
 ARG NODE_VERSION=18.16.1
-FROM node:${NODE_VERSION}-slim as base
+FROM node:${NODE_VERSION}-slim AS base
 
 LABEL fly_launch_runtime="Node.js/Prisma"
 
@@ -12,9 +12,8 @@ WORKDIR /app
 # Set production environment
 ENV NODE_ENV="production"
 
-
 # Throw-away build stage to reduce size of final image
-FROM base as build
+FROM base AS build
 
 # Install packages needed to build node modules
 RUN apt-get update -qq && \
@@ -26,7 +25,7 @@ RUN yarn install --frozen-lockfile --production=false
 
 # Generate Prisma Client
 COPY --link prisma .
-RUN npx prisma generate
+RUN yarn prisma generate
 
 # Copy application code
 COPY --link . .
@@ -50,5 +49,5 @@ RUN apt-get update -qq && \
 COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
-EXPOSE 3000
+EXPOSE 8888
 CMD [ "yarn", "run", "start" ]
