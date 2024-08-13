@@ -71,12 +71,10 @@ export class PrefixCommand extends KoosCommand {
 
         if (isNullish(input)) {
             const data = await db.guild.findUnique({ where: { id: guildId } });
-            let prefix = 'o.';
-            if (envParseString("NODE_ENV") === "production") {
-                if (isNullish(data)) prefix = `${envParseString("CLIENT_PREFIX")}`;
-                else if (data.prefix === "NONE") prefix = `${envParseString("CLIENT_PREFIX")}`;
-                else prefix = `${data.prefix}`;
-            }
+            let prefix;
+            if (isNullish(data)) prefix = `${envParseString("CLIENT_PREFIX")}`;
+            else if (data.prefix === "NONE") prefix = `${envParseString("CLIENT_PREFIX")}`;
+            else prefix = `${data.prefix}`;
 
             return new EmbedBuilder()
                 .setDescription(`Prefix in **${guildName}** is set to: \`${prefix}\``)

@@ -1,11 +1,9 @@
 import { Player } from "#lib/audio";
-import { Spotify } from "#lib/structures";
 import { Events, SearchEngine, type CreatePlayerOptions, type ManagerOptions, type Result, type SearchOptions } from "#lib/types";
 import { Regex } from "#utils/constants";
 import { transform } from "#utils/functions";
-import { isNullish, isNullishOrEmpty, isNumber } from "@sapphire/utilities";
-import { envParseString } from "@skyra/env-utilities";
-import { EventEmitter } from "events";
+import { isNullish, isNumber } from "@sapphire/utilities";
+import { EventEmitter, } from "node:events";
 import { Shoukaku } from "shoukaku";
 
 export class Manager extends EventEmitter {
@@ -52,22 +50,23 @@ export class Manager extends EventEmitter {
 
         let result: Result;
 
-        if (Regex.Spotify.test(query)) {
-            Regex.Spotify.lastIndex = 0;
+        // if (Regex.Spotify.test(query)) {
+        //     Regex.Spotify.lastIndex = 0;
 
-            const spotify = new Spotify({
-                clientId: `${envParseString("SPOTIFY_ID")}`,
-                clientSecret: `${envParseString("SPOTIFY_SECRET")}`,
-            });
+        //     const spotify = new Spotify({
+        //         clientId: `${envParseString("SPOTIFY_ID")}`,
+        //         clientSecret: `${envParseString("SPOTIFY_SECRET")}`,
+        //     });
 
-            const exec = Regex.Spotify.exec(query);
-            const [, type, id] = isNullishOrEmpty(exec) ? [] : exec;
+        //     const exec = Regex.Spotify.exec(query);
+        //     const [, type, id] = isNullishOrEmpty(exec) ? [] : exec;
 
-            if (type === "track") result = await spotify.getTrack(id, options.requester);
-            else if (type === "album") result = await spotify.getAlbum(id, options.requester);
-            else if (type === "playlist") result = await spotify.getPlaylist(id, options.requester);
-            else result = await spotify.searchTrack(query, options.requester);
-        } else if (Regex.Youtube.test(query)) {
+        //     if (type === "track") result = await spotify.getTrack(id, options.requester);
+        //     else if (type === "album") result = await spotify.getAlbum(id, options.requester);
+        //     else if (type === "playlist") result = await spotify.getPlaylist(id, options.requester);
+        //     else result = await spotify.searchTrack(query, options.requester);
+        // } else
+        if (Regex.Youtube.test(query)) {
             const res = await node.rest.resolve(query);
             result = transform(res, options.requester);
         } else {

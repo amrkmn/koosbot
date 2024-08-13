@@ -184,7 +184,7 @@ export class SearchCommand extends KoosCommand {
                             .setColor(KoosColor.Default);
                         interaction.editReply({ embeds: [embed], components: [] });
                         return collector.stop("picked");
-                    } else if (userOptions.length >= 1 && loadType === LoadType.PLAYLIST) {
+                    } else if (userOptions.length >= 1 && loadType === LoadType.SEARCH) {
                         let selected = [];
                         let msg = "";
 
