@@ -5,7 +5,7 @@ export const UserAgent =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36";
 
 export const Nodes: NodeOption[] = [
-    { name: "node1", url: "ssl.lavalink.rocks:443", auth: "horizxon.tech", secure: true },
+    { name: "node1", url: "v4.lavalink.rocks:443", auth: "horizxon.tech", secure: true },
     // { name: "node2", url: "lavalink.ujol.dev:443", auth: "youshallnotpass", secure: true },
 ];
 
