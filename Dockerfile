@@ -4,8 +4,6 @@
 ARG NODE_VERSION=18.16.1
 FROM node:${NODE_VERSION}-slim AS base
 
-LABEL fly_launch_runtime="Node.js/Prisma"
-
 # Node.js/Prisma app lives here
 WORKDIR /app
 
@@ -17,7 +15,8 @@ FROM base AS build
 
 # Install packages needed to build node modules
 RUN apt-get update -qq && \
-    apt-get install -y build-essential openssl pkg-config python-is-python3
+    apt-get install -y --no-install-recommends build-essential openssl pkg-config python-is-python3 && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install node modules
 COPY --link package.json yarn.lock ./
@@ -34,8 +33,11 @@ COPY --link . .
 RUN yarn run build
 
 # Remove development dependencies
-RUN yarn install --production=true
-
+RUN yarn install --production=true && \
+    rm -rf /usr/share/doc && \
+    rm -rf /usr/share/man && \
+    rm -rf /var/cache/apt/* && \
+    rm -rf /root/.cache
 
 # Final stage for app image
 FROM base
@@ -43,7 +45,7 @@ FROM base
 # Install packages needed for deployment
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y openssl && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 # Copy built application
 COPY --from=build /app /app
