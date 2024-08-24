@@ -6,7 +6,8 @@ export const UserAgent =
 
 export const Nodes: NodeOption[] = [
     { name: "node1", url: "v4.lavalink.rocks:443", auth: "horizxon.tech", secure: true },
-    // { name: "node2", url: "lavalink.ujol.dev:443", auth: "youshallnotpass", secure: true },
+    { name: "node2", url: "v4.lavalink.rocks:80", auth: "horizxon.tech", secure: false },
+    { name: "node3", url: "lavalink.ujol.dev:443", auth: "youshallnotpass", secure: true },
 ];
 
 export const Regex = {
