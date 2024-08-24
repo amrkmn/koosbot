@@ -3,7 +3,7 @@ import { Events, SearchEngine, type CreatePlayerOptions, type ManagerOptions, ty
 import { Regex } from "#utils/constants";
 import { transform } from "#utils/functions";
 import { isNullish, isNumber } from "@sapphire/utilities";
-import { EventEmitter, } from "node:events";
+import { EventEmitter } from "node:events";
 import { Shoukaku } from "shoukaku";
 
 export class Manager extends EventEmitter {
