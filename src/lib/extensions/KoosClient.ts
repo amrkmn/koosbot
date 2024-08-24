@@ -74,6 +74,7 @@ export class KoosClient extends SapphireClient {
             send: (id, payload) => this.guilds.cache.get(id)?.shard?.send(payload),
             shoukakuOptions: {
                 moveOnDisconnect: true,
+                reconnectTries: 30,
             },
             defaultSearchEngine: SearchEngine.YoutubeMusic,
         });
