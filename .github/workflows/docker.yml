@@ -22,7 +22,7 @@ jobs:
             - name: Get version
               id: version
               run: |
-                  echo "zipline_version=$(jq .version package.json -r)" >> $GITHUB_OUTPUT
+                  echo "koosbot_version=$(jq .version package.json -r)" >> $GITHUB_OUTPUT
 
             - name: Setup QEMU
               uses: docker/setup-qemu-action@v2
@@ -35,7 +35,7 @@ jobs:
               uses: docker/login-action@v2
               with:
                   registry: ujol.dev
-                  username: u
+                  username: ${{ secrets.FORGEJO_USER }}
                   password: ${{ secrets.FORGEJO_PASSWORD }}
 
             - name: Build Docker Image
@@ -44,7 +44,7 @@ jobs:
                   push: true
                   platforms: linux/amd64,linux/arm64
                   tags: |
-                      ujol.dev/u/${{ github.repository }}:latest
-                      ujol.dev/u/${{ github.repository }}:latest-${{ steps.version.outputs.zipline_version }}
+                      ujol.dev/u/koosbot:latest
+                      ujol.dev/u/koosbot:latest-${{ steps.version.outputs.koosbot_version }}
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
