@@ -15,9 +15,9 @@ export class ClientListener extends Listener {
     private readonly style = dev ? yellow : blue;
 
     public async run(client: KoosClient) {
-        client.logger.info(
+        client.logger.debug(
             client.generateInvite({
-                scopes: [OAuth2Scopes.Bot],
+                scopes: [OAuth2Scopes.Bot, OAuth2Scopes.ApplicationsCommands],
                 permissions: [
                     "CreateInstantInvite",
                     "AttachFiles",
