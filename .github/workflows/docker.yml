@@ -11,7 +11,7 @@ on:
     workflow_dispatch:
 
 jobs:
-    push-to-registry:
+    push:
         runs-on: ubuntu-latest
         steps:
             - name: Check out the repo
