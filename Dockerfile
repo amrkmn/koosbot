@@ -4,54 +4,52 @@
 ARG NODE_VERSION=lts
 FROM node:${NODE_VERSION}-slim AS base
 
-# Set up environment variables and working directory
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+# Node.js/Prisma app lives here
 WORKDIR /app
 
-# Enable corepack for package management
-RUN corepack enable
+# Set production environment
+ENV NODE_ENV="production"
 
-# Throw-away build stage to reduce size of the final image
+# Throw-away build stage to reduce size of final image
 FROM base AS build
 
-# Install necessary build dependencies
+# Install packages needed to build node modules
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends build-essential openssl pkg-config python-is-python3 && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy package files and install dependencies
-COPY --link package.json pnpm-lock.yaml ./
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile
+# Install node modules
+COPY --link package.json yarn.lock ./
+RUN yarn install --frozen-lockfile --production=false
 
-# Copy and generate prisma client
+# Generate Prisma Client
 COPY --link prisma .
-RUN pnpm run generate
+RUN yarn prisma generate
 
-# Copy application code and build the application
+# Copy application code
 COPY --link . .
-RUN pnpm run build
 
-# Remove unnecessary dependencies and clean up
-RUN pnpm install --prod --frozen-lockfile && \
-    rm -rf /usr/share/doc /usr/share/man /var/cache/apt/* /root/.cache
+# Build application
+RUN yarn run build
 
-# Final stage for the production image
-FROM base AS prod
+# Remove development dependencies
+RUN yarn install --production=true && \
+    rm -rf /usr/share/doc && \
+    rm -rf /usr/share/man && \
+    rm -rf /var/cache/apt/* && \
+    rm -rf /root/.cache
 
-# Set production environment
-ENV NODE_ENV="production"
-WORKDIR /app
+# Final stage for app image
+FROM base
 
-# Install only the necessary runtime packages
+# Install packages needed for deployment
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y openssl && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
-# Copy the built application from the build stage
+# Copy built application
 COPY --from=build /app /app
 
-# Expose the application port and define the startup command
+# Start the server by default, this can be overwritten at runtime
 EXPOSE 8888
-CMD ["pnpm", "run", "start"]
+CMD [ "yarn", "run", "start" ]
