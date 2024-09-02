@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1
 
 # Adjust NODE_VERSION as desired
-ARG NODE_VERSION=18.17.1
+ARG NODE_VERSION=lts
 FROM node:${NODE_VERSION}-slim AS base
 
 # Set up environment variables and working directory
@@ -17,11 +17,7 @@ FROM base AS build
 
 # Install necessary build dependencies
 RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends \
-    build-essential \
-    openssl \
-    pkg-config \
-    python-is-python3 && \
+    apt-get install -y --no-install-recommends build-essential openssl pkg-config python-is-python3 && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy package files and install dependencies
@@ -29,9 +25,13 @@ COPY --link package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile
 
+# Copy and generate prisma client
+COPY --link prisma .
+RUN pnpm run generate
+
 # Copy application code and build the application
 COPY --link . .
-RUN pnpm run build && pnpm run generate
+RUN pnpm run build
 
 # Remove unnecessary dependencies and clean up
 RUN pnpm install --prod --frozen-lockfile && \
