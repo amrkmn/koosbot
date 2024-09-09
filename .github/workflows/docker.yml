@@ -8,6 +8,7 @@ on:
             - "prisma/**"
             - ".github/**"
             - "Dockerfile"
+            - "Dockerfile.alpine"
     workflow_dispatch:
 
 jobs:
@@ -36,13 +37,28 @@ jobs:
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Build Docker Image
+            # Step to build and push the default Docker image (non-Alpine)
+            - name: Build and Push Docker Image (default)
               uses: docker/build-push-action@v3
               with:
                   push: true
-                  platforms: linux/amd64,linux/arm64
+                  platforms: linux/amd64
                   tags: |
                       ghcr.io/${{ github.repository }}:latest
                       ghcr.io/${{ github.repository }}:${{ steps.version.outputs.koosbot_version }}
+                  cache-from: type=gha
+                  cache-to: type=gha,mode=max
+
+            # Step to build and push the Alpine Docker image
+            - name: Build and Push Docker Image (Alpine)
+              uses: docker/build-push-action@v3
+              with:
+                  context: .
+                  file: ./Dockerfile.alpine # Specify the Alpine Dockerfile
+                  push: true
+                  platforms: linux/amd64
+                  tags: |
+                      ghcr.io/${{ github.repository }}:alpine
+                      ghcr.io/${{ github.repository }}:alpine-${{ steps.version.outputs.koosbot_version }}
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
