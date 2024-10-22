@@ -11,6 +11,7 @@ import { codeBlock, isThenable } from "@sapphire/utilities";
 import { envParseString } from "@skyra/env-utilities";
 import { stripIndents } from "common-tags";
 import type { Message } from "discord.js";
+import ms from "ms";
 import { inspect } from "util";
 
 type HasteBinResponse = {
@@ -50,7 +51,7 @@ export class EvalCommand extends KoosCommand {
         if (result.length > 1800) {
             try {
                 const data = await this.request(envParseString("WASTEBIN_URL"))
-                    .body({ text: result, extension: "txt" })
+                    .body({ text: result, extension: "txt", expires: `${ms('7d')}` })
                     .options("throwOnError", true)
                     .post()
                     .json<{ path: string }>();
