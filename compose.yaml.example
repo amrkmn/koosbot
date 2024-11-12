@@ -1,7 +1,7 @@
 services:
   koosbot:
     container_name: koosbot
-    image: ujol/koosbot
+    image: ghcr.io/amrkmn/koosbot
     environment:
       PORT: "8888"
       DISCORD_TOKEN: ""
@@ -13,6 +13,7 @@ services:
       SPOTIFY_SECRET: ""
       GENIUS_TOKEN: ""
       WASTEBIN_URL: "https://waste.ujol.dev"
+      LAVALINK_NODES: ""
     ports:
       - 8888:8888
     restart: unless-stopped
