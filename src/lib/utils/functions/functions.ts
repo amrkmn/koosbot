@@ -5,6 +5,7 @@ import { send } from "@sapphire/plugin-editable-commands";
 import { isNullish, isObject } from "@sapphire/utilities";
 import { EmbedBuilder, Message } from "discord.js";
 import pluralize from "pluralize";
+import type { NodeOption } from "shoukaku";
 
 export async function databasePing() {
     const startTime = process.hrtime.bigint();
@@ -178,3 +179,10 @@ export function deepCompare<T extends Record<string, any>>(obj1: T, obj2: T): bo
 export function escapeRegExp(string: string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
+
+export const parseNodeOption = (node: string, index: number): NodeOption => {
+    const secure = node.startsWith("wss");
+    const [auth, url] = node.replace(/^wss?:\/\//, "").split("@");
+
+    return { name: `node${index + 1}`, url, auth, secure };
+};

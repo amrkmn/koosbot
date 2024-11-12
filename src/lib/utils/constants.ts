@@ -1,15 +1,12 @@
+import { envParseArray } from "@skyra/env-utilities";
 import type { NodeOption } from "shoukaku";
+import { parseNodeOption } from "#utils/functions";
 
 export const zws = "\u200B";
 export const UserAgent =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36";
 
-export const Nodes: NodeOption[] = [
-    // { name: "node1", url: "lava.horizxon.rocks:443", auth: "horizxon.tech", secure: true },
-    // { name: "node2", url: "lava.horizxon.rocks:80", auth: "horizxon.tech", secure: false },
-    { name: "node3", url: "lavalink.jirayu.net:13592", auth: "youshallnotpass", secure: false },
-    { name: "node4", url: "lavalink.ujol.dev:443", auth: "pleasegoaway", secure: true },
-];
+export const Nodes: NodeOption[] = envParseArray("LAVALINK_NODES", ["wss://pleasegoaway@lavalink.ujol.dev:443"]).map(parseNodeOption);
 
 export const Regex = {
     Youtube: /(youtu\.be\/|youtube\.com\/)/g,
