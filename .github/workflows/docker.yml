@@ -37,7 +37,6 @@ jobs:
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
 
-            # Step to build and push the default Docker image (non-Alpine)
             - name: Build and Push Docker Image (default)
               uses: docker/build-push-action@v6
               with:
@@ -46,19 +45,5 @@ jobs:
                   tags: |
                       ghcr.io/${{ github.repository }}:latest
                       ghcr.io/${{ github.repository }}:${{ steps.version.outputs.koosbot_version }}
-                  cache-from: type=gha
-                  cache-to: type=gha,mode=max
-
-            # Step to build and push the Alpine Docker image
-            - name: Build and Push Docker Image (Alpine)
-              uses: docker/build-push-action@v6
-              with:
-                  context: .
-                  file: ./Dockerfile.alpine # Specify the Alpine Dockerfile
-                  push: true
-                  platforms: linux/amd64
-                  tags: |
-                      ghcr.io/${{ github.repository }}:alpine
-                      ghcr.io/${{ github.repository }}:alpine-${{ steps.version.outputs.koosbot_version }}
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
