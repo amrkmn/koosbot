@@ -2,7 +2,7 @@
 
 # Adjust NODE_VERSION as desired
 ARG NODE_VERSION=20.18.0
-FROM node:${NODE_VERSION}-slim AS base
+FROM node:${NODE_VERSION}-alpine AS base
 
 # Node.js/Prisma app lives here
 WORKDIR /app
@@ -14,9 +14,12 @@ ENV NODE_ENV="production"
 FROM base AS build
 
 # Install packages needed to build node modules
-RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends build-essential openssl pkg-config python-is-python3 && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk upgrade --no-cache
+RUN apk add --no-cache \
+    build-base \
+    openssl \
+    python3 \
+    py3-pip
 
 # Install node modules
 COPY --link package.json yarn.lock ./
@@ -36,16 +39,13 @@ RUN yarn run build
 RUN yarn install --production=true && \
     rm -rf /usr/share/doc && \
     rm -rf /usr/share/man && \
-    rm -rf /var/cache/apt/* && \
     rm -rf /root/.cache
 
 # Final stage for app image
 FROM base
 
 # Install packages needed for deployment
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y openssl && \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+RUN apk add --no-cache openssl
 
 # Copy built application
 COPY --from=build /app /app
