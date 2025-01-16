@@ -1,0 +1,49 @@
+when:
+  - branch: main
+    event: push
+    path:
+      - "src/**"
+      - "prisma/**"
+      - ".woodpecker/**"
+      - "Dockerfile"
+  - event: [tag, manual]
+
+clone:
+  git:
+    image: woodpeckerci/plugin-git
+    settings:
+      depth: 1
+
+steps:
+  dev:
+    image: woodpeckerci/plugin-docker-buildx
+    settings:
+      platforms: linux/amd64,linux/arm64
+      repo: codeberg.org/${CI_REPO_OWNER}/koosbot
+      registry: codeberg.org
+      tag:
+        - dev
+      username: ${CI_REPO_OWNER}
+      password:
+        from_secret: cb_token
+    when:
+      branch: main
+      event: push
+      path:
+        - "src/**"
+        - "prisma/**"
+        - ".woodpecker/**"
+        - "Dockerfile"
+
+  publish:
+    image: woodpeckerci/plugin-docker-buildx
+    settings:
+      platforms: linux/amd64,linux/arm64
+      repo: codeberg.org/${CI_REPO_OWNER}/koosbot
+      registry: codeberg.org
+      auto_tag: true
+      username: ${CI_REPO_OWNER}
+      password:
+        from_secret: cb_token
+    when:
+      event: tag
