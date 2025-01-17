@@ -23,8 +23,12 @@ steps:
       registry: codeberg.org
       tag:
         - dev
-      cache_images:
-        - codeberg.org/${CI_REPO_OWNER}/koosbot:dev-cache
+      cache_from: type=s3,endpoint_url=https://m.noz.one,region=us-east-1,bucket=woodpecker,name=cache
+      cache_to: type=s3,endpoint_url=https://m.noz.one,region=us-east-1,bucket=woodpecker,name=cache,mode=max
+      aws_access_key_id:
+        from_secret: minio_access_key_id
+      aws_secret_access_key:
+        from_secret: minio_secret_access_key
       username: ${CI_REPO_OWNER}
       password:
         from_secret: cb_token
@@ -44,8 +48,12 @@ steps:
       repo: codeberg.org/${CI_REPO_OWNER}/koosbot
       registry: codeberg.org
       auto_tag: true
-      cache_images:
-        - codeberg.org/${CI_REPO_OWNER}/koosbot:cache
+      cache_from: type=s3,endpoint_url=https://f76393c47e1de54ffcbea638c0e00be7.r2.cloudflarestorage.com,region=us-east-1,bucket=woodpecker,name=cache
+      cache_to: type=s3,endpoint_url=https://f76393c47e1de54ffcbea638c0e00be7.r2.cloudflarestorage.com,region=us-east-1,bucket=woodpecker,name=cache,mode=max
+      aws_access_key_id:
+        from_secret: aws_access_key_id
+      aws_secret_access_key:
+        from_secret: aws_secret_access_key
       username: ${CI_REPO_OWNER}
       password:
         from_secret: cb_token
