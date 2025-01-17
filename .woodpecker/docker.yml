@@ -34,7 +34,7 @@ steps:
         from_secret: minio_secret_access_key
     when:
       branch: main
-      event: push
+      event: [push, manual]
       path:
         - "src/**"
         - "prisma/**"
