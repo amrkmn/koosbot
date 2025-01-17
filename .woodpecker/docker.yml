@@ -26,8 +26,8 @@ steps:
         from_secret: cb_token
       tag:
         - dev
-      cache_from: type=s3,endpoint_url=https://m.noz.one,region=us-east-1,bucket=woodpecker,name=cache
-      cache_to: type=s3,endpoint_url=https://m.noz.one,region=us-east-1,bucket=woodpecker,name=cache,mode=max
+      cache_from: type=s3,endpoint_url=https://m.noz.one,region=us-east-1,bucket=woodpecker,name=dev
+      cache_to: type=s3,endpoint_url=https://m.noz.one,region=us-east-1,bucket=woodpecker,name=dev,mode=max
       aws_access_key_id:
         from_secret: minio_access_key_id
       aws_secret_access_key:
@@ -51,8 +51,8 @@ steps:
       password:
         from_secret: cb_token
       auto_tag: true
-      cache_from: type=s3,endpoint_url=https://f76393c47e1de54ffcbea638c0e00be7.r2.cloudflarestorage.com,region=us-east-1,bucket=woodpecker,name=cache
-      cache_to: type=s3,endpoint_url=https://f76393c47e1de54ffcbea638c0e00be7.r2.cloudflarestorage.com,region=us-east-1,bucket=woodpecker,name=cache,mode=max
+      cache_from: type=s3,endpoint_url=https://m.noz.onz,region=us-east-1,bucket=woodpecker,name=latest
+      cache_to: type=s3,endpoint_url=https://m.noz.one,region=us-east-1,bucket=woodpecker,name=latest,mode=max
       aws_access_key_id:
         from_secret: aws_access_key_id
       aws_secret_access_key:
