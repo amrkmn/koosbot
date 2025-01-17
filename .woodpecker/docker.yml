@@ -23,6 +23,8 @@ steps:
       registry: codeberg.org
       tag:
         - dev
+      cache_images:
+        - codeberg.org/${CI_REPO_OWNER}/koosbot:dev
       username: ${CI_REPO_OWNER}
       password:
         from_secret: cb_token
@@ -42,6 +44,8 @@ steps:
       repo: codeberg.org/${CI_REPO_OWNER}/koosbot
       registry: codeberg.org
       auto_tag: true
+      cache_images:
+        - codeberg.org/${CI_REPO_OWNER}/koosbot:latest
       username: ${CI_REPO_OWNER}
       password:
         from_secret: cb_token
