@@ -28,6 +28,11 @@ steps:
         - main
       cache_images:
         - ujol/koosbot:main-cache
+      logins:
+        - registry: https://index.docker.io/v1/
+          username: ujol
+          password:
+            from_secret: docker_pat
     when:
       branch: main
       event: push
@@ -49,5 +54,10 @@ steps:
       auto_tag: true
       cache_images:
         - ujol/koosbot:cache
+      logins:
+        - registry: https://index.docker.io/v1/
+          username: ujol
+          password:
+            from_secret: docker_pat
     when:
       event: tag
