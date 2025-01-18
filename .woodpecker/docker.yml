@@ -15,7 +15,7 @@ clone:
       depth: 1
 
 steps:
-  dev:
+  main:
     image: woodpeckerci/plugin-docker-buildx
     settings:
       platforms: linux/amd64,linux/arm64
@@ -25,14 +25,9 @@ steps:
       password:
         from_secret: cb_token
       tag:
-        - dev
-      cache_from: type=s3,endpoint_url=https://m.noz.one,region=us-east-1,bucket=woodpecker,name=dev
-      cache_to: type=s3,endpoint_url=https://m.noz.one,region=us-east-1,bucket=woodpecker,name=dev,mode=max
-#      aws_region: us-east-1
-#      aws_access_key_id:
-#        from_secret: aws_access_key_id
-#      aws_secret_access_key:
-#        from_secret: aws_access_key_id
+        - main
+      cache_images:
+        - ujol/koosbot:main-cache
     when:
       branch: main
       event: push
@@ -52,12 +47,7 @@ steps:
       password:
         from_secret: cb_token
       auto_tag: true
-      cache_from: type=s3,endpoint_url=https://m.noz.onz,region=us-east-1,bucket=woodpecker,name=latest
-      cache_to: type=s3,endpoint_url=https://m.noz.one,region=us-east-1,bucket=woodpecker,name=latest,mode=max
-#      aws_region: us-east-1
-#      aws_access_key_id:
-#        from_secret: aws_access_key_id
-#      aws_secret_access_key:
-#        from_secret: aws_secret_access_key
+      cache_images:
+        - ujol/koosbot:cache
     when:
       event: tag
