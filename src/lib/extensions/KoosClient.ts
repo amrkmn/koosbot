@@ -4,6 +4,7 @@ import { Nodes } from "#utils/constants";
 import { PrismaClient } from "@prisma/client";
 import { isMessageInstance } from "@sapphire/discord.js-utilities";
 import { LogLevel, SapphireClient, container, type Awaitable, type SapphirePrefix } from "@sapphire/framework";
+import { isNullishOrEmpty } from "@sapphire/utilities";
 import { envParseNumber, envParseString } from "@skyra/env-utilities";
 import { GatewayIntentBits, Guild, Message, Partials } from "discord.js";
 import { Client as GeniusClient } from "genius-lyrics";
@@ -68,17 +69,19 @@ export class KoosClient extends SapphireClient {
     public override async login(token?: string | undefined): Promise<string> {
         container.genius = new GeniusClient(envParseString("GENIUS_TOKEN"));
         container.db = new PrismaClient();
-        container.manager = new Manager({
-            connector: new Connectors.DiscordJS(this),
-            nodes: Nodes,
-            send: (id, payload) => this.guilds.cache.get(id)?.shard?.send(payload),
-            shoukakuOptions: {
-                moveOnDisconnect: true,
-                reconnectTries: 30,
-            },
-            defaultSearchEngine: SearchEngine.YoutubeMusic,
-        });
-        container.shoukaku = container.manager.shoukaku;
+        if (!isNullishOrEmpty(Nodes)) {
+            container.manager = new Manager({
+                connector: new Connectors.DiscordJS(this),
+                nodes: Nodes,
+                send: (id, payload) => this.guilds.cache.get(id)?.shard?.send(payload),
+                shoukakuOptions: {
+                    moveOnDisconnect: true,
+                    reconnectTries: 30,
+                },
+                defaultSearchEngine: SearchEngine.YoutubeMusic,
+            });
+            container.shoukaku = container.manager.shoukaku;
+        }
 
         await container.db.$connect().then(() => this.logger.info("Successfully connected to database"));
         return super.login(token);
